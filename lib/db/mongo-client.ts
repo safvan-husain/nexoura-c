@@ -22,6 +22,11 @@ if (!global.mongoose) {
 }
 
 export async function connectDB(): Promise<typeof mongoose> {
+  // If mongoose is already connected, return it
+  if (mongoose.connection.readyState === 1) {
+    return mongoose;
+  }
+
   if (cached.conn) {
     return cached.conn;
   }
