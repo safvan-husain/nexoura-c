@@ -257,15 +257,79 @@ Functions:
 
 ---
 
-## 🧪 Testing Policy
+## 🧪 Testing Strategy
 
-(As you said—no strict requirements.)
+### **Integration Tests**
 
-Agent must ensure:
+Integration tests directly test route handlers without requiring a running server.
 
-* pure functions where possible
-* minimal side effects
-* separated concerns
+Location: `__tests__/e2e/` (kept for historical reasons, but these are integration tests)
+
+**Approach:**
+
+* Import route handlers directly from `app/api/**/route.ts`
+* Create mock `Request` objects
+* Call handlers and assert on `Response` objects
+* Use MongoDB Memory Server for database isolation
+
+**Example:**
+
+```ts
+import { POST as registerPOST } from '@/app/api/auth/register/route';
+
+function createMockRequest(body: any): Request {
+  return new Request('http://localhost:3000', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+}
+
+it('should register a new user', async () => {
+  const req = createMockRequest({
+    email: 'test@test.com',
+    password: 'password123',
+    firstName: 'Test',
+    lastName: 'User',
+  });
+
+  const response = await registerPOST(req);
+  const body = await response.json();
+
+  expect(response.status).toBe(201);
+  expect(body.token).toBeDefined();
+});
+```
+
+### **Unit Tests**
+
+Unit tests for services, controllers, and utilities.
+
+Location: `lib/**/*.test.ts`
+
+**Guidelines:**
+
+* Test business logic in services
+* Test validation in controllers
+* Mock external dependencies
+* Keep tests focused and isolated
+
+### **Test Commands**
+
+```bash
+npm test                  # Run all tests
+npm run test:unit         # Run unit tests only
+npm run test:integration  # Run integration tests only
+npm run test:watch        # Run tests in watch mode
+npm run test:coverage     # Generate coverage report
+```
+
+### **General Principles**
+
+* Pure functions where possible
+* Minimal side effects
+* Separated concerns
+* No tests required by default (add when needed)
 
 ---
 
