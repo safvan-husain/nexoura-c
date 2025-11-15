@@ -17,6 +17,8 @@ export async function GET(req: Request) {
   if (searchParams.get('minPrice')) query.minPrice = parseFloat(searchParams.get('minPrice')!);
   if (searchParams.get('maxPrice')) query.maxPrice = parseFloat(searchParams.get('maxPrice')!);
   if (searchParams.get('status')) query.status = searchParams.get('status') as 'draft' | 'published' | 'archived';
+  if (searchParams.get('minStock')) query.minStock = parseInt(searchParams.get('minStock')!);
+  if (searchParams.get('maxStock')) query.maxStock = parseInt(searchParams.get('maxStock')!);
 
   const { status, body } = await handleGetProducts(query);
   return NextResponse.json(body, { status });

@@ -16,6 +16,8 @@ export async function getProducts(params?: {
   search?: string
   category?: string
   status?: string
+  minStock?: number
+  maxStock?: number
 }) {
   'use cache'
   cacheTag('products')
@@ -27,6 +29,8 @@ export async function getProducts(params?: {
   if (params?.search) searchParams.set('search', params.search)
   if (params?.category) searchParams.set('category', params.category)
   if (params?.status) searchParams.set('status', params.status)
+  if (params?.minStock !== undefined) searchParams.set('minStock', params.minStock.toString())
+  if (params?.maxStock !== undefined) searchParams.set('maxStock', params.maxStock.toString())
 
   const baseUrl = getBaseUrl()
   const url = `${baseUrl}/api/products?${searchParams}`

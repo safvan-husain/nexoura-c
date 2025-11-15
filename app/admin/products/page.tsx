@@ -3,12 +3,19 @@ import { getProducts } from '@/lib/api/products'
 import Link from 'next/link'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { DeleteProductButton } from './DeleteProductButton'
+import { ProductFilters } from './ProductFilters'
+import { ProductTile } from './ProductTile'
 
 export default function AdminProductsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>
+  searchParams: Promise<{ 
+    page?: string
+    status?: string
+    minStock?: string
+    maxStock?: string
+    showVariants?: string
+  }>
 }) {
   return (
     <div className="min-h-screen bg-gray-50">
@@ -27,21 +34,47 @@ export default function AdminProductsPage({
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-8">
+        <Suspense fallback={<FiltersLoading />}>
+          <ProductFilters />
+        </Suspense>
+        
         <Suspense fallback={<ProductsLoading />}>
-          <ProductsListWrapper pagePromise={searchParams.then((p) => parseInt(p.page || '1'))} />
+          <ProductsListWrapper searchParamsPromise={searchParams} />
         </Suspense>
       </main>
     </div>
   )
 }
 
-async function ProductsListWrapper({ pagePromise }: { pagePromise: Promise<number> }) {
-  const page = await pagePromise
-  return <ProductsList page={page} />
+async function ProductsListWrapper({ 
+  searchParamsPromise 
+}: { 
+  searchParamsPromise: Promise<{
+    page?: string
+    status?: string
+    minStock?: string
+    maxStock?: string
+    showVariants?: string
+  }> 
+}) {
+  const params = await searchParamsPromise
+  return <ProductsList params={params} />
 }
 
-async function ProductsList({ page }: { page: number }) {
-  const data = await getProducts({ page, limit: 20 })
+async function ProductsList({ params }: { params: any }) {
+  const page = parseInt(params.page || '1')
+  const status = params.status
+  const minStock = params.minStock ? parseInt(params.minStock) : undefined
+  const maxStock = params.maxStock ? parseInt(params.maxStock) : undefined
+  const showVariants = params.showVariants === 'true'
+
+  const data = await getProducts({ 
+    page, 
+    limit: 20,
+    status: status as any,
+    minStock,
+    maxStock
+  })
 
   if (!data.products || data.products.length === 0) {
     return (
@@ -51,40 +84,53 @@ async function ProductsList({ page }: { page: number }) {
     )
   }
 
+  const buildPaginationUrl = (newPage: number) => {
+    const urlParams = new URLSearchParams()
+    urlParams.set('page', newPage.toString())
+    if (status) urlParams.set('status', status)
+    if (minStock !== undefined) urlParams.set('minStock', minStock.toString())
+    if (maxStock !== undefined) urlParams.set('maxStock', maxStock.toString())
+    if (showVariants) urlParams.set('showVariants', 'true')
+    return `/admin/products?${urlParams.toString()}`
+  }
+
+  const totalItems = showVariants 
+    ? data.products.reduce((sum: number, p: any) => sum + p.variants.length, 0)
+    : data.products.length
+
   return (
     <>
-      <div className="space-y-4">
-        {data.products.map((product: any) => (
-          <Card key={product._id} className="flex justify-between items-center">
-            <div>
-              <h3 className="text-lg font-semibold">{product.name}</h3>
-              <p className="text-sm text-gray-600">{product.slug}</p>
-              <p className="text-sm">
-                <span className="font-medium">${product.price.toFixed(2)}</span>
-                {' • '}
-                <span className={`px-2 py-1 rounded text-xs ${
-                  product.status === 'published' ? 'bg-green-100 text-green-800' :
-                  product.status === 'draft' ? 'bg-yellow-100 text-yellow-800' :
-                  'bg-gray-100 text-gray-800'
-                }`}>
-                  {product.status}
-                </span>
-              </p>
-            </div>
-            <div className="flex gap-2">
-              <Link href={`/admin/products/${product._id}/edit`}>
-                <Button variant="secondary" size="sm">Edit</Button>
-              </Link>
-              <DeleteProductButton id={product._id} name={product.name} />
-            </div>
-          </Card>
-        ))}
+      <div className="mb-4 text-sm text-gray-600">
+        Showing {totalItems} {showVariants ? 'variant' : 'product'}{totalItems !== 1 ? 's' : ''} 
+        {data.pagination && ` (${data.pagination.total} total products)`}
+      </div>
+
+      <div className="space-y-3">
+        {data.products.map((product: any) => {
+          if (showVariants) {
+            return product.variants.map((variant: any, idx: number) => (
+              <ProductTile
+                key={`${product._id}-${idx}`}
+                product={product}
+                variant={variant}
+                showVariant={true}
+              />
+            ))
+          }
+          
+          return (
+            <ProductTile
+              key={product._id}
+              product={product}
+            />
+          )
+        })}
       </div>
 
       {data.pagination && data.pagination.totalPages > 1 && (
         <div className="mt-8 flex justify-center gap-2">
           {data.pagination.page > 1 && (
-            <Link href={`/admin/products?page=${data.pagination.page - 1}`}>
+            <Link href={buildPaginationUrl(data.pagination.page - 1)}>
               <Button variant="secondary">Previous</Button>
             </Link>
           )}
@@ -92,13 +138,27 @@ async function ProductsList({ page }: { page: number }) {
             Page {data.pagination.page} of {data.pagination.totalPages}
           </span>
           {data.pagination.page < data.pagination.totalPages && (
-            <Link href={`/admin/products?page=${data.pagination.page + 1}`}>
+            <Link href={buildPaginationUrl(data.pagination.page + 1)}>
               <Button variant="secondary">Next</Button>
             </Link>
           )}
         </div>
       )}
     </>
+  )
+}
+
+function FiltersLoading() {
+  return (
+    <div className="bg-white rounded-lg shadow-md p-6 mb-6 animate-pulse">
+      <div className="h-6 bg-gray-200 rounded w-24 mb-4"></div>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="h-10 bg-gray-200 rounded"></div>
+        <div className="h-10 bg-gray-200 rounded"></div>
+        <div className="h-10 bg-gray-200 rounded"></div>
+        <div className="h-10 bg-gray-200 rounded"></div>
+      </div>
+    </div>
   )
 }
 

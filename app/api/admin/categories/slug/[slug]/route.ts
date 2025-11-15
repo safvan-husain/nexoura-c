@@ -3,8 +3,9 @@ import { handleGetCategoryBySlug } from '@/lib/category/category.controller';
 
 export async function GET(
   req: Request,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
-  const { status, body } = await handleGetCategoryBySlug(params.slug);
+  const { slug } = await params;
+  const { status, body } = await handleGetCategoryBySlug(slug);
   return NextResponse.json(body, { status });
 }

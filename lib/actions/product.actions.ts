@@ -39,7 +39,7 @@ export async function createProductAction(formData: FormData) {
     return { error: data.error || 'Failed to create product' }
   }
 
-  revalidateTag('products')
+  revalidateTag('products', 'max')
   return { success: true, data }
 }
 
@@ -74,8 +74,8 @@ export async function updateProductAction(id: string, formData: FormData) {
     return { error: data.error || 'Failed to update product' }
   }
 
-  revalidateTag('products')
-  revalidateTag(`product-${id}`)
+  revalidateTag('products', 'max')
+  revalidateTag(`product-${id}`, 'max')
   return { success: true, data }
 }
 
@@ -98,6 +98,6 @@ export async function deleteProductAction(id: string) {
     return { error: data.error || 'Failed to delete product' }
   }
 
-  revalidateTag('products')
+  revalidateTag('products', 'max')
   return { success: true }
 }

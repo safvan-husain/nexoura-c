@@ -39,7 +39,7 @@ export function ProductCard({ product }: { product: Product }) {
         
         <div className="flex items-center gap-2">
           <span className="text-xl font-bold">${product.price.toFixed(2)}</span>
-          {hasDiscount && (
+          {hasDiscount && product.compareAtPrice && (
             <span className="text-sm text-gray-500 line-through">
               ${product.compareAtPrice.toFixed(2)}
             </span>

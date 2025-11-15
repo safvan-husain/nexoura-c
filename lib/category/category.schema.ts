@@ -7,7 +7,7 @@ export const CreateCategorySchema = z.object({
   parent: z.string().optional(),
   isActive: z.boolean().default(true),
   sortOrder: z.number().int().default(0),
-  metadata: z.record(z.any()).optional(),
+  metadata: z.record(z.string(), z.any()).optional(),
 });
 
 export const UpdateCategorySchema = CreateCategorySchema.partial();

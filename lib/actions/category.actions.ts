@@ -21,7 +21,7 @@ export async function createCategory(formData: FormData) {
   const result = await res.json()
 
   if (res.ok) {
-    revalidateTag('categories')
+    revalidateTag('categories', 'max')
   }
 
   return { ok: res.ok, data: result }
@@ -46,7 +46,7 @@ export async function updateCategory(id: string, formData: FormData) {
   const result = await res.json()
 
   if (res.ok) {
-    revalidateTag('categories')
+    revalidateTag('categories', 'max')
   }
 
   return { ok: res.ok, data: result }
@@ -65,7 +65,7 @@ export async function deleteCategory(id: string, replacementCategoryId?: string)
   const result = await res.json()
 
   if (res.ok) {
-    revalidateTag('categories')
+    revalidateTag('categories', 'max')
   }
 
   return { ok: res.ok, data: result }

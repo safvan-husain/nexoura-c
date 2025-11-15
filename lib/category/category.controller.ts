@@ -19,7 +19,7 @@ export async function handleCreateCategory(input: unknown) {
   if (!parsed.success) {
     return {
       status: 400,
-      body: { error: 'VALIDATION_ERROR', details: parsed.error.errors }
+      body: { error: 'VALIDATION_ERROR', details: parsed.error.issues }
     };
   }
 
@@ -39,7 +39,7 @@ export async function handleGetCategories(input: unknown) {
   if (!parsed.success) {
     return {
       status: 400,
-      body: { error: 'VALIDATION_ERROR', details: parsed.error.errors }
+      body: { error: 'VALIDATION_ERROR', details: parsed.error.issues }
     };
   }
 
@@ -84,7 +84,7 @@ export async function handleUpdateCategory(id: string, input: unknown) {
   if (!parsed.success) {
     return {
       status: 400,
-      body: { error: 'VALIDATION_ERROR', details: parsed.error.errors }
+      body: { error: 'VALIDATION_ERROR', details: parsed.error.issues }
     };
   }
 
@@ -104,7 +104,7 @@ export async function handleDeleteCategory(id: string, input: unknown) {
   if (!parsed.success) {
     return {
       status: 400,
-      body: { error: 'VALIDATION_ERROR', details: parsed.error.errors }
+      body: { error: 'VALIDATION_ERROR', details: parsed.error.issues }
     };
   }
 

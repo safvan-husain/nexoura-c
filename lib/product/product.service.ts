@@ -47,7 +47,7 @@ export async function createProduct(data: CreateProductInput) {
 export async function getProducts(query: ProductQueryInput) {
   await connectDB();
 
-  const { page, limit, search, category, minPrice, maxPrice, status, sortBy, sortOrder } = query;
+  const { page, limit, search, category, minPrice, maxPrice, status, minStock, maxStock, sortBy, sortOrder } = query;
 
   const filter: any = {};
 
@@ -76,15 +76,24 @@ export async function getProducts(query: ProductQueryInput) {
   const skip = (page - 1) * limit;
   const sort: any = { [sortBy]: sortOrder === 'asc' ? 1 : -1 };
 
-  const [products, total] = await Promise.all([
-    ProductModel.find(filter)
-      .populate('categories', 'name slug')
-      .sort(sort)
-      .skip(skip)
-      .limit(limit)
-      .lean(),
-    ProductModel.countDocuments(filter),
-  ]);
+  let products = await ProductModel.find(filter)
+    .populate('categories', 'name slug')
+    .sort(sort)
+    .skip(skip)
+    .limit(limit)
+    .lean();
+
+  // Apply stock filtering after fetching (since totalStock is computed)
+  if (minStock !== undefined || maxStock !== undefined) {
+    products = products.filter((product: any) => {
+      const totalStock = product.variants.reduce((sum: number, v: any) => sum + v.stock, 0);
+      if (minStock !== undefined && totalStock < minStock) return false;
+      if (maxStock !== undefined && totalStock > maxStock) return false;
+      return true;
+    });
+  }
+
+  const total = await ProductModel.countDocuments(filter);
 
   return {
     products,
