@@ -203,19 +203,14 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
       <div className="grid grid-cols-[1fr_auto_1fr_auto] gap-4">
         {/* Image Section with Navigation */}
         <ProductImageCube
-          currentImage={currentImage}
-          prevImage={prevImage}
-          currentProductName={currentProduct.name}
-          prevProductName={prevProduct.name}
-          currentProductId={currentProduct._id}
-          prevProductId={prevProduct._id}
-          images={images}
-          currentImageIndex={currentImageIndex}
+          currentProduct={currentProduct}
+          prevProduct={products[currentIndex - 1]}
+          nextProduct={products[currentIndex + 1]}
+          currentVariantIndex={currentVariantIndex}
           imageTransition={imageTransition}
           slideDirection={slideDirection}
           onPrevious={handlePrevious}
           onNext={handleNext}
-          onImageSelect={setCurrentImageIndex}
           canGoPrevious={!(currentIndex === 0 && currentImageIndex === 0)}
           canGoNext={!(currentIndex === products.length - 1 && currentImageIndex === images.length - 1)}
         />
@@ -243,11 +238,11 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
         </div>
 
         {/* Product Details Card */}
-        <ProductDetailsCard
+        {/* <ProductDetailsCard
           product={currentProduct}
           currentVariant={currentVariant}
           detailsTransition={detailsTransition}
-        />
+        /> */}
         
         {/* Variant Filter Panel - Right Side */}
         <VariantFilterPanel

@@ -1,39 +1,30 @@
 'use client'
 
 import Image from 'next/image'
+import { Card } from './../ui/Card'
 
 interface ProductImageCubeProps {
-  currentImage: { url: string; alt?: string } | undefined
-  prevImage: { url: string; alt?: string } | undefined
-  currentProductName: string
-  prevProductName: string
-  currentProductId: string
-  prevProductId: string
-  images: any[]
-  currentImageIndex: number
+  currentProduct: any
+  prevProduct: any
+  nextProduct: any
+  currentVariantIndex: number
   imageTransition: boolean
   slideDirection: 'left' | 'right'
   onPrevious: () => void
   onNext: () => void
-  onImageSelect: (index: number) => void
   canGoPrevious: boolean
   canGoNext: boolean
 }
 
 export default function ProductImageCube({
-  currentImage,
-  prevImage,
-  currentProductName,
-  prevProductName,
-  currentProductId,
-  prevProductId,
-  images,
-  currentImageIndex,
+  currentProduct,
+  prevProduct,
+  nextProduct,
+  currentVariantIndex,
   imageTransition,
   slideDirection,
   onPrevious,
   onNext,
-  onImageSelect,
   canGoPrevious,
   canGoNext,
 }: ProductImageCubeProps) {
@@ -50,75 +41,63 @@ export default function ProductImageCube({
     </svg>
   )
 
+  // Get images for carousel
+  const currentImage = currentProduct?.variants?.[currentVariantIndex]?.images?.[0]
+  const prevImage = prevProduct?.variants?.[0]?.images?.[0]
+  const nextImage = nextProduct?.variants?.[0]?.images?.[0]
+
   return (
     <>
       <style jsx>{`
-        .cube-container {
-          perspective: 1500px;
+        .carousel-container {
+          transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
-        .cube-wrapper {
-          position: relative;
-          width: 100%;
-          height: 100%;
-          transform-style: preserve-3d;
-          transform-origin: center center;
+        .carousel-container.sliding-right {
+          transform: translateX(-33.33%);
         }
         
-        .cube-wrapper:not(.rotate-left):not(.rotate-right) {
-          transition: none;
+        .carousel-container.sliding-left {
+          transform: translateX(33.33%);
         }
         
-        .cube-wrapper.rotate-left,
-        .cube-wrapper.rotate-right {
-          transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .cube-face {
-          position: absolute;
-          width: 100%;
-          height: 100%;
-          backface-visibility: hidden;
-          overflow: hidden;
-        }
-        
-        .cube-front {
-          transform: rotateY(0deg) translateZ(200px);
-        }
-        
-        .cube-right {
-          transform: rotateY(90deg) translateZ(200px);
-        }
-        
-        .cube-left {
-          transform: rotateY(-90deg) translateZ(200px);
-        }
-        
-        .rotate-left {
-          transform: translateZ(-200px) rotateY(90deg);
-        }
-        
-        .rotate-right {
-          transform: translateZ(-200px) rotateY(-90deg);
+        .carousel-item {
+          transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
       `}</style>
 
-      <div className="relative cube-container">
-        <div className="relative bg-white rounded-lg shadow-md overflow-hidden h-[50vh] w-[50vh]">
-          <div className={`cube-wrapper ${
-            imageTransition 
-              ? slideDirection === 'right' 
-                ? 'rotate-right' 
-                : 'rotate-left'
-              : ''
-          }`}>
-            {/* Front face - old image that rotates away */}
-            <div className="cube-face cube-front">
-              {prevImage ? (
+      <div className="relative w-full h-[50vh] overflow-hidden">
+        <div className={`relative h-full flex items-center justify-center gap-4 px-16 carousel-container ${
+          imageTransition 
+            ? slideDirection === 'right' 
+              ? 'sliding-right' 
+              : 'sliding-left'
+            : ''
+        }`}>
+          {/* Left Side Image - Smaller & Blurred */}
+          <div className="relative w-[25%] h-[70%] flex-shrink-0 carousel-item">
+            {prevImage ? (
+              <Card className="relative h-full overflow-hidden p-0 opacity-60 hover:opacity-80 transition-opacity cursor-pointer">
                 <Image
-                  key={`prev-${prevProductId}`}
                   src={prevImage.url}
-                  alt={prevImage.alt || prevProductName}
+                  alt={prevImage.alt || prevProduct?.name || 'Previous product'}
+                  fill
+                  className="object-cover blur-sm"
+                />
+              </Card>
+            ) : (
+              <div className="h-full bg-gray-100 rounded-lg opacity-30" />
+            )}
+          </div>
+
+          {/* Center Image - Main Focus */}
+          <div className="relative w-[50%] h-full flex-shrink-0 carousel-item">
+            <Card className="relative h-full overflow-hidden p-0 shadow-2xl">
+              {currentImage ? (
+                <Image
+                  key={`current-${currentProduct._id}-${currentVariantIndex}`}
+                  src={currentImage.url}
+                  alt={currentImage.alt || currentProduct.name}
                   fill
                   className="object-cover"
                   priority
@@ -128,31 +107,30 @@ export default function ProductImageCube({
                   <PlaceholderIcon />
                 </div>
               )}
-            </div>
-            
-            {/* Side face - new image coming in from the side */}
-            <div className={`cube-face ${slideDirection === 'right' ? 'cube-right' : 'cube-left'}`}>
-              {currentImage ? (
-                <Image
-                  key={`current-${currentProductId}`}
-                  src={currentImage.url}
-                  alt={currentImage.alt || currentProductName}
-                  fill
-                  className="object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                  <PlaceholderIcon />
-                </div>
-              )}
-            </div>
+            </Card>
           </div>
-          
+
+          {/* Right Side Image - Smaller & Blurred */}
+          <div className="relative w-[25%] h-[70%] flex-shrink-0 carousel-item">
+            {nextImage ? (
+              <Card className="relative h-full overflow-hidden p-0 opacity-60 hover:opacity-80 transition-opacity cursor-pointer">
+                <Image
+                  src={nextImage.url}
+                  alt={nextImage.alt || nextProduct?.name || 'Next product'}
+                  fill
+                  className="object-cover blur-sm"
+                />
+              </Card>
+            ) : (
+              <div className="h-full bg-gray-100 rounded-lg opacity-30" />
+            )}
+          </div>
+
           {/* Navigation Arrows */}
           <button
             onClick={onPrevious}
             disabled={!canGoPrevious}
-            className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-3 rounded-full shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-3 rounded-full shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all z-10"
             aria-label="Previous"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -163,29 +141,13 @@ export default function ProductImageCube({
           <button
             onClick={onNext}
             disabled={!canGoNext}
-            className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-3 rounded-full shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-3 rounded-full shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all z-10"
             aria-label="Next"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
-
-          {/* Image Progress Indicator */}
-          {images.length > 1 && (
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-              {images.map((_: any, idx: number) => (
-                <button
-                  key={idx}
-                  onClick={() => onImageSelect(idx)}
-                  className={`w-2 h-2 rounded-full transition-all ${
-                    idx === currentImageIndex ? 'bg-white w-8' : 'bg-white/50'
-                  }`}
-                  aria-label={`View image ${idx + 1}`}
-                />
-              ))}
-            </div>
-          )}
         </div>
       </div>
     </>
