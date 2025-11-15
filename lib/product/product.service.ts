@@ -1,4 +1,5 @@
 import { ProductModel } from '@/lib/models/product.model';
+import { CategoryModel } from '@/lib/models/category.model';
 import { AppError } from '@/lib/errors/app-error';
 import { connectDB } from '@/lib/db/mongo-client';
 import type { CreateProductInput, UpdateProductInput, ProductQueryInput } from './product.schema';
@@ -12,6 +13,18 @@ export async function createProduct(data: CreateProductInput) {
     throw new AppError('PRODUCT_ALREADY_EXISTS', 409, {
       field: 'slug'
     });
+  }
+
+  // Validate categories exist
+  if (data.categories && data.categories.length > 0) {
+    const categoriesCount = await CategoryModel.countDocuments({
+      _id: { $in: data.categories }
+    });
+    if (categoriesCount !== data.categories.length) {
+      throw new AppError('INVALID_CATEGORIES', 400, {
+        message: 'One or more category IDs are invalid'
+      });
+    }
   }
 
   // Check for duplicate SKUs in variants
@@ -65,6 +78,7 @@ export async function getProducts(query: ProductQueryInput) {
 
   const [products, total] = await Promise.all([
     ProductModel.find(filter)
+      .populate('categories', 'name slug')
       .sort(sort)
       .skip(skip)
       .limit(limit)
@@ -86,7 +100,9 @@ export async function getProducts(query: ProductQueryInput) {
 export async function getProductById(id: string) {
   await connectDB();
 
-  const product = await ProductModel.findById(id).lean();
+  const product = await ProductModel.findById(id)
+    .populate('categories', 'name slug')
+    .lean();
 
   if (!product) {
     throw new AppError('PRODUCT_NOT_FOUND', 404);
@@ -98,7 +114,9 @@ export async function getProductById(id: string) {
 export async function getProductBySlug(slug: string) {
   await connectDB();
 
-  const product = await ProductModel.findOne({ slug }).lean();
+  const product = await ProductModel.findOne({ slug })
+    .populate('categories', 'name slug')
+    .lean();
 
   if (!product) {
     throw new AppError('PRODUCT_NOT_FOUND', 404);
@@ -123,6 +141,18 @@ export async function updateProduct(id: string, data: UpdateProductInput) {
     }
   }
 
+  // Validate categories exist if being updated
+  if (data.categories && data.categories.length > 0) {
+    const categoriesCount = await CategoryModel.countDocuments({
+      _id: { $in: data.categories }
+    });
+    if (categoriesCount !== data.categories.length) {
+      throw new AppError('INVALID_CATEGORIES', 400, {
+        message: 'One or more category IDs are invalid'
+      });
+    }
+  }
+
   // Check for duplicate SKUs in variants if variants are being updated
   if (data.variants) {
     const variantSkus = data.variants.map(v => v.sku);
@@ -142,7 +172,7 @@ export async function updateProduct(id: string, data: UpdateProductInput) {
     id,
     data,
     { new: true, runValidators: true }
-  );
+  ).populate('categories', 'name slug');
 
   if (!product) {
     throw new AppError('PRODUCT_NOT_FOUND', 404);

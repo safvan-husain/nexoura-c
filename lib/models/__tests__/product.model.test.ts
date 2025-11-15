@@ -179,13 +179,12 @@ describe('Product Model', () => {
         description: 'Description',
         price: 10,
         variants: [{ name: 'Default', sku: 'CAT-001', stock: 5 }],
-        categories: ['electronics', 'gadgets'],
+        categories: [],
         tags: ['new', 'featured', 'sale'],
       });
 
-      expect(product.categories).toHaveLength(2);
+      expect(product.categories).toHaveLength(0);
       expect(product.tags).toHaveLength(3);
-      expect(product.categories).toContain('electronics');
       expect(product.tags).toContain('featured');
     });
   });

@@ -21,7 +21,7 @@ export const CreateProductSchema = z.object({
   shortDescription: z.string().optional(),
   price: z.number().min(0, 'Price must be positive'),
   compareAtPrice: z.number().min(0).optional(),
-  categories: z.array(z.string()).default([]),
+  categories: z.array(z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid category ID')).default([]),
   tags: z.array(z.string()).default([]),
   variants: z.array(ProductVariantSchema).min(1, 'At least one variant is required'),
   status: z.enum(['draft', 'published', 'archived']).default('draft'),

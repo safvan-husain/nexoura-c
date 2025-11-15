@@ -446,12 +446,171 @@ app/api/<feature>/route.ts
 
 ---
 
+## 🎨 Frontend Architecture
+
+### **Next.js 16 with Cache Components**
+
+This project uses Next.js 16 with Cache Components enabled for optimal performance.
+
+**Key Principles:**
+
+* **Dynamic by default**: All pages are dynamic unless explicitly cached
+* **Use `use cache` directive**: Cache components/functions that don't need runtime data
+* **Suspense boundaries**: Wrap dynamic content in `<Suspense>` for streaming
+* **Server Components first**: Use Server Components by default, Client Components only when needed
+
+### **Runtime APIs and Suspense**
+
+When using runtime APIs like `searchParams` or `params`, pass them as promises to child components wrapped in Suspense:
+
+```tsx
+// ✅ Correct - Pass promise to child wrapped in Suspense
+export default function Page({ 
+  searchParams 
+}: { 
+  searchParams: Promise<{page?: string}> 
+}) {
+  return (
+    <Suspense fallback={<Loading />}>
+      <Content pagePromise={searchParams.then(p => p.page)} />
+    </Suspense>
+  )
+}
+
+async function Content({ pagePromise }: { pagePromise: Promise<string | undefined> }) {
+  const page = await pagePromise
+  // Use page...
+}
+```
+
+### **Caching Strategy**
+
+```ts
+// Cache static data with cacheLife
+import { cacheLife } from 'next/cache'
+
+async function getProducts() {
+  'use cache'
+  cacheLife('hours')
+  const res = await fetch('/api/products')
+  return res.json()
+}
+```
+
+### **Revalidation with Tags**
+
+```ts
+// Tag cached data
+import { cacheTag, revalidateTag } from 'next/cache'
+
+async function getProducts() {
+  'use cache'
+  cacheTag('products')
+  // fetch data
+}
+
+// Revalidate after mutations
+async function createProduct(data: FormData) {
+  'use server'
+  // create product
+  revalidateTag('products')
+}
+```
+
+### **Client Components**
+
+Use `"use client"` only when needed:
+
+* User interactions (onClick, onChange, etc.)
+* Browser APIs (localStorage, window, etc.)
+* React hooks (useState, useEffect, etc.)
+* Third-party libraries requiring client-side
+
+### **Folder Structure**
+
+```
+app/
+  (auth)/              # Auth pages group
+    login/
+      page.tsx
+    register/
+      page.tsx
+  (admin)/             # Admin pages group
+    dashboard/
+      page.tsx
+    products/
+      page.tsx
+  products/            # Public product pages
+    page.tsx
+    [id]/
+      page.tsx
+  components/          # Page-specific components
+    ProductCard.tsx
+
+components/            # Shared components
+  ui/
+    Button.tsx
+    Input.tsx
+  forms/
+    LoginForm.tsx
+
+lib/
+  actions/             # Server Actions
+    auth.actions.ts
+    product.actions.ts
+```
+
+### **Server Actions**
+
+Place all mutations in Server Actions:
+
+```ts
+// lib/actions/product.actions.ts
+'use server'
+
+import { revalidateTag } from 'next/cache'
+
+export async function createProduct(formData: FormData) {
+  const res = await fetch('/api/products', {
+    method: 'POST',
+    body: JSON.stringify(Object.fromEntries(formData)),
+  })
+  
+  if (res.ok) {
+    revalidateTag('products')
+  }
+  
+  return res.json()
+}
+```
+
+### **Form Handling**
+
+Use Server Actions with forms:
+
+```tsx
+import { createProduct } from '@/lib/actions/product.actions'
+
+export function ProductForm() {
+  return (
+    <form action={createProduct}>
+      <input name="name" required />
+      <button type="submit">Create</button>
+    </form>
+  )
+}
+```
+
+---
+
 ## ✅ Final Notes
 
 * **No business logic in route handlers.**
 * **All validation must use Zod.**
 * **MongoDB access only through `lib/db/`.**
 * **Never import from `app/*` inside `lib/*`.**
+* **Use Cache Components for optimal performance.**
+* **Server Components by default, Client Components when needed.**
 * **Follow this structure unless explicitly overridden.**
 
 ---

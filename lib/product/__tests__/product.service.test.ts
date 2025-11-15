@@ -7,6 +7,7 @@ import {
   deleteProduct,
 } from '../product.service';
 import { ProductModel } from '@/lib/models/product.model';
+import { CategoryModel } from '@/lib/models/category.model';
 import { AppError } from '@/lib/errors/app-error';
 
 describe('Product Service', () => {
@@ -75,14 +76,27 @@ describe('Product Service', () => {
   });
 
   describe('getProducts', () => {
+    let electronicsCategory: any;
+    let clothingCategory: any;
+
     beforeEach(async () => {
+      electronicsCategory = await CategoryModel.create({
+        name: 'Electronics',
+        slug: 'electronics',
+      });
+
+      clothingCategory = await CategoryModel.create({
+        name: 'Clothing',
+        slug: 'clothing',
+      });
+
       await ProductModel.create([
         {
           name: 'Product A',
           slug: 'product-a',
           description: 'Description A',
           price: 10,
-          categories: ['electronics'],
+          categories: [electronicsCategory._id],
           tags: ['new'],
           status: 'published',
           variants: [{ name: 'Default', sku: 'SKU-A', stock: 50 }],
@@ -92,7 +106,7 @@ describe('Product Service', () => {
           slug: 'product-b',
           description: 'Description B',
           price: 20,
-          categories: ['clothing'],
+          categories: [clothingCategory._id],
           tags: ['sale'],
           status: 'published',
           variants: [{ name: 'Default', sku: 'SKU-B', stock: 30 }],
@@ -138,13 +152,13 @@ describe('Product Service', () => {
       const result = await getProducts({
         page: 1,
         limit: 20,
-        category: 'electronics',
+        category: electronicsCategory._id.toString(),
         sortBy: 'createdAt',
         sortOrder: 'desc',
       });
 
       expect(result.products).toHaveLength(1);
-      expect(result.products[0].categories).toContain('electronics');
+      expect(result.products[0].name).toBe('Product A');
     });
 
     it('should filter by price range', async () => {

@@ -1,6 +1,7 @@
 import { GET as productsGET, POST as productsPOST } from '@/app/api/products/route';
 import { GET as productGET, PUT as productPUT, DELETE as productDELETE } from '@/app/api/products/[id]/route';
 import { ProductModel } from '@/lib/models/product.model';
+import { CategoryModel } from '@/lib/models/category.model';
 
 // Helper to create mock Request
 function createMockRequest(method: string, body?: any, url?: string): Request {
@@ -17,6 +18,15 @@ function createMockRequest(method: string, body?: any, url?: string): Request {
 }
 
 describe('Products Integration Tests', () => {
+  let testCategory: any;
+
+  beforeAll(async () => {
+    testCategory = await CategoryModel.create({
+      name: 'Test Category',
+      slug: 'test-category',
+    });
+  });
+
   describe('POST /api/products', () => {
     it('should create a new product', async () => {
       const req = createMockRequest('POST', {
@@ -24,7 +34,7 @@ describe('Products Integration Tests', () => {
         slug: 'e2e-product',
         description: 'E2E test product',
         price: 29.99,
-        categories: ['test'],
+        categories: [testCategory._id.toString()],
         tags: ['e2e'],
         variants: [
           { name: 'Default', sku: 'E2E-001', stock: 100 }
@@ -85,7 +95,7 @@ describe('Products Integration Tests', () => {
           slug: 'product-1',
           description: 'Description 1',
           price: 10,
-          categories: ['electronics'],
+          categories: [testCategory._id],
           status: 'published',
           variants: [{ name: 'Default', sku: 'PROD-001', stock: 50 }],
         },
@@ -94,7 +104,7 @@ describe('Products Integration Tests', () => {
           slug: 'product-2',
           description: 'Description 2',
           price: 20,
-          categories: ['clothing'],
+          categories: [],
           status: 'published',
           variants: [{ name: 'Default', sku: 'PROD-002', stock: 30 }],
         },
@@ -130,13 +140,13 @@ describe('Products Integration Tests', () => {
     });
 
     it('should filter by category', async () => {
-      const req = createMockRequest('GET', undefined, 'http://localhost:3000/api/products?category=electronics');
+      const req = createMockRequest('GET', undefined, `http://localhost:3000/api/products?category=${testCategory._id.toString()}`);
       const response = await productsGET(req);
       const body = await response.json();
 
       expect(response.status).toBe(200);
       expect(body.products).toHaveLength(1);
-      expect(body.products[0].categories).toContain('electronics');
+      expect(body.products[0].name).toBe('Product 1');
     });
 
     it('should filter by price range', async () => {

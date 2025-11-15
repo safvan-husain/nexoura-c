@@ -1,4 +1,5 @@
 import * as typegoose from '@typegoose/typegoose';
+import type { Category } from './category.model';
 
 class ProductImage {
   @typegoose.prop({ required: true })
@@ -53,8 +54,8 @@ export class Product {
   @typegoose.prop({ min: 0 })
   public compareAtPrice?: number;
 
-  @typegoose.prop({ type: () => [String], default: [] })
-  public categories!: string[];
+  @typegoose.prop({ ref: () => 'Category', type: () => [typegoose.mongoose.Schema.Types.ObjectId], default: [] })
+  public categories!: typegoose.Ref<Category>[];
 
   @typegoose.prop({ type: () => [String], default: [] })
   public tags!: string[];
