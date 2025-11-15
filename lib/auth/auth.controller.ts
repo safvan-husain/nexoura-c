@@ -3,15 +3,14 @@ import { loginUser, registerUser, loginAdmin } from './auth.service';
 import { AppError } from '@/lib/errors/app-error';
 
 export async function handleRegister(input: unknown) {
-  const parsed = RegisterSchema.safeParse(input);
-  if (!parsed.success) {
-    return {
-      status: 400,
-      body: { error: 'VALIDATION_ERROR', details: parsed.error.errors }
-    };
-  }
-
   try {
+    const parsed = RegisterSchema.safeParse(input);
+    if (!parsed.success) {
+      return {
+        status: 400,
+        body: { error: 'VALIDATION_ERROR', details: parsed.error.errors }
+      };
+    }
     const result = await registerUser(parsed.data);
     return { status: 201, body: result };
   } catch (err) {
@@ -23,15 +22,14 @@ export async function handleRegister(input: unknown) {
 }
 
 export async function handleLogin(input: unknown) {
-  const parsed = LoginSchema.safeParse(input);
-  if (!parsed.success) {
-    return {
-      status: 400,
-      body: { error: 'VALIDATION_ERROR', details: parsed.error.errors }
-    };
-  }
-
   try {
+    const parsed = LoginSchema.safeParse(input);
+    if (!parsed.success) {
+      return {
+        status: 400,
+        body: { error: 'VALIDATION_ERROR', details: parsed.error.errors }
+      };
+    }
     const result = await loginUser(parsed.data);
     return { status: 200, body: result };
   } catch (err) {
@@ -43,15 +41,14 @@ export async function handleLogin(input: unknown) {
 }
 
 export async function handleAdminLogin(input: unknown) {
-  const parsed = AdminLoginSchema.safeParse(input);
-  if (!parsed.success) {
-    return {
-      status: 400,
-      body: { error: 'VALIDATION_ERROR', details: parsed.error.errors }
-    };
-  }
-
   try {
+    const parsed = AdminLoginSchema.safeParse(input);
+    if (!parsed.success) {
+      return {
+        status: 400,
+        body: { error: 'VALIDATION_ERROR', details: parsed.error.errors }
+      };
+    }
     const result = await loginAdmin(parsed.data);
     return { status: 200, body: result };
   } catch (err) {
