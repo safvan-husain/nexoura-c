@@ -9,6 +9,9 @@ const ProductImageSchema = z.object({
 const ProductVariantSchema = z.object({
   name: z.string().min(1, 'Variant name is required'),
   sku: z.string().min(1, 'SKU is required'),
+  color: z.string().min(1, 'Color is required'),
+  size: z.string().min(1, 'Size is required'),
+  price: z.number().min(0, 'Price must be non-negative'),
   stock: z.number().int().min(0, 'Stock must be non-negative'),
   images: z.array(ProductImageSchema).default([]),
   attributes: z.record(z.string(), z.string()).optional(),

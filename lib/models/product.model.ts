@@ -20,6 +20,15 @@ class ProductVariant {
   @typegoose.prop({ required: true })
   public sku!: string;
 
+  @typegoose.prop({ required: true })
+  public color!: string;
+
+  @typegoose.prop({ required: true })
+  public size!: string;
+
+  @typegoose.prop({ required: true, min: 0 })
+  public price!: number;
+
   @typegoose.prop({ required: true, min: 0 })
   public stock!: number;
 

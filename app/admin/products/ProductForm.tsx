@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
@@ -11,9 +11,19 @@ import { Card } from '@/components/ui/Card'
 interface Variant {
   name: string
   sku: string
+  color: string
+  size: string
+  price: number
   stock: number
   images: { url: string; alt?: string; isPrimary: boolean }[]
   attributes?: Record<string, string>
+}
+
+interface VariantCombination {
+  color: string
+  size: string
+  price: number
+  stock: number
 }
 
 interface ProductFormProps {
@@ -36,17 +46,35 @@ export function ProductForm({ product, mode }: ProductFormProps) {
     status: product?.status || 'draft',
   })
 
-  const [variants, setVariants] = useState<Variant[]>(
-    product?.variants || [
-      {
-        name: 'Default',
-        sku: '',
-        stock: 0,
-        images: [],
-        attributes: {},
-      },
-    ]
-  )
+  // Fixed color and size options
+  const [colors, setColors] = useState<string[]>([''])
+  const [sizes, setSizes] = useState<string[]>([''])
+  
+  // Store price and stock for each combination
+  const [variantCombinations, setVariantCombinations] = useState<Record<string, VariantCombination>>({})
+
+  // Initialize from existing product
+  useEffect(() => {
+    if (product?.variants && product.variants.length > 0) {
+      const uniqueColors = [...new Set(product.variants.map((v: Variant) => v.color))].filter((c): c is string => typeof c === 'string')
+      const uniqueSizes = [...new Set(product.variants.map((v: Variant) => v.size))].filter((s): s is string => typeof s === 'string')
+      
+      setColors(uniqueColors.length > 0 ? uniqueColors : [''])
+      setSizes(uniqueSizes.length > 0 ? uniqueSizes : [''])
+      
+      const combinations: Record<string, VariantCombination> = {}
+      product.variants.forEach((v: Variant) => {
+        const key = `${v.color}-${v.size}`
+        combinations[key] = {
+          color: v.color,
+          size: v.size,
+          price: v.price,
+          stock: v.stock,
+        }
+      })
+      setVariantCombinations(combinations)
+    }
+  }, [product])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -64,33 +92,85 @@ export function ProductForm({ product, mode }: ProductFormProps) {
     setFormData((prev) => ({ ...prev, slug }))
   }
 
-  const handleVariantChange = (index: number, field: keyof Variant, value: any) => {
-    setVariants((prev) => {
-      const updated = [...prev]
-      updated[index] = { ...updated[index], [field]: value }
-      return updated
-    })
+  // Color management
+  const addColor = () => {
+    setColors([...colors, ''])
   }
 
-  const addVariant = () => {
-    setVariants((prev) => [
-      ...prev,
-      {
-        name: `Variant ${prev.length + 1}`,
-        sku: '',
-        stock: 0,
-        images: [],
-        attributes: {},
-      },
-    ])
-  }
-
-  const removeVariant = (index: number) => {
-    if (variants.length === 1) {
-      alert('At least one variant is required')
+  const removeColor = (index: number) => {
+    if (colors.length === 1) {
+      alert('At least one color is required')
       return
     }
-    setVariants((prev) => prev.filter((_, i) => i !== index))
+    const newColors = colors.filter((_, i) => i !== index)
+    setColors(newColors)
+  }
+
+  const updateColor = (index: number, value: string) => {
+    const newColors = [...colors]
+    newColors[index] = value
+    setColors(newColors)
+  }
+
+  // Size management
+  const addSize = () => {
+    setSizes([...sizes, ''])
+  }
+
+  const removeSize = (index: number) => {
+    if (sizes.length === 1) {
+      alert('At least one size is required')
+      return
+    }
+    const newSizes = sizes.filter((_, i) => i !== index)
+    setSizes(newSizes)
+  }
+
+  const updateSize = (index: number, value: string) => {
+    const newSizes = [...sizes]
+    newSizes[index] = value
+    setSizes(newSizes)
+  }
+
+  // Update variant combination data
+  const updateCombination = (color: string, size: string, field: 'price' | 'stock', value: number) => {
+    const key = `${color}-${size}`
+    setVariantCombinations((prev) => ({
+      ...prev,
+      [key]: {
+        ...prev[key],
+        color,
+        size,
+        [field]: value,
+      },
+    }))
+  }
+
+  // Generate all combinations
+  const generateVariants = (): Variant[] => {
+    const variants: Variant[] = []
+    const validColors = colors.filter(c => c.trim() !== '')
+    const validSizes = sizes.filter(s => s.trim() !== '')
+
+    validColors.forEach((color) => {
+      validSizes.forEach((size) => {
+        const key = `${color}-${size}`
+        const combination = variantCombinations[key] || { color, size, price: formData.price, stock: 0 }
+        
+        variants.push({
+          name: `${color} / ${size}`,
+          sku: `${formData.slug || 'product'}-${color.toLowerCase().replace(/\s+/g, '-')}-${size.toLowerCase().replace(/\s+/g, '-')}`,
+          color,
+          size,
+          price: combination.price,
+          stock: combination.stock,
+          images: [],
+          attributes: {},
+        })
+      })
+    })
+
+    return variants
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -99,9 +179,24 @@ export function ProductForm({ product, mode }: ProductFormProps) {
     setError('')
 
     try {
+      // Validate colors and sizes
+      const validColors = colors.filter(c => c.trim() !== '')
+      const validSizes = sizes.filter(s => s.trim() !== '')
+
+      if (validColors.length === 0) {
+        throw new Error('At least one color is required')
+      }
+
+      if (validSizes.length === 0) {
+        throw new Error('At least one size is required')
+      }
+
+      // Generate variants from combinations
+      const generatedVariants = generateVariants()
+
       const payload = {
         ...formData,
-        variants,
+        variants: generatedVariants,
       }
 
       const url = mode === 'create' 
@@ -223,57 +318,124 @@ export function ProductForm({ product, mode }: ProductFormProps) {
       </Card>
 
       <Card>
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Variants</h2>
-          <Button type="button" variant="secondary" onClick={addVariant}>
-            + Add Variant
-          </Button>
-        </div>
-
-        <div className="space-y-4">
-          {variants.map((variant, index) => (
-            <div key={index} className="border rounded-lg p-4 bg-gray-50">
-              <div className="flex justify-between items-center mb-3">
-                <h3 className="font-medium">Variant {index + 1}</h3>
-                {variants.length > 1 && (
-                  <Button
-                    type="button"
-                    variant="danger"
-                    size="sm"
-                    onClick={() => removeVariant(index)}
-                  >
-                    Remove
-                  </Button>
-                )}
-              </div>
-
-              <div className="grid grid-cols-3 gap-3">
-                <Input
-                  label="Name *"
-                  value={variant.name}
-                  onChange={(e) => handleVariantChange(index, 'name', e.target.value)}
-                  required
-                  placeholder="e.g., Small / Red"
-                />
-
-                <Input
-                  label="SKU *"
-                  value={variant.sku}
-                  onChange={(e) => handleVariantChange(index, 'sku', e.target.value)}
-                  required
-                  placeholder="e.g., TSH-SM-RED"
-                />
-
-                <Input
-                  label="Stock *"
-                  type="number"
-                  min="0"
-                  value={variant.stock}
-                  onChange={(e) => handleVariantChange(index, 'stock', parseInt(e.target.value) || 0)}
-                  required
-                />
-              </div>
+        <h2 className="text-xl font-semibold mb-4">Colors & Sizes</h2>
+        
+        <div className="grid grid-cols-2 gap-6">
+          {/* Colors Section */}
+          <div>
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="font-medium">Colors</h3>
+              <Button type="button" variant="secondary" size="sm" onClick={addColor}>
+                + Add Color
+              </Button>
             </div>
+            <div className="space-y-2">
+              {colors.map((color, index) => (
+                <div key={index} className="flex gap-2">
+                  <Input
+                    value={color}
+                    onChange={(e) => updateColor(index, e.target.value)}
+                    placeholder="e.g., Red, Blue, Black"
+                    required
+                  />
+                  {colors.length > 1 && (
+                    <Button
+                      type="button"
+                      variant="danger"
+                      size="sm"
+                      onClick={() => removeColor(index)}
+                    >
+                      ×
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Sizes Section */}
+          <div>
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="font-medium">Sizes</h3>
+              <Button type="button" variant="secondary" size="sm" onClick={addSize}>
+                + Add Size
+              </Button>
+            </div>
+            <div className="space-y-2">
+              {sizes.map((size, index) => (
+                <div key={index} className="flex gap-2">
+                  <Input
+                    value={size}
+                    onChange={(e) => updateSize(index, e.target.value)}
+                    placeholder="e.g., S, M, L, XL"
+                    required
+                  />
+                  {sizes.length > 1 && (
+                    <Button
+                      type="button"
+                      variant="danger"
+                      size="sm"
+                      onClick={() => removeSize(index)}
+                    >
+                      ×
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      <Card>
+        <h2 className="text-xl font-semibold mb-4">Variant Combinations</h2>
+        <p className="text-sm text-gray-600 mb-4">
+          Set price and stock for each color/size combination. SKUs will be auto-generated.
+        </p>
+        
+        <div className="space-y-3">
+          {colors.filter(c => c.trim() !== '').map((color) => (
+            sizes.filter(s => s.trim() !== '').map((size) => {
+              const key = `${color}-${size}`
+              const combination = variantCombinations[key] || { color, size, price: formData.price, stock: 0 }
+              
+              return (
+                <div key={key} className="border rounded-lg p-3 bg-gray-50">
+                  <div className="grid grid-cols-4 gap-3 items-center">
+                    <div>
+                      <label className="text-sm font-medium text-gray-700">Variant</label>
+                      <p className="text-sm font-semibold">{color} / {size}</p>
+                    </div>
+                    
+                    <Input
+                      label="Price *"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={combination.price}
+                      onChange={(e) => updateCombination(color, size, 'price', parseFloat(e.target.value) || 0)}
+                      required
+                    />
+                    
+                    <Input
+                      label="Stock *"
+                      type="number"
+                      min="0"
+                      value={combination.stock}
+                      onChange={(e) => updateCombination(color, size, 'stock', parseInt(e.target.value) || 0)}
+                      required
+                    />
+                    
+                    <div>
+                      <label className="text-sm font-medium text-gray-700">SKU (auto)</label>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {formData.slug || 'product'}-{color.toLowerCase().replace(/\s+/g, '-')}-{size.toLowerCase().replace(/\s+/g, '-')}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )
+            })
           ))}
         </div>
       </Card>

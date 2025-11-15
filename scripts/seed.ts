@@ -138,22 +138,28 @@ async function seedProducts(categories: any[]) {
       tags: ['audio', 'wireless', 'bluetooth', 'headphones'],
       variants: [
         {
-          name: 'Black',
-          sku: 'WBH-BLK-001',
+          name: 'Black / Standard',
+          sku: 'WBH-BLK-STD',
+          color: 'Black',
+          size: 'Standard',
+          price: 199.99,
           stock: 50,
           images: [
             { url: '/images/headphones-black.jpg', alt: 'Black Headphones', isPrimary: true }
           ],
-          attributes: { color: 'Black' }
+          attributes: { color: 'Black', size: 'Standard' }
         },
         {
-          name: 'Silver',
-          sku: 'WBH-SLV-001',
+          name: 'Silver / Standard',
+          sku: 'WBH-SLV-STD',
+          color: 'Silver',
+          size: 'Standard',
+          price: 199.99,
           stock: 30,
           images: [
             { url: '/images/headphones-silver.jpg', alt: 'Silver Headphones', isPrimary: true }
           ],
-          attributes: { color: 'Silver' }
+          attributes: { color: 'Silver', size: 'Standard' }
         }
       ],
       status: 'published',
@@ -170,8 +176,11 @@ async function seedProducts(categories: any[]) {
       tags: ['smartwatch', 'fitness', 'health', 'wearable'],
       variants: [
         {
-          name: 'Black - 42mm',
+          name: 'Black / 42mm',
           sku: 'SFW-BLK-42',
+          color: 'Black',
+          size: '42mm',
+          price: 249.99,
           stock: 40,
           images: [
             { url: '/images/watch-black-42.jpg', alt: 'Black 42mm Watch', isPrimary: true }
@@ -179,8 +188,11 @@ async function seedProducts(categories: any[]) {
           attributes: { color: 'Black', size: '42mm' }
         },
         {
-          name: 'Rose Gold - 38mm',
+          name: 'Rose Gold / 38mm',
           sku: 'SFW-RG-38',
+          color: 'Rose Gold',
+          size: '38mm',
+          price: 249.99,
           stock: 25,
           images: [
             { url: '/images/watch-rosegold-38.jpg', alt: 'Rose Gold 38mm Watch', isPrimary: true }
@@ -201,8 +213,11 @@ async function seedProducts(categories: any[]) {
       tags: ['clothing', 'tshirt', 'cotton', 'casual'],
       variants: [
         {
-          name: 'White - Small',
+          name: 'White / Small',
           sku: 'CCT-WHT-S',
+          color: 'White',
+          size: 'S',
+          price: 24.99,
           stock: 100,
           images: [
             { url: '/images/tshirt-white.jpg', alt: 'White T-Shirt', isPrimary: true }
@@ -210,8 +225,11 @@ async function seedProducts(categories: any[]) {
           attributes: { color: 'White', size: 'S' }
         },
         {
-          name: 'White - Medium',
+          name: 'White / Medium',
           sku: 'CCT-WHT-M',
+          color: 'White',
+          size: 'M',
+          price: 24.99,
           stock: 120,
           images: [
             { url: '/images/tshirt-white.jpg', alt: 'White T-Shirt', isPrimary: true }
@@ -219,8 +237,11 @@ async function seedProducts(categories: any[]) {
           attributes: { color: 'White', size: 'M' }
         },
         {
-          name: 'Black - Medium',
+          name: 'Black / Medium',
           sku: 'CCT-BLK-M',
+          color: 'Black',
+          size: 'M',
+          price: 24.99,
           stock: 80,
           images: [
             { url: '/images/tshirt-black.jpg', alt: 'Black T-Shirt', isPrimary: true }
@@ -228,8 +249,11 @@ async function seedProducts(categories: any[]) {
           attributes: { color: 'Black', size: 'M' }
         },
         {
-          name: 'Navy - Large',
+          name: 'Navy / Large',
           sku: 'CCT-NVY-L',
+          color: 'Navy',
+          size: 'L',
+          price: 24.99,
           stock: 60,
           images: [
             { url: '/images/tshirt-navy.jpg', alt: 'Navy T-Shirt', isPrimary: true }
@@ -251,8 +275,11 @@ async function seedProducts(categories: any[]) {
       tags: ['furniture', 'office', 'chair', 'ergonomic'],
       variants: [
         {
-          name: 'Black Mesh',
-          sku: 'EOC-BLK-001',
+          name: 'Black / Standard',
+          sku: 'EOC-BLK-STD',
+          color: 'Black',
+          size: 'Standard',
+          price: 399.99,
           stock: 15,
           images: [
             { url: '/images/chair-black.jpg', alt: 'Black Office Chair', isPrimary: true }
@@ -260,8 +287,11 @@ async function seedProducts(categories: any[]) {
           attributes: { color: 'Black', material: 'Mesh' }
         },
         {
-          name: 'Gray Fabric',
-          sku: 'EOC-GRY-001',
+          name: 'Gray / Standard',
+          sku: 'EOC-GRY-STD',
+          color: 'Gray',
+          size: 'Standard',
+          price: 399.99,
           stock: 10,
           images: [
             { url: '/images/chair-gray.jpg', alt: 'Gray Office Chair', isPrimary: true }
@@ -283,8 +313,11 @@ async function seedProducts(categories: any[]) {
       tags: ['yoga', 'fitness', 'exercise', 'mat'],
       variants: [
         {
-          name: 'Purple',
-          sku: 'YMP-PUR-001',
+          name: 'Purple / Standard',
+          sku: 'YMP-PUR-STD',
+          color: 'Purple',
+          size: 'Standard',
+          price: 39.99,
           stock: 75,
           images: [
             { url: '/images/yoga-mat-purple.jpg', alt: 'Purple Yoga Mat', isPrimary: true }
@@ -292,8 +325,11 @@ async function seedProducts(categories: any[]) {
           attributes: { color: 'Purple' }
         },
         {
-          name: 'Blue',
-          sku: 'YMP-BLU-001',
+          name: 'Blue / Standard',
+          sku: 'YMP-BLU-STD',
+          color: 'Blue',
+          size: 'Standard',
+          price: 39.99,
           stock: 60,
           images: [
             { url: '/images/yoga-mat-blue.jpg', alt: 'Blue Yoga Mat', isPrimary: true }
@@ -301,8 +337,11 @@ async function seedProducts(categories: any[]) {
           attributes: { color: 'Blue' }
         },
         {
-          name: 'Green',
-          sku: 'YMP-GRN-001',
+          name: 'Green / Standard',
+          sku: 'YMP-GRN-STD',
+          color: 'Green',
+          size: 'Standard',
+          price: 39.99,
           stock: 50,
           images: [
             { url: '/images/yoga-mat-green.jpg', alt: 'Green Yoga Mat', isPrimary: true }
@@ -323,8 +362,11 @@ async function seedProducts(categories: any[]) {
       tags: ['book', 'programming', 'javascript', 'education'],
       variants: [
         {
-          name: 'Paperback',
-          sku: 'CGJ-PB-001',
+          name: 'Standard / Paperback',
+          sku: 'CGJ-STD-PB',
+          color: 'Standard',
+          size: 'Paperback',
+          price: 49.99,
           stock: 200,
           images: [
             { url: '/images/book-js-paperback.jpg', alt: 'JavaScript Book Paperback', isPrimary: true }
@@ -332,8 +374,11 @@ async function seedProducts(categories: any[]) {
           attributes: { format: 'Paperback', pages: '650' }
         },
         {
-          name: 'Hardcover',
-          sku: 'CGJ-HC-001',
+          name: 'Standard / Hardcover',
+          sku: 'CGJ-STD-HC',
+          color: 'Standard',
+          size: 'Hardcover',
+          price: 69.99,
           stock: 50,
           images: [
             { url: '/images/book-js-hardcover.jpg', alt: 'JavaScript Book Hardcover', isPrimary: true }
@@ -354,8 +399,11 @@ async function seedProducts(categories: any[]) {
       tags: ['bottle', 'hydration', 'eco-friendly', 'insulated'],
       variants: [
         {
-          name: 'Matte Black',
+          name: 'Matte Black / 32oz',
           sku: 'SSWB-MBLK-32',
+          color: 'Matte Black',
+          size: '32oz',
+          price: 29.99,
           stock: 90,
           images: [
             { url: '/images/bottle-matte-black.jpg', alt: 'Matte Black Bottle', isPrimary: true }
@@ -363,8 +411,11 @@ async function seedProducts(categories: any[]) {
           attributes: { color: 'Matte Black', capacity: '32oz' }
         },
         {
-          name: 'Ocean Blue',
+          name: 'Ocean Blue / 32oz',
           sku: 'SSWB-BLU-32',
+          color: 'Ocean Blue',
+          size: '32oz',
+          price: 29.99,
           stock: 70,
           images: [
             { url: '/images/bottle-blue.jpg', alt: 'Blue Bottle', isPrimary: true }
@@ -385,8 +436,11 @@ async function seedProducts(categories: any[]) {
       tags: ['lighting', 'desk', 'led', 'office'],
       variants: [
         {
-          name: 'White',
-          sku: 'LDL-WHT-001',
+          name: 'White / Standard',
+          sku: 'LDL-WHT-STD',
+          color: 'White',
+          size: 'Standard',
+          price: 45.99,
           stock: 35,
           images: [
             { url: '/images/lamp-white.jpg', alt: 'White Desk Lamp', isPrimary: true }
@@ -394,8 +448,11 @@ async function seedProducts(categories: any[]) {
           attributes: { color: 'White' }
         },
         {
-          name: 'Black',
-          sku: 'LDL-BLK-001',
+          name: 'Black / Standard',
+          sku: 'LDL-BLK-STD',
+          color: 'Black',
+          size: 'Standard',
+          price: 45.99,
           stock: 40,
           images: [
             { url: '/images/lamp-black.jpg', alt: 'Black Desk Lamp', isPrimary: true }
@@ -417,8 +474,11 @@ async function seedProducts(categories: any[]) {
       tags: ['shoes', 'running', 'sports', 'footwear'],
       variants: [
         {
-          name: 'Black/Red - US 9',
+          name: 'Black/Red / US 9',
           sku: 'RSP-BR-9',
+          color: 'Black/Red',
+          size: 'US 9',
+          price: 129.99,
           stock: 20,
           images: [
             { url: '/images/shoes-black-red.jpg', alt: 'Black Red Running Shoes', isPrimary: true }
@@ -426,8 +486,11 @@ async function seedProducts(categories: any[]) {
           attributes: { color: 'Black/Red', size: 'US 9' }
         },
         {
-          name: 'White/Blue - US 10',
+          name: 'White/Blue / US 10',
           sku: 'RSP-WB-10',
+          color: 'White/Blue',
+          size: 'US 10',
+          price: 129.99,
           stock: 25,
           images: [
             { url: '/images/shoes-white-blue.jpg', alt: 'White Blue Running Shoes', isPrimary: true }
@@ -435,8 +498,11 @@ async function seedProducts(categories: any[]) {
           attributes: { color: 'White/Blue', size: 'US 10' }
         },
         {
-          name: 'Gray - US 11',
+          name: 'Gray / US 11',
           sku: 'RSP-GRY-11',
+          color: 'Gray',
+          size: 'US 11',
+          price: 129.99,
           stock: 15,
           images: [
             { url: '/images/shoes-gray.jpg', alt: 'Gray Running Shoes', isPrimary: true }
@@ -457,8 +523,11 @@ async function seedProducts(categories: any[]) {
       tags: ['keyboard', 'mouse', 'wireless', 'computer'],
       variants: [
         {
-          name: 'Black',
-          sku: 'WKMC-BLK-001',
+          name: 'Black / Standard',
+          sku: 'WKMC-BLK-STD',
+          color: 'Black',
+          size: 'Standard',
+          price: 59.99,
           stock: 45,
           images: [
             { url: '/images/keyboard-mouse-black.jpg', alt: 'Black Keyboard Mouse', isPrimary: true }
