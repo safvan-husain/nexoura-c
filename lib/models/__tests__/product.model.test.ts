@@ -55,6 +55,9 @@ describe('Product Model', () => {
         sku: 'DUPLICATE-SKU',
       });
 
+      // Ensure indexes are created
+      await ProductModel.createIndexes();
+
       await expect(
         ProductModel.create({
           name: 'Product 2',

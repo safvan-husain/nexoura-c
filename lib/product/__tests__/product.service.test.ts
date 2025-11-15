@@ -48,8 +48,8 @@ describe('Product Service', () => {
           sku: 'SKU-002',
         })
       ).rejects.toMatchObject({
-        status: 409,
-        code: 'PRODUCT_ALREADY_EXISTS',
+        statusCode: 409,
+        message: 'PRODUCT_ALREADY_EXISTS',
       });
     });
 
@@ -73,8 +73,8 @@ describe('Product Service', () => {
           sku: 'DUPLICATE-SKU',
         })
       ).rejects.toMatchObject({
-        status: 409,
-        code: 'PRODUCT_ALREADY_EXISTS',
+        statusCode: 409,
+        message: 'PRODUCT_ALREADY_EXISTS',
       });
     });
   });
@@ -225,8 +225,8 @@ describe('Product Service', () => {
     it('should throw error for non-existent product', async () => {
       const fakeId = '507f1f77bcf86cd799439011';
       await expect(getProductById(fakeId)).rejects.toMatchObject({
-        status: 404,
-        code: 'PRODUCT_NOT_FOUND',
+        statusCode: 404,
+        message: 'PRODUCT_NOT_FOUND',
       });
     });
   });
@@ -249,8 +249,8 @@ describe('Product Service', () => {
 
     it('should throw error for non-existent slug', async () => {
       await expect(getProductBySlug('non-existent')).rejects.toMatchObject({
-        status: 404,
-        code: 'PRODUCT_NOT_FOUND',
+        statusCode: 404,
+        message: 'PRODUCT_NOT_FOUND',
       });
     });
   });
@@ -281,8 +281,8 @@ describe('Product Service', () => {
       await expect(
         updateProduct(fakeId, { name: 'Updated' })
       ).rejects.toMatchObject({
-        status: 404,
-        code: 'PRODUCT_NOT_FOUND',
+        statusCode: 404,
+        message: 'PRODUCT_NOT_FOUND',
       });
     });
   });
@@ -309,8 +309,8 @@ describe('Product Service', () => {
     it('should throw error for non-existent product', async () => {
       const fakeId = '507f1f77bcf86cd799439011';
       await expect(deleteProduct(fakeId)).rejects.toMatchObject({
-        status: 404,
-        code: 'PRODUCT_NOT_FOUND',
+        statusCode: 404,
+        message: 'PRODUCT_NOT_FOUND',
       });
     });
   });

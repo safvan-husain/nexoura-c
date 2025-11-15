@@ -34,10 +34,9 @@ describe('Auth Service', () => {
 
       await registerUser(userData);
 
-      await expect(registerUser(userData)).rejects.toThrow(AppError);
       await expect(registerUser(userData)).rejects.toMatchObject({
-        status: 409,
-        code: 'USER_ALREADY_EXISTS',
+        statusCode: 409,
+        message: 'USER_ALREADY_EXISTS',
       });
     });
   });
@@ -68,7 +67,10 @@ describe('Auth Service', () => {
           email: 'nonexistent@test.com',
           password: 'password123',
         })
-      ).rejects.toThrow(AppError);
+      ).rejects.toMatchObject({
+        statusCode: 401,
+        message: 'INVALID_CREDENTIALS',
+      });
     });
 
     it('should throw error for incorrect password', async () => {
@@ -78,8 +80,8 @@ describe('Auth Service', () => {
           password: 'wrongpassword',
         })
       ).rejects.toMatchObject({
-        status: 401,
-        code: 'INVALID_CREDENTIALS',
+        statusCode: 401,
+        message: 'INVALID_CREDENTIALS',
       });
     });
 
@@ -98,8 +100,8 @@ describe('Auth Service', () => {
           password: 'password123',
         })
       ).rejects.toMatchObject({
-        status: 403,
-        code: 'ACCOUNT_DISABLED',
+        statusCode: 403,
+        message: 'ACCOUNT_DISABLED',
       });
     });
 
@@ -141,7 +143,10 @@ describe('Auth Service', () => {
           email: 'nonexistent@test.com',
           password: 'password123',
         })
-      ).rejects.toThrow(AppError);
+      ).rejects.toMatchObject({
+        statusCode: 401,
+        message: 'INVALID_CREDENTIALS',
+      });
     });
 
     it('should throw error for incorrect password', async () => {
@@ -151,8 +156,8 @@ describe('Auth Service', () => {
           password: 'wrongpassword',
         })
       ).rejects.toMatchObject({
-        status: 401,
-        code: 'INVALID_CREDENTIALS',
+        statusCode: 401,
+        message: 'INVALID_CREDENTIALS',
       });
     });
 
@@ -170,8 +175,8 @@ describe('Auth Service', () => {
           password: 'password123',
         })
       ).rejects.toMatchObject({
-        status: 403,
-        code: 'ACCOUNT_DISABLED',
+        statusCode: 403,
+        message: 'ACCOUNT_DISABLED',
       });
     });
   });

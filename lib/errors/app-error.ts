@@ -43,16 +43,15 @@ export const catchError = (error: any): { status: number, body: object } => {
   //TODO: use logger here.
   if (error instanceof z.ZodError) {
     return {
-      status: 400, body: { message: error?.issues?.length > 0 ? `${String(error.issues[0].path[0])}: ${error.issues[0].message}` : "Validation error", errors: error.issues }
+      status: 400, body: { error: "VALIDATION_ERROR", details: error.issues }
     }
-
   }
   if (error instanceof AppError) {
     return {
-      status: error.statusCode, body: error.toJson()
+      status: error.statusCode, body: { error: error.message, details: error.error }
     }
   }
   return {
-    status: 500, body: { message: "Internal server error", error }
+    status: 500, body: { error: "INTERNAL_SERVER_ERROR" }
   }
 }
