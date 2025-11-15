@@ -149,8 +149,8 @@ export function ProductForm({ product, mode }: ProductFormProps) {
   // Generate all combinations
   const generateVariants = (): Variant[] => {
     const variants: Variant[] = []
-    const validColors = colors.filter(c => c.trim() !== '')
-    const validSizes = sizes.filter(s => s.trim() !== '')
+    const validColors = colors.filter(c => c && c.trim() !== '')
+    const validSizes = sizes.filter(s => s && s.trim() !== '')
 
     validColors.forEach((color) => {
       validSizes.forEach((size) => {
@@ -160,10 +160,10 @@ export function ProductForm({ product, mode }: ProductFormProps) {
         variants.push({
           name: `${color} / ${size}`,
           sku: `${formData.slug || 'product'}-${color.toLowerCase().replace(/\s+/g, '-')}-${size.toLowerCase().replace(/\s+/g, '-')}`,
-          color,
-          size,
-          price: combination.price,
-          stock: combination.stock,
+          color: color.trim(),
+          size: size.trim(),
+          price: Number(combination.price) || 0,
+          stock: Number(combination.stock) || 0,
           images: [],
           attributes: {},
         })
@@ -205,6 +205,8 @@ export function ProductForm({ product, mode }: ProductFormProps) {
       
       const method = mode === 'create' ? 'POST' : 'PUT'
 
+      console.log('Submitting payload:', JSON.stringify(payload, null, 2))
+
       const res = await fetch(url, {
         method,
         headers: {
@@ -216,7 +218,11 @@ export function ProductForm({ product, mode }: ProductFormProps) {
       const data = await res.json()
 
       if (!res.ok) {
-        throw new Error(data.error || 'Failed to save product')
+        console.error('Validation error details:', data)
+        const errorMsg = data.details 
+          ? `${data.error}: ${JSON.stringify(data.details, null, 2)}`
+          : data.error || 'Failed to save product'
+        throw new Error(errorMsg)
       }
 
       router.push('/admin/products')
@@ -412,7 +418,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
                       type="number"
                       step="0.01"
                       min="0"
-                      value={combination.price}
+                      value={combination.price ?? formData.price}
                       onChange={(e) => updateCombination(color, size, 'price', parseFloat(e.target.value) || 0)}
                       required
                     />
@@ -421,7 +427,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
                       label="Stock *"
                       type="number"
                       min="0"
-                      value={combination.stock}
+                      value={combination.stock ?? 0}
                       onChange={(e) => updateCombination(color, size, 'stock', parseInt(e.target.value) || 0)}
                       required
                     />
