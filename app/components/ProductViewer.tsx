@@ -16,11 +16,15 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
   const [imageTransition, setImageTransition] = useState(false)
   const [detailsTransition, setDetailsTransition] = useState(false)
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right')
+  const [prevProduct, setPrevProduct] = useState(products[initialIndex])
   
   const currentProduct = products[currentIndex]
   const currentVariant = currentProduct?.variants?.[0]
   const images = currentVariant?.images || []
   const currentImage = images[currentImageIndex]
+  
+  const prevVariant = prevProduct?.variants?.[0]
+  const prevImage = prevVariant?.images?.[0]
 
   useEffect(() => {
     setCurrentImageIndex(0)
@@ -31,7 +35,8 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
     const timer = setTimeout(() => {
       setImageTransition(false)
       setDetailsTransition(false)
-    }, 600)
+      setPrevProduct(currentProduct)
+    }, 800)
     
     return () => clearTimeout(timer)
   }, [currentIndex])
@@ -86,26 +91,45 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <style jsx>{`
-        @keyframes slideInFromLeft {
-          from {
-            transform: translateX(-100%);
-            opacity: 0;
-          }
-          to {
-            transform: translateX(0);
-            opacity: 1;
-          }
+        .cube-container {
+          perspective: 1500px;
         }
         
-        @keyframes slideInFromRight {
-          from {
-            transform: translateX(100%);
-            opacity: 0;
-          }
-          to {
-            transform: translateX(0);
-            opacity: 1;
-          }
+        .cube-wrapper {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          transform-style: preserve-3d;
+          transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+          transform-origin: center center;
+        }
+        
+        .cube-face {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          backface-visibility: hidden;
+          overflow: hidden;
+        }
+        
+        .cube-front {
+          transform: rotateY(0deg) translateZ(250px);
+        }
+        
+        .cube-right {
+          transform: rotateY(90deg) translateZ(250px);
+        }
+        
+        .cube-left {
+          transform: rotateY(-90deg) translateZ(250px);
+        }
+        
+        .rotate-left {
+          transform: translateZ(-250px) rotateY(90deg);
+        }
+        
+        .rotate-right {
+          transform: translateZ(-250px) rotateY(-90deg);
         }
         
         @keyframes fadeUp {
@@ -119,14 +143,6 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
           }
         }
         
-        .slide-in-left {
-          animation: slideInFromLeft 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .slide-in-right {
-          animation: slideInFromRight 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
         .fade-up {
           animation: fadeUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -135,36 +151,53 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
       {/* Main Product View */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
         {/* Image Section with Navigation */}
-        <div className="relative">
-          <div className={`relative aspect-square bg-white rounded-lg shadow-lg overflow-hidden ${
-            imageTransition 
-              ? slideDirection === 'right' 
-                ? 'slide-in-right' 
-                : 'slide-in-left'
-              : ''
-          }`}>
-            {currentImage ? (
-              <Image
-                src={currentImage.url}
-                alt={currentImage.alt || currentProduct.name}
-                fill
-                className="object-cover transition-opacity duration-300"
-                priority
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                <svg
-                  className="w-32 h-32 text-gray-300"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6h-6z"/>
-                  <path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4V6h16v12z"/>
-                  <path d="M12 8.5c0-.83-.67-1.5-1.5-1.5S9 7.67 9 8.5 9.67 10 10.5 10s1.5-.67 1.5-1.5z"/>
-                </svg>
+        <div className="relative cube-container">
+          <div className="relative aspect-square bg-white rounded-lg shadow-lg overflow-hidden">
+            <div className={`cube-wrapper ${
+              imageTransition 
+                ? slideDirection === 'right' 
+                  ? 'rotate-right' 
+                  : 'rotate-left'
+                : ''
+            }`}>
+              {/* Front face - shows previous image during transition, current image when idle */}
+              <div className="cube-face cube-front">
+                {(imageTransition ? prevImage : currentImage) ? (
+                  <Image
+                    src={(imageTransition ? prevImage : currentImage).url}
+                    alt={(imageTransition ? prevImage : currentImage).alt || (imageTransition ? prevProduct : currentProduct).name}
+                    fill
+                    className="object-cover"
+                    priority
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                    <svg
+                      className="w-32 h-32 text-gray-300"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6h-6z"/>
+                      <path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4V6h16v12z"/>
+                      <path d="M12 8.5c0-.83-.67-1.5-1.5-1.5S9 7.67 9 8.5 9.67 10 10.5 10s1.5-.67 1.5-1.5z"/>
+                    </svg>
+                  </div>
+                )}
               </div>
-            )}
+              
+              {/* Side face - new image coming in during transition */}
+              {imageTransition && currentImage && (
+                <div className={`cube-face ${slideDirection === 'right' ? 'cube-left' : 'cube-right'}`}>
+                  <Image
+                    src={currentImage.url}
+                    alt={currentImage.alt || currentProduct.name}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              )}
+            </div>
             
             {/* Navigation Arrows */}
             <button
