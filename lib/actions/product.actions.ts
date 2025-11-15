@@ -55,6 +55,7 @@ export async function updateProductAction(id: string, formData: FormData) {
     slug: formData.get('slug'),
     description: formData.get('description'),
     price: parseFloat(formData.get('price') as string),
+    variants: JSON.parse(formData.get('variants') as string),
     status: formData.get('status'),
   }
 
