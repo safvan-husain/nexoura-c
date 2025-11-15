@@ -11,7 +11,7 @@ export async function createProduct(data: CreateProductInput, adminId?: string) 
   });
 
   if (existingProduct) {
-    throw new AppError(409, 'PRODUCT_ALREADY_EXISTS', {
+    throw new AppError('PRODUCT_ALREADY_EXISTS', 409, {
       field: existingProduct.slug === data.slug ? 'slug' : 'sku'
     });
   }
@@ -86,7 +86,7 @@ export async function getProductById(id: string) {
   const product = await ProductModel.findById(id).lean();
 
   if (!product) {
-    throw new AppError(404, 'PRODUCT_NOT_FOUND');
+    throw new AppError('PRODUCT_NOT_FOUND', 404);
   }
 
   return product;
@@ -98,7 +98,7 @@ export async function getProductBySlug(slug: string) {
   const product = await ProductModel.findOne({ slug }).lean();
 
   if (!product) {
-    throw new AppError(404, 'PRODUCT_NOT_FOUND');
+    throw new AppError('PRODUCT_NOT_FOUND', 404);
   }
 
   return product;
@@ -117,7 +117,7 @@ export async function updateProduct(id: string, data: UpdateProductInput, adminI
     });
 
     if (existingProduct) {
-      throw new AppError(409, 'PRODUCT_ALREADY_EXISTS', {
+      throw new AppError('PRODUCT_ALREADY_EXISTS', 409, {
         field: existingProduct.slug === data.slug ? 'slug' : 'sku'
       });
     }
@@ -130,7 +130,7 @@ export async function updateProduct(id: string, data: UpdateProductInput, adminI
   );
 
   if (!product) {
-    throw new AppError(404, 'PRODUCT_NOT_FOUND');
+    throw new AppError('PRODUCT_NOT_FOUND', 404);
   }
 
   return product;
@@ -142,7 +142,7 @@ export async function deleteProduct(id: string) {
   const product = await ProductModel.findByIdAndDelete(id);
 
   if (!product) {
-    throw new AppError(404, 'PRODUCT_NOT_FOUND');
+    throw new AppError('PRODUCT_NOT_FOUND', 404);
   }
 
   return { message: 'Product deleted successfully' };
