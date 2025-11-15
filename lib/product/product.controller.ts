@@ -2,10 +2,10 @@ import { CreateProductSchema, UpdateProductSchema, ProductQuerySchema } from './
 import { createProduct, getProducts, getProductById, getProductBySlug, updateProduct, deleteProduct } from './product.service';
 import { catchError } from '@/lib/errors/app-error';
 
-export async function handleCreateProduct(input: unknown, adminId?: string) {
+export async function handleCreateProduct(input: unknown) {
   try {
     const parsed = CreateProductSchema.parse(input);
-    const result = await createProduct(parsed, adminId);
+    const result = await createProduct(parsed);
     return { status: 201, body: result };
   } catch (err) {
     return catchError(err);
@@ -40,10 +40,10 @@ export async function handleGetProductBySlug(slug: string) {
   }
 }
 
-export async function handleUpdateProduct(id: string, input: unknown, adminId?: string) {
+export async function handleUpdateProduct(id: string, input: unknown) {
   try {
     const parsed = UpdateProductSchema.parse(input);
-    const result = await updateProduct(id, parsed, adminId);
+    const result = await updateProduct(id, parsed);
     return { status: 200, body: result };
   } catch (err) {
     return catchError(err);

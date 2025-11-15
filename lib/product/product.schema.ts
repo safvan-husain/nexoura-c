@@ -9,9 +9,8 @@ const ProductImageSchema = z.object({
 const ProductVariantSchema = z.object({
   name: z.string().min(1, 'Variant name is required'),
   sku: z.string().min(1, 'SKU is required'),
-  price: z.number().min(0, 'Price must be positive'),
-  compareAtPrice: z.number().min(0).optional(),
   stock: z.number().int().min(0, 'Stock must be non-negative'),
+  images: z.array(ProductImageSchema).default([]),
   attributes: z.record(z.string()).optional(),
 });
 
@@ -22,14 +21,10 @@ export const CreateProductSchema = z.object({
   shortDescription: z.string().optional(),
   price: z.number().min(0, 'Price must be positive'),
   compareAtPrice: z.number().min(0).optional(),
-  stock: z.number().int().min(0, 'Stock must be non-negative'),
-  sku: z.string().min(1, 'SKU is required'),
   categories: z.array(z.string()).default([]),
   tags: z.array(z.string()).default([]),
-  images: z.array(ProductImageSchema).default([]),
-  variants: z.array(ProductVariantSchema).default([]),
-  isActive: z.boolean().default(true),
-  isFeatured: z.boolean().default(false),
+  variants: z.array(ProductVariantSchema).min(1, 'At least one variant is required'),
+  status: z.enum(['draft', 'published', 'archived']).default('draft'),
   metadata: z.record(z.any()).optional(),
 });
 
@@ -42,9 +37,8 @@ export const ProductQuerySchema = z.object({
   category: z.string().optional(),
   minPrice: z.number().min(0).optional(),
   maxPrice: z.number().min(0).optional(),
-  isActive: z.boolean().optional(),
-  isFeatured: z.boolean().optional(),
-  sortBy: z.enum(['name', 'price', 'createdAt', 'rating']).default('createdAt'),
+  status: z.enum(['draft', 'published', 'archived']).optional(),
+  sortBy: z.enum(['name', 'price', 'createdAt']).default('createdAt'),
   sortOrder: z.enum(['asc', 'desc']).default('desc'),
 });
 

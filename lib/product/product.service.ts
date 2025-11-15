@@ -3,23 +3,30 @@ import { AppError } from '@/lib/errors/app-error';
 import { connectDB } from '@/lib/db/mongo-client';
 import type { CreateProductInput, UpdateProductInput, ProductQueryInput } from './product.schema';
 
-export async function createProduct(data: CreateProductInput, adminId?: string) {
+export async function createProduct(data: CreateProductInput) {
   await connectDB();
 
-  const existingProduct = await ProductModel.findOne({
-    $or: [{ slug: data.slug }, { sku: data.sku }]
-  });
+  const existingProduct = await ProductModel.findOne({ slug: data.slug });
 
   if (existingProduct) {
     throw new AppError('PRODUCT_ALREADY_EXISTS', 409, {
-      field: existingProduct.slug === data.slug ? 'slug' : 'sku'
+      field: 'slug'
     });
   }
 
-  const product = await ProductModel.create({
-    ...data,
-    createdBy: adminId,
+  // Check for duplicate SKUs in variants
+  const variantSkus = data.variants.map(v => v.sku);
+  const duplicateSku = await ProductModel.findOne({
+    'variants.sku': { $in: variantSkus }
   });
+
+  if (duplicateSku) {
+    throw new AppError('VARIANT_SKU_ALREADY_EXISTS', 409, {
+      field: 'sku'
+    });
+  }
+
+  const product = await ProductModel.create(data);
 
   return product;
 }
@@ -27,7 +34,7 @@ export async function createProduct(data: CreateProductInput, adminId?: string) 
 export async function getProducts(query: ProductQueryInput) {
   await connectDB();
 
-  const { page, limit, search, category, minPrice, maxPrice, isActive, isFeatured, sortBy, sortOrder } = query;
+  const { page, limit, search, category, minPrice, maxPrice, status, sortBy, sortOrder } = query;
 
   const filter: any = {};
 
@@ -49,12 +56,8 @@ export async function getProducts(query: ProductQueryInput) {
     if (maxPrice !== undefined) filter.price.$lte = maxPrice;
   }
 
-  if (isActive !== undefined) {
-    filter.isActive = isActive;
-  }
-
-  if (isFeatured !== undefined) {
-    filter.isFeatured = isFeatured;
+  if (status !== undefined) {
+    filter.status = status;
   }
 
   const skip = (page - 1) * limit;
@@ -104,28 +107,40 @@ export async function getProductBySlug(slug: string) {
   return product;
 }
 
-export async function updateProduct(id: string, data: UpdateProductInput, adminId?: string) {
+export async function updateProduct(id: string, data: UpdateProductInput) {
   await connectDB();
 
-  if (data.slug || data.sku) {
+  if (data.slug) {
     const existingProduct = await ProductModel.findOne({
       _id: { $ne: id },
-      $or: [
-        ...(data.slug ? [{ slug: data.slug }] : []),
-        ...(data.sku ? [{ sku: data.sku }] : []),
-      ]
+      slug: data.slug
     });
 
     if (existingProduct) {
       throw new AppError('PRODUCT_ALREADY_EXISTS', 409, {
-        field: existingProduct.slug === data.slug ? 'slug' : 'sku'
+        field: 'slug'
+      });
+    }
+  }
+
+  // Check for duplicate SKUs in variants if variants are being updated
+  if (data.variants) {
+    const variantSkus = data.variants.map(v => v.sku);
+    const duplicateSku = await ProductModel.findOne({
+      _id: { $ne: id },
+      'variants.sku': { $in: variantSkus }
+    });
+
+    if (duplicateSku) {
+      throw new AppError('VARIANT_SKU_ALREADY_EXISTS', 409, {
+        field: 'sku'
       });
     }
   }
 
   const product = await ProductModel.findByIdAndUpdate(
     id,
-    { ...data, updatedBy: adminId },
+    data,
     { new: true, runValidators: true }
   );
 

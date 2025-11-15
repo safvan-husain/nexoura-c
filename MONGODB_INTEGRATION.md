@@ -33,7 +33,6 @@ Created three main models with full TypeScript support:
 - Categories and tags
 - Stock management
 - Pricing with compare-at-price
-- Rating and review count
 - Featured products
 - Metadata for extensibility
 - Computed properties (isInStock, hasDiscount, discountPercentage)

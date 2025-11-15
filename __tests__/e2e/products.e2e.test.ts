@@ -24,10 +24,11 @@ describe('Products Integration Tests', () => {
         slug: 'e2e-product',
         description: 'E2E test product',
         price: 29.99,
-        stock: 100,
-        sku: 'E2E-001',
         categories: ['test'],
         tags: ['e2e'],
+        variants: [
+          { name: 'Default', sku: 'E2E-001', stock: 100 }
+        ],
       });
 
       const response = await productsPOST(req);
@@ -57,8 +58,7 @@ describe('Products Integration Tests', () => {
         slug: 'duplicate-slug',
         description: 'Description',
         price: 10,
-        stock: 50,
-        sku: 'FIRST-001',
+        variants: [{ name: 'Default', sku: 'FIRST-001', stock: 50 }],
       });
 
       const req = createMockRequest('POST', {
@@ -66,8 +66,7 @@ describe('Products Integration Tests', () => {
         slug: 'duplicate-slug',
         description: 'Description',
         price: 20,
-        stock: 30,
-        sku: 'SECOND-001',
+        variants: [{ name: 'Default', sku: 'SECOND-001', stock: 30 }],
       });
 
       const response = await productsPOST(req);
@@ -86,29 +85,26 @@ describe('Products Integration Tests', () => {
           slug: 'product-1',
           description: 'Description 1',
           price: 10,
-          stock: 50,
-          sku: 'PROD-001',
           categories: ['electronics'],
-          isActive: true,
+          status: 'published',
+          variants: [{ name: 'Default', sku: 'PROD-001', stock: 50 }],
         },
         {
           name: 'Product 2',
           slug: 'product-2',
           description: 'Description 2',
           price: 20,
-          stock: 30,
-          sku: 'PROD-002',
           categories: ['clothing'],
-          isActive: true,
+          status: 'published',
+          variants: [{ name: 'Default', sku: 'PROD-002', stock: 30 }],
         },
         {
           name: 'Product 3',
           slug: 'product-3',
           description: 'Description 3',
           price: 30,
-          stock: 0,
-          sku: 'PROD-003',
-          isActive: false,
+          status: 'archived',
+          variants: [{ name: 'Default', sku: 'PROD-003', stock: 0 }],
         },
       ]);
     });
@@ -153,8 +149,8 @@ describe('Products Integration Tests', () => {
       expect(body.products[0].price).toBe(20);
     });
 
-    it('should filter by isActive', async () => {
-      const req = createMockRequest('GET', undefined, 'http://localhost:3000/api/products?isActive=true');
+    it('should filter by status', async () => {
+      const req = createMockRequest('GET', undefined, 'http://localhost:3000/api/products?status=published');
       const response = await productsGET(req);
       const body = await response.json();
 
@@ -190,8 +186,7 @@ describe('Products Integration Tests', () => {
         slug: 'get-by-id',
         description: 'Description',
         price: 10,
-        stock: 50,
-        sku: 'GET-001',
+        variants: [{ name: 'Default', sku: 'GET-001', stock: 50 }],
       });
 
       const req = createMockRequest('GET');
@@ -220,8 +215,7 @@ describe('Products Integration Tests', () => {
         slug: 'original-slug',
         description: 'Description',
         price: 10,
-        stock: 50,
-        sku: 'UPDATE-001',
+        variants: [{ name: 'Default', sku: 'UPDATE-001', stock: 50 }],
       });
 
       const req = createMockRequest('PUT', {
@@ -254,8 +248,7 @@ describe('Products Integration Tests', () => {
         slug: 'to-delete',
         description: 'Description',
         price: 10,
-        stock: 50,
-        sku: 'DELETE-001',
+        variants: [{ name: 'Default', sku: 'DELETE-001', stock: 50 }],
       });
 
       const req = createMockRequest('DELETE');

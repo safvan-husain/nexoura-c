@@ -70,7 +70,6 @@ ongoDB connection string in `.env.local`
 - Categories and tags
 - Stock management
 - Pricing with compare-at-price
-- Rating and reviews count
 - Metadata for extensibility
 
 ## API Endpoints

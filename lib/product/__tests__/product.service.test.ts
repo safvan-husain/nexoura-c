@@ -17,8 +17,7 @@ describe('Product Service', () => {
         slug: 'new-product',
         description: 'A new product',
         price: 29.99,
-        stock: 100,
-        sku: 'NEW-001',
+        variants: [{ name: 'Default', sku: 'NEW-001', stock: 100 }],
       };
 
       const product = await createProduct(productData);
@@ -34,8 +33,7 @@ describe('Product Service', () => {
         slug: 'duplicate-slug',
         description: 'Description',
         price: 10,
-        stock: 50,
-        sku: 'SKU-001',
+        variants: [{ name: 'Default', sku: 'SKU-001', stock: 50 }],
       });
 
       await expect(
@@ -44,8 +42,7 @@ describe('Product Service', () => {
           slug: 'duplicate-slug',
           description: 'Description',
           price: 20,
-          stock: 30,
-          sku: 'SKU-002',
+          variants: [{ name: 'Default', sku: 'SKU-002', stock: 30 }],
         })
       ).rejects.toMatchObject({
         statusCode: 409,
@@ -53,14 +50,13 @@ describe('Product Service', () => {
       });
     });
 
-    it('should throw error for duplicate sku', async () => {
+    it('should throw error for duplicate variant sku', async () => {
       await createProduct({
         name: 'Product 1',
         slug: 'product-1',
         description: 'Description',
         price: 10,
-        stock: 50,
-        sku: 'DUPLICATE-SKU',
+        variants: [{ name: 'Default', sku: 'DUPLICATE-SKU', stock: 50 }],
       });
 
       await expect(
@@ -69,12 +65,11 @@ describe('Product Service', () => {
           slug: 'product-2',
           description: 'Description',
           price: 20,
-          stock: 30,
-          sku: 'DUPLICATE-SKU',
+          variants: [{ name: 'Default', sku: 'DUPLICATE-SKU', stock: 30 }],
         })
       ).rejects.toMatchObject({
         statusCode: 409,
-        message: 'PRODUCT_ALREADY_EXISTS',
+        message: 'VARIANT_SKU_ALREADY_EXISTS',
       });
     });
   });
@@ -87,31 +82,28 @@ describe('Product Service', () => {
           slug: 'product-a',
           description: 'Description A',
           price: 10,
-          stock: 50,
-          sku: 'SKU-A',
           categories: ['electronics'],
           tags: ['new'],
-          isActive: true,
+          status: 'published',
+          variants: [{ name: 'Default', sku: 'SKU-A', stock: 50 }],
         },
         {
           name: 'Product B',
           slug: 'product-b',
           description: 'Description B',
           price: 20,
-          stock: 30,
-          sku: 'SKU-B',
           categories: ['clothing'],
           tags: ['sale'],
-          isActive: true,
+          status: 'published',
+          variants: [{ name: 'Default', sku: 'SKU-B', stock: 30 }],
         },
         {
           name: 'Product C',
           slug: 'product-c',
           description: 'Description C',
           price: 30,
-          stock: 0,
-          sku: 'SKU-C',
-          isActive: false,
+          status: 'archived',
+          variants: [{ name: 'Default', sku: 'SKU-C', stock: 0 }],
         },
       ]);
     });
@@ -169,11 +161,11 @@ describe('Product Service', () => {
       expect(result.products[0].price).toBe(20);
     });
 
-    it('should filter by isActive', async () => {
+    it('should filter by status', async () => {
       const result = await getProducts({
         page: 1,
         limit: 20,
-        isActive: true,
+        status: 'published',
         sortBy: 'createdAt',
         sortOrder: 'desc',
       });
@@ -213,8 +205,7 @@ describe('Product Service', () => {
         slug: 'test-product',
         description: 'Description',
         price: 10,
-        stock: 50,
-        sku: 'TEST-001',
+        variants: [{ name: 'Default', sku: 'TEST-001', stock: 50 }],
       });
 
       const product = await getProductById(created._id.toString());
@@ -238,8 +229,7 @@ describe('Product Service', () => {
         slug: 'slug-product',
         description: 'Description',
         price: 10,
-        stock: 50,
-        sku: 'SLUG-001',
+        variants: [{ name: 'Default', sku: 'SLUG-001', stock: 50 }],
       });
 
       const product = await getProductBySlug('slug-product');
@@ -262,8 +252,7 @@ describe('Product Service', () => {
         slug: 'original-slug',
         description: 'Description',
         price: 10,
-        stock: 50,
-        sku: 'ORIG-001',
+        variants: [{ name: 'Default', sku: 'ORIG-001', stock: 50 }],
       });
 
       const updated = await updateProduct(created._id.toString(), {
@@ -294,8 +283,7 @@ describe('Product Service', () => {
         slug: 'to-delete',
         description: 'Description',
         price: 10,
-        stock: 50,
-        sku: 'DEL-001',
+        variants: [{ name: 'Default', sku: 'DEL-001', stock: 50 }],
       });
 
       const result = await deleteProduct(created._id.toString());

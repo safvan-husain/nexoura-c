@@ -4,18 +4,19 @@ import { handleGetProducts, handleCreateProduct } from '@/lib/product/product.co
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   
-  const query = {
+  const query: any = {
     page: parseInt(searchParams.get('page') || '1'),
     limit: parseInt(searchParams.get('limit') || '20'),
-    search: searchParams.get('search') || undefined,
-    category: searchParams.get('category') || undefined,
-    minPrice: searchParams.get('minPrice') ? parseFloat(searchParams.get('minPrice')!) : undefined,
-    maxPrice: searchParams.get('maxPrice') ? parseFloat(searchParams.get('maxPrice')!) : undefined,
-    isActive: searchParams.get('isActive') ? searchParams.get('isActive') === 'true' : undefined,
-    isFeatured: searchParams.get('isFeatured') ? searchParams.get('isFeatured') === 'true' : undefined,
-    sortBy: searchParams.get('sortBy') || 'createdAt',
-    sortOrder: searchParams.get('sortOrder') || 'desc',
+    sortBy: (searchParams.get('sortBy') || 'createdAt') as 'name' | 'price' | 'createdAt',
+    sortOrder: (searchParams.get('sortOrder') || 'desc') as 'asc' | 'desc',
   };
+
+  // Only add optional params if they exist
+  if (searchParams.get('search')) query.search = searchParams.get('search');
+  if (searchParams.get('category')) query.category = searchParams.get('category');
+  if (searchParams.get('minPrice')) query.minPrice = parseFloat(searchParams.get('minPrice')!);
+  if (searchParams.get('maxPrice')) query.maxPrice = parseFloat(searchParams.get('maxPrice')!);
+  if (searchParams.get('status')) query.status = searchParams.get('status') as 'draft' | 'published' | 'archived';
 
   const { status, body } = await handleGetProducts(query);
   return NextResponse.json(body, { status });

@@ -1,103 +1,82 @@
-import { prop, getModelForClass, modelOptions, Ref } from '@typegoose/typegoose';
-import { Admin } from './admin.model';
+import * as typegoose from '@typegoose/typegoose';
 
 class ProductImage {
-  @prop({ required: true })
+  @typegoose.prop({ required: true })
   public url!: string;
 
-  @prop()
+  @typegoose.prop()
   public alt?: string;
 
-  @prop({ default: false })
+  @typegoose.prop({ default: false })
   public isPrimary!: boolean;
 }
 
 class ProductVariant {
-  @prop({ required: true })
+  @typegoose.prop({ required: true })
   public name!: string;
 
-  @prop({ required: true })
+  @typegoose.prop({ required: true })
   public sku!: string;
 
-  @prop({ required: true, min: 0 })
-  public price!: number;
-
-  @prop({ min: 0 })
-  public compareAtPrice?: number;
-
-  @prop({ required: true, min: 0 })
+  @typegoose.prop({ required: true, min: 0 })
   public stock!: number;
 
-  @prop({ type: () => Object })
+  @typegoose.prop({ type: () => [ProductImage], default: [] })
+  public images!: ProductImage[];
+
+  @typegoose.prop({ type: () => Object })
   public attributes?: Record<string, string>;
 }
 
-@modelOptions({
+@typegoose.modelOptions({
   schemaOptions: {
     timestamps: true,
     collection: 'products'
   }
 })
 export class Product {
-  @prop({ required: true, trim: true })
+  @typegoose.prop({ required: true, trim: true })
   public name!: string;
 
-  @prop({ required: true, unique: true, trim: true })
+  @typegoose.prop({ required: true, unique: true, trim: true })
   public slug!: string;
 
-  @prop({ required: true })
+  @typegoose.prop({ required: true })
   public description!: string;
 
-  @prop()
+  @typegoose.prop()
   public shortDescription?: string;
 
-  @prop({ required: true, min: 0 })
+  @typegoose.prop({ required: true, min: 0 })
   public price!: number;
 
-  @prop({ min: 0 })
+  @typegoose.prop({ min: 0 })
   public compareAtPrice?: number;
 
-  @prop({ required: true, min: 0 })
-  public stock!: number;
-
-  @prop({ required: true, unique: true, trim: true })
-  public sku!: string;
-
-  @prop({ type: () => [String], default: [] })
+  @typegoose.prop({ type: () => [String], default: [] })
   public categories!: string[];
 
-  @prop({ type: () => [String], default: [] })
+  @typegoose.prop({ type: () => [String], default: [] })
   public tags!: string[];
 
-  @prop({ type: () => [ProductImage], default: [] })
-  public images!: ProductImage[];
-
-  @prop({ type: () => [ProductVariant], default: [] })
+  @typegoose.prop({ type: () => [ProductVariant], required: true, validate: {
+    validator: (v: ProductVariant[]) => v && v.length > 0,
+    message: 'At least one variant is required'
+  }})
   public variants!: ProductVariant[];
 
-  @prop({ default: true })
-  public isActive!: boolean;
+  @typegoose.prop({ enum: ['draft', 'published', 'archived'], default: 'draft' })
+  public status!: 'draft' | 'published' | 'archived';
 
-  @prop({ default: false })
-  public isFeatured!: boolean;
-
-  @prop({ min: 0, max: 5 })
-  public rating?: number;
-
-  @prop({ min: 0, default: 0 })
-  public reviewCount!: number;
-
-  @prop({ type: () => Object })
+  @typegoose.prop({ type: () => Object })
   public metadata?: Record<string, any>;
 
-  @prop({ ref: () => Admin })
-  public createdBy?: Ref<Admin>;
-
-  @prop({ ref: () => Admin })
-  public updatedBy?: Ref<Admin>;
-
   public get isInStock(): boolean {
-    return this.stock > 0;
+    return this.variants.some(variant => variant.stock > 0);
+  }
+
+  public get totalStock(): number {
+    return this.variants.reduce((sum, variant) => sum + variant.stock, 0);
   }
 
   public get hasDiscount(): boolean {
@@ -110,4 +89,4 @@ export class Product {
   }
 }
 
-export const ProductModel = getModelForClass(Product);
+export const ProductModel = typegoose.getModelForClass(Product);
