@@ -160,12 +160,13 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
                   : 'rotate-left'
                 : ''
             }`}>
-              {/* Front face - shows previous image during transition, current image when idle */}
+              {/* Front face - old image that rotates away */}
               <div className="cube-face cube-front">
-                {(imageTransition ? prevImage : currentImage) ? (
+                {prevImage ? (
                   <Image
-                    src={(imageTransition ? prevImage : currentImage).url}
-                    alt={(imageTransition ? prevImage : currentImage).alt || (imageTransition ? prevProduct : currentProduct).name}
+                    key={`prev-${prevProduct._id}`}
+                    src={prevImage.url}
+                    alt={prevImage.alt || prevProduct.name}
                     fill
                     className="object-cover"
                     priority
@@ -186,17 +187,31 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
                 )}
               </div>
               
-              {/* Side face - new image coming in during transition */}
-              {imageTransition && currentImage && (
-                <div className={`cube-face ${slideDirection === 'right' ? 'cube-left' : 'cube-right'}`}>
+              {/* Side face - new image coming in from the side */}
+              <div className={`cube-face ${slideDirection === 'right' ? 'cube-right' : 'cube-left'}`}>
+                {currentImage ? (
                   <Image
+                    key={`current-${currentProduct._id}`}
                     src={currentImage.url}
                     alt={currentImage.alt || currentProduct.name}
                     fill
                     className="object-cover"
                   />
-                </div>
-              )}
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                    <svg
+                      className="w-32 h-32 text-gray-300"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6h-6z"/>
+                      <path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4V6h16v12z"/>
+                      <path d="M12 8.5c0-.83-.67-1.5-1.5-1.5S9 7.67 9 8.5 9.67 10 10.5 10s1.5-.67 1.5-1.5z"/>
+                    </svg>
+                  </div>
+                )}
+              </div>
             </div>
             
             {/* Navigation Arrows */}
