@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/nexoura';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/nexoura';
 
 if (!MONGODB_URI) {
   throw new Error('Please define the MONGODB_URI environment variable');
@@ -34,6 +34,7 @@ export async function connectDB(): Promise<typeof mongoose> {
   if (!cached.promise) {
     const opts = {
       bufferCommands: false,
+      family: 4, // Force IPv4
     };
 
     cached.promise = mongoose.connect(MONGODB_URI, opts);

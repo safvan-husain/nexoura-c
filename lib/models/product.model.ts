@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import * as typegoose from '@typegoose/typegoose';
 import type { Category } from './category.model';
 

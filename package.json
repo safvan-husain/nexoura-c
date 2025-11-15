@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "seed": "ts-node --project scripts/tsconfig.json scripts/seed.ts",
     "seed:admin": "tsx scripts/seed-admin.ts",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -20,7 +21,6 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.19.3",
     "next": "16.0.3",
-    "next-devtools-mcp": "^0.3.3",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "reflect-metadata": "^0.2.2",
@@ -42,6 +42,8 @@
     "supertest": "^7.1.4",
     "tailwindcss": "^4",
     "ts-jest": "^29.4.5",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "tsx": "^4.20.6",
     "typescript": "^5"
   }

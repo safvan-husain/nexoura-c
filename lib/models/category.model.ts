@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import * as typegoose from '@typegoose/typegoose';
 
 @typegoose.modelOptions({

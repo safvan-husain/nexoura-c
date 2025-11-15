@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { prop, getModelForClass, pre, modelOptions } from '@typegoose/typegoose';
 import bcrypt from 'bcryptjs';
 
