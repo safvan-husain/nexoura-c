@@ -13,6 +13,9 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
   const router = useRouter()
   const [currentIndex, setCurrentIndex] = useState(initialIndex)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [imageTransition, setImageTransition] = useState(false)
+  const [detailsTransition, setDetailsTransition] = useState(false)
+  const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right')
   
   const currentProduct = products[currentIndex]
   const currentVariant = currentProduct?.variants?.[0]
@@ -21,12 +24,23 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
 
   useEffect(() => {
     setCurrentImageIndex(0)
+    // Trigger transitions when product changes
+    setImageTransition(true)
+    setDetailsTransition(true)
+    
+    const timer = setTimeout(() => {
+      setImageTransition(false)
+      setDetailsTransition(false)
+    }, 600)
+    
+    return () => clearTimeout(timer)
   }, [currentIndex])
 
   const handlePrevious = () => {
     if (currentImageIndex > 0) {
       setCurrentImageIndex(currentImageIndex - 1)
     } else if (currentIndex > 0) {
+      setSlideDirection('left')
       setCurrentIndex(currentIndex - 1)
       router.push(`/?productId=${products[currentIndex - 1]._id}`, { scroll: false })
     }
@@ -36,12 +50,14 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
     if (currentImageIndex < images.length - 1) {
       setCurrentImageIndex(currentImageIndex + 1)
     } else if (currentIndex < products.length - 1) {
+      setSlideDirection('right')
       setCurrentIndex(currentIndex + 1)
       router.push(`/?productId=${products[currentIndex + 1]._id}`, { scroll: false })
     }
   }
 
   const handleProductSelect = (index: number) => {
+    setSlideDirection(index > currentIndex ? 'right' : 'left')
     setCurrentIndex(index)
     setCurrentImageIndex(0)
     router.push(`/?productId=${products[index]._id}`, { scroll: false })
@@ -69,17 +85,70 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
+      <style jsx>{`
+        @keyframes slideInFromLeft {
+          from {
+            transform: translateX(-100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes slideInFromRight {
+          from {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes fadeUp {
+          from {
+            transform: translateY(30px);
+            opacity: 0;
+          }
+          to {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+        
+        .slide-in-left {
+          animation: slideInFromLeft 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .slide-in-right {
+          animation: slideInFromRight 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .fade-up {
+          animation: fadeUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+      `}</style>
+      
       {/* Main Product View */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
         {/* Image Section with Navigation */}
         <div className="relative">
-          <div className="relative aspect-square bg-white rounded-lg shadow-lg overflow-hidden">
+          <div className={`relative aspect-square bg-white rounded-lg shadow-lg overflow-hidden ${
+            imageTransition 
+              ? slideDirection === 'right' 
+                ? 'slide-in-right' 
+                : 'slide-in-left'
+              : ''
+          }`}>
             {currentImage ? (
               <Image
                 src={currentImage.url}
                 alt={currentImage.alt || currentProduct.name}
                 fill
-                className="object-cover"
+                className="object-cover transition-opacity duration-300"
                 priority
               />
             ) : (
@@ -139,7 +208,9 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
         </div>
 
         {/* Product Details Card */}
-        <div className="bg-white rounded-lg shadow-lg p-8">
+        <div className={`bg-white rounded-lg shadow-lg p-8 ${
+          detailsTransition ? 'fade-up' : ''
+        }`}>
           <h1 className="text-3xl font-bold mb-4">{currentProduct.name}</h1>
           
           <div className="flex items-baseline gap-3 mb-6">
