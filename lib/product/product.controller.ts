@@ -18,6 +18,7 @@ export async function handleGetProducts(query: unknown) {
     const result = await getProducts(parsed);
     return { status: 200, body: result };
   } catch (err) {
+    console.error('Error in handleGetProducts:', err);
     return catchError(err);
   }
 }

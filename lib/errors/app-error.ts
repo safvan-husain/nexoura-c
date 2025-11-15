@@ -51,7 +51,8 @@ export const catchError = (error: any): { status: number, body: object } => {
       status: error.statusCode, body: { error: error.message, details: error.error }
     }
   }
+  console.error('Unhandled error in catchError:', error);
   return {
-    status: 500, body: { error: "INTERNAL_SERVER_ERROR" }
+    status: 500, body: { error: "INTERNAL_SERVER_ERROR", message: error instanceof Error ? error.message : 'Unknown error' }
   }
 }

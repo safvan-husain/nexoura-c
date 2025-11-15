@@ -47,10 +47,11 @@ export async function handleGetCategories(input: unknown) {
     const result = await getCategories(parsed.data);
     return { status: 200, body: result };
   } catch (err) {
+    console.error('Error in handleGetCategories:', err);
     if (err instanceof AppError) {
       return { status: err.statusCode, body: { error: err.message, details: err.error } };
     }
-    return { status: 500, body: { error: 'INTERNAL_SERVER_ERROR' } };
+    return { status: 500, body: { error: 'INTERNAL_SERVER_ERROR', message: err instanceof Error ? err.message : 'Unknown error' } };
   }
 }
 

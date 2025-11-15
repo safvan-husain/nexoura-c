@@ -2,26 +2,21 @@
 
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { handleLogin } from '@/lib/auth/auth.controller'
 
-export async function loginAction(formData: FormData) {
+export async function loginAction(_prevState: any, formData: FormData) {
   const email = formData.get('email') as string
   const password = formData.get('password') as string
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
-  })
+  const { status, body } = await handleLogin({ email, password })
 
-  const data = await res.json()
-
-  if (!res.ok) {
-    return { error: data.error || 'Login failed' }
+  if (status !== 200) {
+    return { error: (body as any).error || 'Login failed' }
   }
 
   // Set auth cookie
   const cookieStore = await cookies()
-  cookieStore.set('auth_token', data.token, {
+  cookieStore.set('auth_token', (body as any).token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
@@ -31,28 +26,23 @@ export async function loginAction(formData: FormData) {
   redirect('/products')
 }
 
-export async function registerAction(formData: FormData) {
+export async function registerAction(_prevState: any, formData: FormData) {
   const email = formData.get('email') as string
   const password = formData.get('password') as string
   const firstName = formData.get('firstName') as string
   const lastName = formData.get('lastName') as string
   const phone = formData.get('phone') as string
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/auth/register`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password, firstName, lastName, phone }),
-  })
+  const { handleRegister } = await import('@/lib/auth/auth.controller')
+  const { status, body } = await handleRegister({ email, password, firstName, lastName, phone })
 
-  const data = await res.json()
-
-  if (!res.ok) {
-    return { error: data.error || 'Registration failed' }
+  if (status !== 201) {
+    return { error: (body as any).error || 'Registration failed' }
   }
 
   // Set auth cookie
   const cookieStore = await cookies()
-  cookieStore.set('auth_token', data.token, {
+  cookieStore.set('auth_token', (body as any).token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
@@ -62,25 +52,20 @@ export async function registerAction(formData: FormData) {
   redirect('/products')
 }
 
-export async function adminLoginAction(formData: FormData) {
+export async function adminLoginAction(_prevState: any, formData: FormData) {
   const email = formData.get('email') as string
   const password = formData.get('password') as string
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/admin/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
-  })
+  const { handleAdminLogin } = await import('@/lib/auth/auth.controller')
+  const { status, body } = await handleAdminLogin({ email, password })
 
-  const data = await res.json()
-
-  if (!res.ok) {
-    return { error: data.error || 'Admin login failed' }
+  if (status !== 200) {
+    return { error: (body as any).error || 'Admin login failed' }
   }
 
   // Set admin auth cookie
   const cookieStore = await cookies()
-  cookieStore.set('admin_token', data.token, {
+  cookieStore.set('admin_token', (body as any).token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',

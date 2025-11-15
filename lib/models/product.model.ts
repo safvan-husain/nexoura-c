@@ -91,4 +91,7 @@ export class Product {
   }
 }
 
-export const ProductModel = typegoose.getModelForClass(Product);
+if (!(global as any).ProductModel) {
+  (global as any).ProductModel = typegoose.getModelForClass(Product);
+}
+export const ProductModel = (global as any).ProductModel;

@@ -30,4 +30,7 @@ export class Category {
   public metadata?: Record<string, any>;
 }
 
-export const CategoryModel = typegoose.getModelForClass(Category);
+if (!(global as any).CategoryModel) {
+  (global as any).CategoryModel = typegoose.getModelForClass(Category);
+}
+export const CategoryModel = (global as any).CategoryModel;

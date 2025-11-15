@@ -62,4 +62,7 @@ export class User {
   }
 }
 
-export const UserModel = getModelForClass(User);
+if (!(global as any).UserModel) {
+  (global as any).UserModel = getModelForClass(User);
+}
+export const UserModel = (global as any).UserModel;

@@ -37,4 +37,7 @@ export class Admin {
   }
 }
 
-export const AdminModel = getModelForClass(Admin);
+export const AdminModel = (global as any).AdminModel || getModelForClass(Admin);
+if (!(global as any).AdminModel) {
+  (global as any).AdminModel = AdminModel;
+}
