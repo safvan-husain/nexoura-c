@@ -130,7 +130,7 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
                             }}
                             transition={{ type: "spring", stiffness: 300, damping: 28 }}
                             style={{ zIndex: currentPos.zIndex }}
-                            className={`absolute top-8 md:top-12 w-[30%] aspect-[3/4] rounded-2xl shadow-xl ${bgColor} overflow-hidden cursor-pointer hover:shadow-2xl transition-shadow ${i == 0 && direction === "next" ? "hidden" : ""} ${i == 4 && direction === "prev" ? "hidden" : ""}`}
+                            className={`absolute top-8 md:top-12 w-[30%] aspect-[3/4] cursor-pointer ${i == 0 && direction === "next" ? "hidden" : ""} ${i == 4 && direction === "prev" ? "hidden" : ""}`}
                             onClick={() => {
                                 const originalIndex = products.findIndex(p => p.id === product.id);
                                 if (originalIndex >= 0) setCurrentIndex(originalIndex);
@@ -142,7 +142,7 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
                                         src={product.img}
                                         alt={product.name}
                                         fill
-                                        className="object-cover"
+                                        className="object-contain"
                                     />
                                 ) : (
                                     <div className="bg-gray-200 w-full h-full flex items-center justify-center">

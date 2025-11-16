@@ -3,33 +3,33 @@ import * as typegoose from '@typegoose/typegoose';
 import type { Category } from './category.model';
 
 class ProductImage {
-  @typegoose.prop({ required: true })
+  @typegoose.prop({ required: true, type: String })
   public url!: string;
 
-  @typegoose.prop()
+  @typegoose.prop({type: String })
   public alt?: string;
 
-  @typegoose.prop({ default: false })
+  @typegoose.prop({ default: false, type: Boolean })
   public isPrimary!: boolean;
 }
 
 class ProductVariant {
-  @typegoose.prop({ required: true })
+  @typegoose.prop({ required: true, type: String })
   public name!: string;
 
-  @typegoose.prop({ required: true })
+  @typegoose.prop({ required: true, type: String })
   public sku!: string;
 
-  @typegoose.prop({ required: true })
+  @typegoose.prop({ required: true, type: String })
   public color!: string;
 
-  @typegoose.prop({ required: true })
+  @typegoose.prop({ required: true, type: String })
   public size!: string;
 
-  @typegoose.prop({ required: true, min: 0 })
+  @typegoose.prop({ required: true, min: 0, type: Number })
   public price!: number;
 
-  @typegoose.prop({ required: true, min: 0 })
+  @typegoose.prop({ required: true, min: 0,type: Number })
   public stock!: number;
 
   @typegoose.prop({ type: () => [ProductImage], default: [] })
@@ -46,22 +46,22 @@ class ProductVariant {
   }
 })
 export class Product {
-  @typegoose.prop({ required: true, trim: true })
+  @typegoose.prop({ required: true, trim: true, type: () => String })
   public name!: string;
 
-  @typegoose.prop({ required: true, unique: true, trim: true })
+  @typegoose.prop({ required: true, unique: true, trim: true,type: () => String })
   public slug!: string;
 
-  @typegoose.prop({ required: true })
+  @typegoose.prop({ required: true, type: String })
   public description!: string;
 
-  @typegoose.prop()
+  @typegoose.prop({ type: String})
   public shortDescription?: string;
 
-  @typegoose.prop({ required: true, min: 0 })
+  @typegoose.prop({ required: true, min: 0, type: Number })
   public price!: number;
 
-  @typegoose.prop({ min: 0 })
+  @typegoose.prop({ min: 0, type: Number })
   public compareAtPrice?: number;
 
   @typegoose.prop({ ref: () => 'Category', type: () => [typegoose.mongoose.Schema.Types.ObjectId], default: [] })
@@ -76,7 +76,7 @@ export class Product {
   }})
   public variants!: ProductVariant[];
 
-  @typegoose.prop({ enum: ['draft', 'published', 'archived'], default: 'draft' })
+  @typegoose.prop({ enum: ['draft', 'published', 'archived'], default: 'draft', type: String })
   public status!: 'draft' | 'published' | 'archived';
 
   @typegoose.prop({ type: () => Object })
