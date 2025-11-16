@@ -129,7 +129,7 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
                             }}
                             transition={{ type: "spring", stiffness: 320, damping: 30 }}
                             style={{ zIndex: currentPos.zIndex }}
-                            className={`absolute top-8 md:top-16 w-[30%] aspect-[3/4] cursor-pointer ${i == 0 ? "hidden" : ""} ${i == 4 && direction === "prev" ? "hidden" : ""}`}
+                            className={`absolute top-8 md:top-16 w-[30%] aspect-[3/4] cursor-pointer ${i == 0 && direction !== "prev" ? "hidden" : ""} ${i == 4 && direction !== "next" ? "hidden" : ""}`}
                             onClick={() => {
                                 const originalIndex = products.findIndex(p => p.id === product.id);
                                 if (originalIndex >= 0) setCurrentIndex(originalIndex);
