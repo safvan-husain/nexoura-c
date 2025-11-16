@@ -109,8 +109,10 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
         return <div className="text-center text-gray-500">No products available</div>;
     }
 
+    const centerProduct = products[currentIndex];
+
     return (
-        <div className="w-full min-h-[400px] flex items-center justify-center p-4 md:p-8">
+        <div className="w-full flex flex-col items-center justify-center p-4 md:p-8 gap-6">
             <div className="relative w-full h-[400px] md:h-[500px] max-w-4xl">
                 {/* Boxes: render all five so stacking/animation looks natural */}
                 {displayProducts.map((product, i) => {
@@ -135,7 +137,7 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
                                 if (originalIndex >= 0) setCurrentIndex(originalIndex);
                             }}
                         >
-                            <div className="relative w-full h-[55%]">
+                            <div className="relative w-full h-full">
                                 {product.img.length > 0 ? (
                                     <Image
                                         src={product.img}
@@ -149,17 +151,19 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
                                     </div>
                                 )}
                             </div>
-                            <div className="p-2 md:p-3">
-                                <h3 className="text-xs md:text-sm font-semibold text-gray-800 truncate">
-                                    {product.name}
-                                </h3>
-                                <p className="text-sm md:text-base font-bold text-blue-600">
-                                    ${product.price.toFixed(2)}
-                                </p>
-                            </div>
                         </motion.div>
                     );
                 })}
+            </div>
+            
+            {/* Center product name displayed outside carousel */}
+            <div className="text-center">
+                <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+                    {centerProduct.name}
+                </h2>
+                <p className="text-xl md:text-2xl font-semibold text-blue-600 mt-2">
+                    ${centerProduct.price.toFixed(2)}
+                </p>
             </div>
         </div>
     );
