@@ -126,7 +126,7 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
             if (index === 4) return { x: slotX[3], y: 8, scale: 0.01, zIndex: 5, opacity: 0 };
         }
 
-        return { x: 0, y: 0, scale: 1, zIndex: 10, opacity: 1 };
+        return { x: slotX[1], y: 0, scale: 1, zIndex: 10, opacity: 0 };
     };
 
     if (displayProducts.length === 0) {
@@ -145,7 +145,7 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
                             key={product.id}
                             animate={currentPos}
                             transition={shouldAnimate ? { type: "spring", stiffness: 300, damping: 28 } : { duration: 0 }}
-                            style={{ width: boxWidth, height: boxHeight, zIndex: currentPos.zIndex }}
+                            style={{ width: boxWidth, height: boxHeight, zIndex: currentPos.zIndex, opacity: 0 }}
                             className="absolute top-12 rounded-2xl shadow-xl bg-white overflow-hidden cursor-pointer hover:shadow-2xl transition-shadow"
                             onClick={() => {
                                 const originalIndex = products.findIndex(p => p.id === product.id);
