@@ -88,10 +88,10 @@ export default function VariantFilterPanel({
         <div className="pt-3 border-t">
           <p className="text-xs font-semibold mb-2">Current Selection:</p>
           <div className="space-y-1 text-xs">
-            <p><span className="font-medium">Color:</span> {currentVariant.color}</p>
-            <p><span className="font-medium">Size:</span> {currentVariant.size}</p>
-            <p><span className="font-medium">Price:</span> ${currentVariant.price.toFixed(2)}</p>
-            <p><span className="font-medium">Stock:</span> {currentVariant.stock}</p>
+            <p><span className="font-medium">Color:</span> {currentVariant.color || 'N/A'}</p>
+            <p><span className="font-medium">Size:</span> {currentVariant.size || 'N/A'}</p>
+            <p><span className="font-medium">Price:</span> ${currentVariant.price?.toFixed(2) || '0.00'}</p>
+            <p><span className="font-medium">Stock:</span> {currentVariant.stock ?? 'N/A'}</p>
           </div>
         </div>
       )}

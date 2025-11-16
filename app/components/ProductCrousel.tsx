@@ -166,7 +166,7 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
                     );
                 })}
             </div>
-            <div>
+            {/* <div>
                 <motion.div
                     key={centerProduct.id}
                     initial={{ scale: 0.8, opacity: 0 }}
@@ -186,7 +186,7 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
                         ${centerProduct.price.toFixed(2)}
                     </p>
                 </motion.div>
-            </div>
+            </div> */}
         </div>
     );
 }
