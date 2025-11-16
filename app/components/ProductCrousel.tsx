@@ -13,6 +13,7 @@ type ProductCrouselProps = {
 export function ProductCrousel({ products, currentIndex, setCurrentIndex }: ProductCrouselProps) {
     const [direction, setDirection] = useState<'next' | 'prev' | 'idle'>('idle');
     const [displayProducts, setDisplayProducts] = useState(products.slice(0, 5));
+    const [shouldAnimate, setShouldAnimate] = useState(true);
     
     // Sync displayProducts when products prop changes
     useEffect(() => {
@@ -61,15 +62,13 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
         
         setDirection('next');
         
-        // After animation completes, rotate the array and reset to idle
+        // After animation completes, snap to idle without animation
         setTimeout(() => {
-            setDisplayProducts(prev => {
-                const newArray = [...prev];
-                const first = newArray.shift()!;
-                newArray.push(first);
-                return newArray;
-            });
+            setShouldAnimate(false);
             setDirection('idle');
+            
+            // Re-enable animation after state update
+            setTimeout(() => setShouldAnimate(true), 50);
         }, 800);
     };
 
@@ -78,15 +77,13 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
         
         setDirection('prev');
         
-        // After animation completes, rotate the array in reverse and reset to idle
+        // After animation completes, snap to idle without animation
         setTimeout(() => {
-            setDisplayProducts(prev => {
-                const newArray = [...prev];
-                const last = newArray.pop()!;
-                newArray.unshift(last);
-                return newArray;
-            });
+            setShouldAnimate(false);
             setDirection('idle');
+            
+            // Re-enable animation after state update
+            setTimeout(() => setShouldAnimate(true), 50);
         }, 800);
     };
 
@@ -105,7 +102,7 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
                         <motion.div
                             key={product.id}
                             animate={currentPos}
-                            transition={{ type: "spring", stiffness: 300, damping: 28 }}
+                            transition={shouldAnimate ? { type: "spring", stiffness: 300, damping: 28 } : { duration: 0 }}
                             style={{ width: boxWidth, height: boxHeight, zIndex: currentPos.zIndex }}
                             className="absolute top-12 rounded-2xl shadow-xl bg-white overflow-hidden cursor-pointer hover:shadow-2xl transition-shadow"
                             onClick={() => {
