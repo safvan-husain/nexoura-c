@@ -13,33 +13,29 @@ type ProductCrouselProps = {
 export function ProductCrousel({ products, currentIndex, setCurrentIndex }: ProductCrouselProps) {
     const [direction, setDirection] = useState<'next' | 'prev' | 'idle'>('idle');
     const [displayProducts, setDisplayProducts] = useState(products.slice(0, 5));
-    const [shouldAnimate, setShouldAnimate] = useState(true);
     const prevIndexRef = useRef(currentIndex);
     const isAnimatingRef = useRef(false);
 
     // Sync displayProducts centered around currentIndex
     useEffect(() => {
-        setTimeout(() => {
-            if (products.length === 0) {
-                setDisplayProducts([]);
-                return;
-            }
+        if (products.length === 0) {
+            setDisplayProducts([]);
+            return;
+        }
 
-            const totalProducts = products.length;
-            const displayCount = Math.min(5, totalProducts);
-            const newDisplay = [];
+        const totalProducts = products.length;
+        const displayCount = Math.min(5, totalProducts);
+        const newDisplay = [];
 
-            // Calculate positions: currentIndex should be at position 2 (3rd element, 0-indexed)
-            // So we need 2 items before currentIndex and 2 items after
-            for (let i = 0; i < displayCount; i++) {
-                const offset = i - 2; // -2, -1, 0, 1, 2
-                let index = (currentIndex + offset + totalProducts) % totalProducts;
-                newDisplay.push(products[index]);
-            }
+        // Calculate positions: currentIndex should be at position 2 (3rd element, 0-indexed)
+        // So we need 2 items before currentIndex and 2 items after
+        for (let i = 0; i < displayCount; i++) {
+            const offset = i - 2; // -2, -1, 0, 1, 2
+            let index = (currentIndex + offset + totalProducts) % totalProducts;
+            newDisplay.push(products[index]);
+        }
 
-            setDisplayProducts(newDisplay.reverse());
-        }, 50);
-
+        setDisplayProducts(newDisplay.reverse());
     }, [products, currentIndex]);
 
     // Watch for currentIndex changes and trigger animation
@@ -66,27 +62,10 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
         isAnimatingRef.current = true;
         setDirection(animDirection);
 
-        // After animation completes, snap to idle without animation
+        // After animation completes, reset to idle
         setTimeout(() => {
-            setShouldAnimate(false);
-            setDisplayProducts(prev => {
-                const newArray = [...prev];
-                if (animDirection === 'next') {
-                    const first = newArray.shift()!;
-                    newArray.push(first);
-                } else {
-                    const last = newArray.pop()!;
-                    newArray.unshift(last);
-                }
-                return newArray;
-            });
             setDirection('idle');
-
-            // Re-enable animation after state update
-            setTimeout(() => {
-                setShouldAnimate(true);
-                isAnimatingRef.current = false;
-            }, 50);
+            isAnimatingRef.current = false;
         }, 800);
 
         prevIndexRef.current = currentIndex;
@@ -109,9 +88,9 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
             // Next: shift right (reversed - items move right when going to next)
             if (index === 0) return { x: '0%', y: 8, scale: 0.5, zIndex: 5, opacity: 0 };
             if (index === 1) return { x: '0%', y: 8, scale: 0.4, zIndex: 10, opacity: 1 };
-            if (index === 2) return { x: '0%', y: 0, scale: .4, zIndex: 40, opacity: 1 };
+            if (index === 2) return { x: '0%', y: 0, scale: .7, zIndex: 40, opacity: 1 };
             if (index === 3) return { x: '35%', y: 0, scale: 1, zIndex: 35, opacity: 1 };
-            if (index === 4) return { x: '70%', y: 0, scale: .5, zIndex: 25, opacity: 1 };
+            if (index === 4) return { x: '70%', y: 0, scale: .7, zIndex: 40, opacity: 1 };
         }
 
         if (animState === 'prev') {
@@ -148,7 +127,7 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
                                 scale: currentPos.scale,
                                 opacity: currentPos.opacity
                             }}
-                            transition={shouldAnimate ? { type: "spring", stiffness: 300, damping: 28 } : { duration: 0 }}
+                            transition={{ type: "spring", stiffness: 300, damping: 28 }}
                             style={{ zIndex: currentPos.zIndex }}
                             className={`absolute top-8 md:top-12 w-[30%] aspect-[3/4] rounded-2xl shadow-xl ${bgColor} overflow-hidden cursor-pointer hover:shadow-2xl transition-shadow ${i == 0 && direction === "next" ? "hidden" : ""} ${i == 4 && direction === "prev" ? "hidden" : ""}`}
                             onClick={() => {
