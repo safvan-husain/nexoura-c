@@ -92,10 +92,19 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
         prevIndexRef.current = currentIndex;
     }, [currentIndex, products.length]);
 
-    // Base positions (px) for five slots (left-to-right)
-    const slotX = [0, 140, 280, 420, 560];
-    const boxWidth = 120;
-    const boxHeight = 160;
+    // Base dimensions
+    const boxWidth = 180;
+    const boxHeight = 220;
+    const spacing = 20; // Gap between cards
+    
+    // Dynamic positions based on box width and spacing
+    const slotX = [
+        boxWidth + spacing,
+        boxWidth + spacing,
+        (boxWidth + spacing) * 2,
+        (boxWidth + spacing) * 3,
+        (boxWidth + spacing) * 4
+    ];
 
     // Get position for a slot index based on current animation state
     const getPosition = (index: number, animState: 'idle' | 'next' | 'prev') => {
@@ -133,9 +142,12 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
         return <div className="text-center text-gray-500">No products available</div>;
     }
 
+    // Calculate container width dynamically
+    const containerWidth = (boxWidth + spacing) * 4;
+    
     return (
-        <div className="w-full min-h-[320px] flex items-center justify-center p-8">
-            <div className="relative w-[720px] h-[420px]">
+        <div className="w-full min-h-[400px] flex items-center justify-center p-8">
+            <div className="relative h-[500px]" style={{ width: containerWidth }}>
                 {/* Boxes: render all five so stacking/animation looks natural */}
                 {displayProducts.map((product, i) => {
                     const currentPos = getPosition(i, direction);
@@ -152,7 +164,7 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
                                 if (originalIndex >= 0) setCurrentIndex(originalIndex);
                             }}
                         >
-                            <div className="relative w-full h-24">
+                            <div className="relative w-full h-32">
                                 {product.img.length > 0 ? (
                                     <Image
                                         src={product.img}
@@ -162,15 +174,15 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
                                     />
                                 ) : (
                                     <div className="bg-gray-200 w-full h-full flex items-center justify-center">
-                                        <span className="text-gray-400 text-xs">No image</span>
+                                        <span className="text-gray-400 text-sm">No image</span>
                                     </div>
                                 )}
                             </div>
-                            <div className="p-2">
-                                <h3 className="text-xs font-semibold text-gray-800 truncate">
+                            <div className="p-3">
+                                <h3 className="text-sm font-semibold text-gray-800 truncate">
                                     {product.name}
                                 </h3>
-                                <p className="text-sm font-bold text-blue-600">
+                                <p className="text-base font-bold text-blue-600">
                                     ${product.price.toFixed(2)}
                                 </p>
                             </div>
