@@ -76,29 +76,29 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
     const getPosition = (index: number, animState: 'idle' | 'next' | 'prev') => {
         if (animState === 'idle') {
             // Default idle positions (percentage-based with spacing)
-            if (index === 0) return { x: '0%', y: 8, scale: 0.5, zIndex: 10, opacity: 0 };
-            if (index === 1) return { x: '0%', y: 0, scale: .7, zIndex: 40, opacity: 1 };
-            if (index === 2) return { x: '35%', y: 0, scale: 1, zIndex: 35, opacity: 1 };
-            if (index === 3) return { x: '70%', y: 0, scale: .7, zIndex: 30, opacity: 1 };
-            if (index === 4) return { x: '70%', y: 8, scale: 0.5, zIndex: 9, opacity: 0 };
+            if (index === 0) return { x: '0%', y: 8, scale: 0.5, zIndex: 5, opacity: 0 };
+            if (index === 1) return { x: '0%', y: 0, scale: .7, zIndex: 20, opacity: 1 };
+            if (index === 2) return { x: '35%', y: 0, scale: 1, zIndex: 50, opacity: 1 };
+            if (index === 3) return { x: '70%', y: 0, scale: .7, zIndex: 20, opacity: 1 };
+            if (index === 4) return { x: '70%', y: 8, scale: 0.5, zIndex: 5, opacity: 0 };
         }
 
         if (animState === 'next') {
             // Next: shift right (reversed - items move right when going to next)
             if (index === 0) return { x: '0%', y: 8, scale: 0.5, zIndex: 5, opacity: 0 };
-            if (index === 1) return { x: '0%', y: 8, scale: 0.4, zIndex: 10, opacity: 1 };
-            if (index === 2) return { x: '0%', y: 0, scale: .7, zIndex: 40, opacity: 1 };
-            if (index === 3) return { x: '35%', y: 0, scale: 1, zIndex: 35, opacity: 1 };
-            if (index === 4) return { x: '70%', y: 0, scale: .7, zIndex: 40, opacity: 1 };
+            if (index === 1) return { x: '0%', y: 8, scale: 0.4, zIndex: 5, opacity: 1 };
+            if (index === 2) return { x: '0%', y: 0, scale: .7, zIndex: 20, opacity: 1 };
+            if (index === 3) return { x: '35%', y: 0, scale: 1, zIndex: 50, opacity: 1 };
+            if (index === 4) return { x: '70%', y: 0, scale: .7, zIndex: 20, opacity: 1 };
         }
 
         if (animState === 'prev') {
             // Prev: shift left (reversed - items move left when going to previous)
-            if (index === 0) return { x: '0%', y: 0, scale: .7, zIndex: 40, opacity: 1 };
-            if (index === 1) return { x: '35%', y: 0, scale: 1, zIndex: 35, opacity: 1 };
-            if (index === 2) return { x: '70%', y: 0, scale: .7, zIndex: 30, opacity: 1 };
-            if (index === 3) return { x: '70%', y: 8, scale: 0.4, zIndex: 9, opacity: 0 };
-            if (index === 4) return { x: '0%', y: 8, scale: 0.5, zIndex: 0, opacity: 0 };
+            if (index === 0) return { x: '0%', y: 0, scale: .7, zIndex: 20, opacity: 1 };
+            if (index === 1) return { x: '35%', y: 0, scale: 1, zIndex: 50, opacity: 1 };
+            if (index === 2) return { x: '70%', y: 0, scale: .7, zIndex: 20, opacity: 1 };
+            if (index === 3) return { x: '70%', y: 8, scale: 0.4, zIndex: 5, opacity: 0 };
+            if (index === 4) return { x: '0%', y: 8, scale: 0.5, zIndex: 5, opacity: 0 };
         }
 
         return { x: '0%', y: 0, scale: 1, zIndex: 10, opacity: 0 };
