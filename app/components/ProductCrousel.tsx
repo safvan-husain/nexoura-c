@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
 import Image from "next/image";
 
 type ProductCrouselProps = {
@@ -14,11 +14,63 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
     const [direction, setDirection] = useState<'next' | 'prev' | 'idle'>('idle');
     const [displayProducts, setDisplayProducts] = useState(products.slice(0, 5));
     const [shouldAnimate, setShouldAnimate] = useState(true);
+    const prevIndexRef = useRef(currentIndex);
+    const isAnimatingRef = useRef(false);
     
     // Sync displayProducts when products prop changes
     useEffect(() => {
         setDisplayProducts(products.slice(0, 5));
     }, [products]);
+
+    // Watch for currentIndex changes and trigger animation
+    useEffect(() => {
+        if (isAnimatingRef.current || products.length < 2) return;
+        
+        const prevIndex = prevIndexRef.current;
+        const totalProducts = products.length;
+        
+        if (prevIndex === currentIndex) return;
+        
+        // Determine direction based on index change
+        let animDirection: 'next' | 'prev';
+        
+        // Handle wrapping (e.g., 0 -> last or last -> 0)
+        if (prevIndex === 0 && currentIndex === totalProducts - 1) {
+            animDirection = 'prev';
+        } else if (prevIndex === totalProducts - 1 && currentIndex === 0) {
+            animDirection = 'next';
+        } else {
+            animDirection = currentIndex > prevIndex ? 'next' : 'prev';
+        }
+        
+        isAnimatingRef.current = true;
+        setDirection(animDirection);
+        
+        // After animation completes, snap to idle without animation
+        setTimeout(() => {
+            setShouldAnimate(false);
+            setDisplayProducts(prev => {
+                const newArray = [...prev];
+                if (animDirection === 'next') {
+                    const first = newArray.shift()!;
+                    newArray.push(first);
+                } else {
+                    const last = newArray.pop()!;
+                    newArray.unshift(last);
+                }
+                return newArray;
+            });
+            setDirection('idle');
+            
+            // Re-enable animation after state update
+            setTimeout(() => {
+                setShouldAnimate(true);
+                isAnimatingRef.current = false;
+            }, 50);
+        }, 800);
+        
+        prevIndexRef.current = currentIndex;
+    }, [currentIndex, products.length]);
 
     // Base positions (px) for five slots (left-to-right)
     const slotX = [0, 140, 280, 420, 560];
@@ -55,36 +107,6 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
         }
         
         return { x: 0, y: 0, scale: 1, zIndex: 10, opacity: 1 };
-    };
-
-    const handleNext = () => {
-        if (direction !== 'idle' || displayProducts.length < 2) return;
-        
-        setDirection('next');
-        
-        // After animation completes, snap to idle without animation
-        setTimeout(() => {
-            setShouldAnimate(false);
-            setDirection('idle');
-            
-            // Re-enable animation after state update
-            setTimeout(() => setShouldAnimate(true), 50);
-        }, 800);
-    };
-
-    const handlePrev = () => {
-        if (direction !== 'idle' || displayProducts.length < 2) return;
-        
-        setDirection('prev');
-        
-        // After animation completes, snap to idle without animation
-        setTimeout(() => {
-            setShouldAnimate(false);
-            setDirection('idle');
-            
-            // Re-enable animation after state update
-            setTimeout(() => setShouldAnimate(true), 50);
-        }, 800);
     };
 
     if (displayProducts.length === 0) {
@@ -135,24 +157,6 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
                         </motion.div>
                     );
                 })}
-
-                {/* Navigation Buttons */}
-                <div className="absolute left-2 bottom-2 flex gap-2">
-                    <button
-                        onClick={handlePrev}
-                        disabled={direction !== 'idle'}
-                        className="px-4 py-2 rounded-full bg-gray-900 text-white shadow-md hover:scale-105 active:scale-95 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        Previous
-                    </button>
-                    <button
-                        onClick={handleNext}
-                        disabled={direction !== 'idle'}
-                        className="px-4 py-2 rounded-full bg-gray-900 text-white shadow-md hover:scale-105 active:scale-95 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        Next
-                    </button>
-                </div>
             </div>
         </div>
     );
