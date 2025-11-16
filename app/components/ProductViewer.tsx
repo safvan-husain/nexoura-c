@@ -4,9 +4,8 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import FilterPanel, { FilterState } from './FilterPanel'
-import ProductImageCube from './ProductImageCube'
-import ProductDetailsCard from './ProductDetailsCard'
 import VariantFilterPanel from './VariantFilterPanel'
+import { ProductCrousel } from './ProductCrousel'
 
 interface ProductViewerProps {
   products: any[]
@@ -202,18 +201,16 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
       {/* Main Product View */}
       <div className="grid grid-cols-[1fr_auto_1fr_auto] gap-4">
         {/* Image Section with Navigation */}
-        <ProductImageCube
-          currentProduct={currentProduct}
-          prevProduct={products[currentIndex - 1]}
-          nextProduct={products[currentIndex + 1]}
-          currentVariantIndex={currentVariantIndex}
-          imageTransition={imageTransition}
-          slideDirection={slideDirection}
-          onPrevious={handlePrevious}
-          onNext={handleNext}
-          canGoPrevious={!(currentIndex === 0 && currentImageIndex === 0)}
-          canGoNext={!(currentIndex === products.length - 1 && currentImageIndex === images.length - 1)}
-        />
+        <ProductCrousel 
+          products={products.map(p => ({
+            img: p.variants?.[0]?.images?.[0]?.url || '',
+            name: p.name,
+            price: p.price,
+            id: p._id
+          }))}
+          currentIndex={currentIndex}
+          setCurrentIndex={handleProductSelect}
+        /> 
         
         {/* Variant Image Thumbnails - Vertical */}
         <div className="flex flex-col gap-2 h-[50vh] overflow-y-auto pr-2">
