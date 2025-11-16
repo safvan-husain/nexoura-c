@@ -137,19 +137,74 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
   }
 
   return (
-    <div className="flex gap-4 max-w-[1600px] mx-auto px-4 py-4">
+    <div className="flex gap-4 max-w-[1600px] min-h-screen mx-auto px-4 py-4">
       {/* Filter Panel on the Left */}
-      <div className="flex-shrink-0">
+      {/* <div className="">
         <FilterPanel onFilterChange={handleFilterChange} />
-      </div>
+      </div> */}
 
       {/* Main Content */}
       <div className="flex-1 min-w-0">
-      
-      {/* Other Products Gallery - Moved to Top */}
-      <div className="bg-white rounded-lg shadow-md p-3 mb-4">
-        <div className="overflow-x-auto">
-          <div className="flex gap-2 pb-2">
+        {/* Main Product View */}
+        <div className="flex gap-4">
+          {/* Image Section with Navigation */}
+          <ProductCrousel 
+            products={products.map(p => ({
+              img: p.variants?.[0]?.images?.[0]?.url || '',
+              name: p.name,
+              price: p.price,
+              id: p._id
+            }))}
+            currentIndex={currentIndex}
+            setCurrentIndex={handleProductSelect}
+          /> 
+          
+          {/* Variant Image Thumbnails - Vertical */}
+          <div className="flex flex-col gap-2 h-[50vh] overflow-y-auto pr-2">
+            {images.map((img: any, idx: number) => (
+              <button
+                key={idx}
+                onClick={() => setCurrentImageIndex(idx)}
+                className={`relative w-16 h-16 flex-shrink-0 rounded-md overflow-hidden transition-all ${
+                  idx === currentImageIndex 
+                    ? 'ring-2 ring-blue-500 scale-105' 
+                    : 'hover:scale-105 opacity-70 hover:opacity-100'
+                }`}
+              >
+                <Image
+                  src={img.url}
+                  alt={img.alt || `Image ${idx + 1}`}
+                  fill
+                  className="object-cover"
+                />
+              </button>
+            ))}
+          </div>
+
+          {/* Product Details Card */}
+          {/* <ProductDetailsCard
+            product={currentProduct}
+            currentVariant={currentVariant}
+            detailsTransition={detailsTransition}
+          /> */}
+          
+          {/* Variant Filter Panel - Right Side */}
+          <VariantFilterPanel
+            availableColors={availableColors}
+            availableSizes={availableSizes}
+            selectedColor={selectedColor}
+            selectedSize={selectedSize}
+            currentVariant={currentVariant}
+            onColorSelect={handleColorSelect}
+            onSizeSelect={handleSizeSelect}
+          />
+        </div>
+      </div>
+
+      {/* Other Products Gallery - Right Corner Vertical Grid */}
+      <div className="w-28">
+        <div className="bg-white rounded-lg shadow-md p-3 sticky top-4">
+          <div className="grid grid-cols-2 gap-3 max-h-[calc(100vh-2rem)] overflow-hidden">
             {products.map((product, index) => {
               const variant = product.variants?.[0]
               const image = variant?.images?.[0]
@@ -158,7 +213,7 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
                 <button
                   key={product._id}
                   onClick={() => handleProductSelect(index)}
-                  className={`flex-shrink-0 w-20 transition-all ${
+                  className={`flex-shrink-0 transition-all ${
                     index === currentIndex 
                       ? 'ring-2 ring-blue-500 scale-105' 
                       : 'hover:scale-105'
@@ -196,62 +251,6 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
             })}
           </div>
         </div>
-      </div>
-      
-      {/* Main Product View */}
-      <div className="grid grid-cols-[1fr_auto_1fr_auto] gap-4">
-        {/* Image Section with Navigation */}
-        <ProductCrousel 
-          products={products.map(p => ({
-            img: p.variants?.[0]?.images?.[0]?.url || '',
-            name: p.name,
-            price: p.price,
-            id: p._id
-          }))}
-          currentIndex={currentIndex}
-          setCurrentIndex={handleProductSelect}
-        /> 
-        
-        {/* Variant Image Thumbnails - Vertical */}
-        <div className="flex flex-col gap-2 h-[50vh] overflow-y-auto pr-2">
-          {images.map((img: any, idx: number) => (
-            <button
-              key={idx}
-              onClick={() => setCurrentImageIndex(idx)}
-              className={`relative w-16 h-16 flex-shrink-0 rounded-md overflow-hidden transition-all ${
-                idx === currentImageIndex 
-                  ? 'ring-2 ring-blue-500 scale-105' 
-                  : 'hover:scale-105 opacity-70 hover:opacity-100'
-              }`}
-            >
-              <Image
-                src={img.url}
-                alt={img.alt || `Image ${idx + 1}`}
-                fill
-                className="object-cover"
-              />
-            </button>
-          ))}
-        </div>
-
-        {/* Product Details Card */}
-        {/* <ProductDetailsCard
-          product={currentProduct}
-          currentVariant={currentVariant}
-          detailsTransition={detailsTransition}
-        /> */}
-        
-        {/* Variant Filter Panel - Right Side */}
-        <VariantFilterPanel
-          availableColors={availableColors}
-          availableSizes={availableSizes}
-          selectedColor={selectedColor}
-          selectedSize={selectedSize}
-          currentVariant={currentVariant}
-          onColorSelect={handleColorSelect}
-          onSizeSelect={handleSizeSelect}
-        />
-      </div>
       </div>
     </div>
   )

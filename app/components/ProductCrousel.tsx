@@ -92,62 +92,47 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
         prevIndexRef.current = currentIndex;
     }, [currentIndex, products.length]);
 
-    // Base dimensions
-    const boxWidth = 180;
-    const boxHeight = 220;
-    const spacing = 20; // Gap between cards
-    
-    // Dynamic positions based on box width and spacing
-    const slotX = [
-        boxWidth + spacing,
-        boxWidth + spacing,
-        (boxWidth + spacing) * 2,
-        (boxWidth + spacing) * 3,
-        (boxWidth + spacing) * 4
-    ];
-
     // Get position for a slot index based on current animation state
+    // Using percentage-based positioning for responsive layout
+    // Card width is 30%, so positions: 0%, 35%, 70% (30% + 5% gap between cards)
     const getPosition = (index: number, animState: 'idle' | 'next' | 'prev') => {
         if (animState === 'idle') {
-            // Default idle positions
-            if (index === 0) return { x: slotX[1], y: 8, scale: 0.01, zIndex: 10, opacity: 0 };
-            if (index === 1) return { x: slotX[1], y: 0, scale: 1, zIndex: 40, opacity: 1 };
-            if (index === 2) return { x: slotX[2], y: 0, scale: 1, zIndex: 35, opacity: 1 };
-            if (index === 3) return { x: slotX[3], y: 0, scale: 1, zIndex: 30, opacity: 1 };
-            if (index === 4) return { x: slotX[3], y: 8, scale: 0.92, zIndex: 9, opacity: 1 };
+            // Default idle positions (percentage-based with spacing)
+            if (index === 0) return { x: '0%', y: 8, scale: 0.01, zIndex: 10, opacity: 0 };
+            if (index === 1) return { x: '0%', y: 0, scale: 1, zIndex: 40, opacity: 1 };
+            if (index === 2) return { x: '35%', y: 0, scale: 1, zIndex: 35, opacity: 1 };
+            if (index === 3) return { x: '70%', y: 0, scale: 1, zIndex: 30, opacity: 1 };
+            if (index === 4) return { x: '70%', y: 8, scale: 0.92, zIndex: 9, opacity: 1 };
         }
 
         if (animState === 'next') {
             // Next: shift right (reversed - items move right when going to next)
-            if (index === 0) return { x: slotX[1], y: 8, scale: 0.01, zIndex: 5, opacity: 0 };
-            if (index === 1) return { x: slotX[1], y: 8, scale: 0.01, zIndex: 10, opacity: 0 };
-            if (index === 2) return { x: slotX[1], y: 0, scale: 1, zIndex: 40, opacity: 1 };
-            if (index === 3) return { x: slotX[2], y: 0, scale: 1, zIndex: 35, opacity: 1 };
-            if (index === 4) return { x: slotX[3], y: 0, scale: 1, zIndex: 30, opacity: 1 };
+            if (index === 0) return { x: '0%', y: 8, scale: 0.01, zIndex: 5, opacity: 0 };
+            if (index === 1) return { x: '0%', y: 8, scale: 0.01, zIndex: 10, opacity: 0 };
+            if (index === 2) return { x: '0%', y: 0, scale: 1, zIndex: 40, opacity: 1 };
+            if (index === 3) return { x: '35%', y: 0, scale: 1, zIndex: 35, opacity: 1 };
+            if (index === 4) return { x: '70%', y: 0, scale: 1, zIndex: 30, opacity: 1 };
         }
 
         if (animState === 'prev') {
             // Prev: shift left (reversed - items move left when going to previous)
-            if (index === 0) return { x: slotX[1], y: 0, scale: 1, zIndex: 40, opacity: 1 };
-            if (index === 1) return { x: slotX[2], y: 0, scale: 1, zIndex: 35, opacity: 1 };
-            if (index === 2) return { x: slotX[3], y: 0, scale: 1, zIndex: 30, opacity: 1 };
-            if (index === 3) return { x: slotX[3], y: 8, scale: 0.92, zIndex: 9, opacity: 1 };
-            if (index === 4) return { x: slotX[3], y: 8, scale: 0.01, zIndex: 5, opacity: 0 };
+            if (index === 0) return { x: '0%', y: 0, scale: 1, zIndex: 40, opacity: 1 };
+            if (index === 1) return { x: '35%', y: 0, scale: 1, zIndex: 35, opacity: 1 };
+            if (index === 2) return { x: '70%', y: 0, scale: 1, zIndex: 30, opacity: 1 };
+            if (index === 3) return { x: '70%', y: 8, scale: 0.92, zIndex: 9, opacity: 1 };
+            if (index === 4) return { x: '70%', y: 8, scale: 0.01, zIndex: 5, opacity: 0 };
         }
 
-        return { x: slotX[1], y: 0, scale: 1, zIndex: 10, opacity: 0 };
+        return { x: '0%', y: 0, scale: 1, zIndex: 10, opacity: 0 };
     };
 
     if (displayProducts.length === 0) {
         return <div className="text-center text-gray-500">No products available</div>;
     }
-
-    // Calculate container width dynamically
-    const containerWidth = (boxWidth + spacing) * 4;
     
     return (
-        <div className="w-full min-h-[400px] flex items-center justify-center p-8">
-            <div className="relative h-[500px]" style={{ width: containerWidth }}>
+        <div className="w-full min-h-[400px] flex items-center justify-center p-4 md:p-8">
+            <div className="relative w-full h-[400px] md:h-[500px] max-w-4xl">
                 {/* Boxes: render all five so stacking/animation looks natural */}
                 {displayProducts.map((product, i) => {
                     const currentPos = getPosition(i, direction);
@@ -155,16 +140,21 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
                     return (
                         <motion.div
                             key={product.id}
-                            animate={currentPos}
+                            animate={{
+                                left: currentPos.x,
+                                y: currentPos.y,
+                                scale: currentPos.scale,
+                                opacity: currentPos.opacity
+                            }}
                             transition={shouldAnimate ? { type: "spring", stiffness: 300, damping: 28 } : { duration: 0 }}
-                            style={{ width: boxWidth, height: boxHeight, zIndex: currentPos.zIndex, opacity: 0 }}
-                            className="absolute top-12 rounded-2xl shadow-xl bg-white overflow-hidden cursor-pointer hover:shadow-2xl transition-shadow"
+                            style={{ zIndex: currentPos.zIndex }}
+                            className="absolute top-8 md:top-12 w-[30%] aspect-[3/4] rounded-2xl shadow-xl bg-white overflow-hidden cursor-pointer hover:shadow-2xl transition-shadow"
                             onClick={() => {
                                 const originalIndex = products.findIndex(p => p.id === product.id);
                                 if (originalIndex >= 0) setCurrentIndex(originalIndex);
                             }}
                         >
-                            <div className="relative w-full h-32">
+                            <div className="relative w-full h-[55%]">
                                 {product.img.length > 0 ? (
                                     <Image
                                         src={product.img}
@@ -174,15 +164,15 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
                                     />
                                 ) : (
                                     <div className="bg-gray-200 w-full h-full flex items-center justify-center">
-                                        <span className="text-gray-400 text-sm">No image</span>
+                                        <span className="text-gray-400 text-xs md:text-sm">No image</span>
                                     </div>
                                 )}
                             </div>
-                            <div className="p-3">
-                                <h3 className="text-sm font-semibold text-gray-800 truncate">
+                            <div className="p-2 md:p-3">
+                                <h3 className="text-xs md:text-sm font-semibold text-gray-800 truncate">
                                     {product.name}
                                 </h3>
-                                <p className="text-base font-bold text-blue-600">
+                                <p className="text-sm md:text-base font-bold text-blue-600">
                                     ${product.price.toFixed(2)}
                                 </p>
                             </div>
