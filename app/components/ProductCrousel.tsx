@@ -98,29 +98,29 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
     const getPosition = (index: number, animState: 'idle' | 'next' | 'prev') => {
         if (animState === 'idle') {
             // Default idle positions (percentage-based with spacing)
-            if (index === 0) return { x: '0%', y: 8, scale: 0.01, zIndex: 10, opacity: 0 };
-            if (index === 1) return { x: '0%', y: 0, scale: 1, zIndex: 40, opacity: 1 };
+            if (index === 0) return { x: '0%', y: 8, scale: 0.5, zIndex: 10, opacity: 0 };
+            if (index === 1) return { x: '0%', y: 0, scale: .7, zIndex: 40, opacity: 1 };
             if (index === 2) return { x: '35%', y: 0, scale: 1, zIndex: 35, opacity: 1 };
-            if (index === 3) return { x: '70%', y: 0, scale: 1, zIndex: 30, opacity: 1 };
-            if (index === 4) return { x: '70%', y: 8, scale: 0.92, zIndex: 9, opacity: 1 };
+            if (index === 3) return { x: '70%', y: 0, scale: .7, zIndex: 30, opacity: 1 };
+            if (index === 4) return { x: '70%', y: 8, scale: 0.5, zIndex: 9, opacity: 0 };
         }
 
         if (animState === 'next') {
             // Next: shift right (reversed - items move right when going to next)
-            if (index === 0) return { x: '0%', y: 8, scale: 0.01, zIndex: 5, opacity: 0 };
-            if (index === 1) return { x: '0%', y: 8, scale: 0.01, zIndex: 10, opacity: 0 };
-            if (index === 2) return { x: '0%', y: 0, scale: 1, zIndex: 40, opacity: 1 };
+            if (index === 0) return { x: '0%', y: 8, scale: 0.5, zIndex: 5, opacity: 0 };
+            if (index === 1) return { x: '0%', y: 8, scale: 0.4, zIndex: 10, opacity: 1 };
+            if (index === 2) return { x: '0%', y: 0, scale: .4, zIndex: 40, opacity: 1 };
             if (index === 3) return { x: '35%', y: 0, scale: 1, zIndex: 35, opacity: 1 };
-            if (index === 4) return { x: '70%', y: 0, scale: 1, zIndex: 30, opacity: 1 };
+            if (index === 4) return { x: '70%', y: 0, scale: .5, zIndex: 25, opacity: 1 };
         }
 
         if (animState === 'prev') {
             // Prev: shift left (reversed - items move left when going to previous)
-            if (index === 0) return { x: '0%', y: 0, scale: 1, zIndex: 40, opacity: 1 };
+            if (index === 0) return { x: '0%', y: 0, scale: .7, zIndex: 40, opacity: 1 };
             if (index === 1) return { x: '35%', y: 0, scale: 1, zIndex: 35, opacity: 1 };
-            if (index === 2) return { x: '70%', y: 0, scale: 1, zIndex: 30, opacity: 1 };
-            if (index === 3) return { x: '70%', y: 8, scale: 0.92, zIndex: 9, opacity: 1 };
-            if (index === 4) return { x: '70%', y: 8, scale: 0.01, zIndex: 5, opacity: 0 };
+            if (index === 2) return { x: '70%', y: 0, scale: .7, zIndex: 30, opacity: 1 };
+            if (index === 3) return { x: '70%', y: 8, scale: 0.4, zIndex: 9, opacity: 0 };
+            if (index === 4) return { x: '0%', y: 8, scale: 0.5, zIndex: 0, opacity: 0 };
         }
 
         return { x: '0%', y: 0, scale: 1, zIndex: 10, opacity: 0 };
@@ -129,13 +129,15 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
     if (displayProducts.length === 0) {
         return <div className="text-center text-gray-500">No products available</div>;
     }
-    
+
     return (
         <div className="w-full min-h-[400px] flex items-center justify-center p-4 md:p-8">
             <div className="relative w-full h-[400px] md:h-[500px] max-w-4xl">
                 {/* Boxes: render all five so stacking/animation looks natural */}
                 {displayProducts.map((product, i) => {
                     const currentPos = getPosition(i, direction);
+                    const bgColors = ['bg-blue-500', 'bg-purple-500', 'bg-pink-500', 'bg-green-500', 'bg-yellow-500'];
+                    const bgColor = bgColors[i % bgColors.length];
 
                     return (
                         <motion.div
@@ -148,7 +150,7 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
                             }}
                             transition={shouldAnimate ? { type: "spring", stiffness: 300, damping: 28 } : { duration: 0 }}
                             style={{ zIndex: currentPos.zIndex }}
-                            className="absolute top-8 md:top-12 w-[30%] aspect-[3/4] rounded-2xl shadow-xl bg-white overflow-hidden cursor-pointer hover:shadow-2xl transition-shadow"
+                            className={`absolute top-8 md:top-12 w-[30%] aspect-[3/4] rounded-2xl shadow-xl ${bgColor} overflow-hidden cursor-pointer hover:shadow-2xl transition-shadow ${i == 0 && direction === "next" ? "hidden" : ""} ${i == 4 && direction === "prev" ? "hidden" : ""}`}
                             onClick={() => {
                                 const originalIndex = products.findIndex(p => p.id === product.id);
                                 if (originalIndex >= 0) setCurrentIndex(originalIndex);
