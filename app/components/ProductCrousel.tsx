@@ -16,24 +16,44 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
     const [shouldAnimate, setShouldAnimate] = useState(true);
     const prevIndexRef = useRef(currentIndex);
     const isAnimatingRef = useRef(false);
-    
-    // Sync displayProducts when products prop changes
+
+    // Sync displayProducts centered around currentIndex
     useEffect(() => {
-        setDisplayProducts(products.slice(0, 5));
-    }, [products]);
+        setTimeout(() => {
+            if (products.length === 0) {
+                setDisplayProducts([]);
+                return;
+            }
+
+            const totalProducts = products.length;
+            const displayCount = Math.min(5, totalProducts);
+            const newDisplay = [];
+
+            // Calculate positions: currentIndex should be at position 2 (3rd element, 0-indexed)
+            // So we need 2 items before currentIndex and 2 items after
+            for (let i = 0; i < displayCount; i++) {
+                const offset = i - 2; // -2, -1, 0, 1, 2
+                let index = (currentIndex + offset + totalProducts) % totalProducts;
+                newDisplay.push(products[index]);
+            }
+
+            setDisplayProducts(newDisplay.reverse());
+        }, 50);
+
+    }, [products, currentIndex]);
 
     // Watch for currentIndex changes and trigger animation
     useEffect(() => {
         if (isAnimatingRef.current || products.length < 2) return;
-        
+
         const prevIndex = prevIndexRef.current;
         const totalProducts = products.length;
-        
+
         if (prevIndex === currentIndex) return;
-        
+
         // Determine direction based on index change
         let animDirection: 'next' | 'prev';
-        
+
         // Handle wrapping (e.g., 0 -> last or last -> 0)
         if (prevIndex === 0 && currentIndex === totalProducts - 1) {
             animDirection = 'prev';
@@ -42,10 +62,10 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
         } else {
             animDirection = currentIndex > prevIndex ? 'next' : 'prev';
         }
-        
+
         isAnimatingRef.current = true;
         setDirection(animDirection);
-        
+
         // After animation completes, snap to idle without animation
         setTimeout(() => {
             setShouldAnimate(false);
@@ -61,14 +81,14 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
                 return newArray;
             });
             setDirection('idle');
-            
+
             // Re-enable animation after state update
             setTimeout(() => {
                 setShouldAnimate(true);
                 isAnimatingRef.current = false;
             }, 50);
         }, 800);
-        
+
         prevIndexRef.current = currentIndex;
     }, [currentIndex, products.length]);
 
@@ -87,25 +107,25 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
             if (index === 3) return { x: slotX[3], y: 0, scale: 1, zIndex: 30, opacity: 1 };
             if (index === 4) return { x: slotX[3], y: 8, scale: 0.92, zIndex: 9, opacity: 1 };
         }
-        
+
         if (animState === 'next') {
-            // Next: shift left (0→1, 1→2, 2→3, 3→4, 4 disappears)
-            if (index === 0) return { x: slotX[1], y: 0, scale: 1, zIndex: 40, opacity: 1 };
-            if (index === 1) return { x: slotX[2], y: 0, scale: 1, zIndex: 35, opacity: 1 };
-            if (index === 2) return { x: slotX[3], y: 0, scale: 1, zIndex: 30, opacity: 1 };
-            if (index === 3) return { x: slotX[3], y: 8, scale: 0.92, zIndex: 9, opacity: 1 };
-            if (index === 4) return { x: slotX[3], y: 8, scale: 0.01, zIndex: 5, opacity: 0 };
-        }
-        
-        if (animState === 'prev') {
-            // Prev: shift right (4→3, 3→2, 2→1, 1→0, 0 disappears)
+            // Next: shift right (reversed - items move right when going to next)
             if (index === 0) return { x: slotX[1], y: 8, scale: 0.01, zIndex: 5, opacity: 0 };
             if (index === 1) return { x: slotX[1], y: 8, scale: 0.01, zIndex: 10, opacity: 0 };
             if (index === 2) return { x: slotX[1], y: 0, scale: 1, zIndex: 40, opacity: 1 };
             if (index === 3) return { x: slotX[2], y: 0, scale: 1, zIndex: 35, opacity: 1 };
             if (index === 4) return { x: slotX[3], y: 0, scale: 1, zIndex: 30, opacity: 1 };
         }
-        
+
+        if (animState === 'prev') {
+            // Prev: shift left (reversed - items move left when going to previous)
+            if (index === 0) return { x: slotX[1], y: 0, scale: 1, zIndex: 40, opacity: 1 };
+            if (index === 1) return { x: slotX[2], y: 0, scale: 1, zIndex: 35, opacity: 1 };
+            if (index === 2) return { x: slotX[3], y: 0, scale: 1, zIndex: 30, opacity: 1 };
+            if (index === 3) return { x: slotX[3], y: 8, scale: 0.92, zIndex: 9, opacity: 1 };
+            if (index === 4) return { x: slotX[3], y: 8, scale: 0.01, zIndex: 5, opacity: 0 };
+        }
+
         return { x: 0, y: 0, scale: 1, zIndex: 10, opacity: 1 };
     };
 
