@@ -112,12 +112,12 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
 
     return (
         <div className="w-full flex flex-col items-center justify-center p-4 md:p-8 gap-6">
-            <div className="relative w-full h-[400px] md:h-[500px] max-w-4xl">
+
+            {/* Product carousel container */}
+            <div className="relative w-full h-full pt-12">
                 {/* Boxes: render all five so stacking/animation looks natural */}
                 {displayProducts.map((product, i) => {
                     const currentPos = getPosition(i, direction);
-                    const bgColors = ['bg-blue-500', 'bg-purple-500', 'bg-pink-500', 'bg-green-500', 'bg-yellow-500'];
-                    const bgColor = bgColors[i % bgColors.length];
 
                     return (
                         <motion.div
@@ -130,51 +130,64 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
                             }}
                             transition={{ type: "spring", stiffness: 300, damping: 28 }}
                             style={{ zIndex: currentPos.zIndex }}
-                            className={`absolute top-8 md:top-12 w-[30%] aspect-[3/4] cursor-pointer ${i == 0 && direction === "next" ? "hidden" : ""} ${i == 4 && direction === "prev" ? "hidden" : ""}`}
+                            className={`absolute top-8 md:top-16 w-[30%] aspect-[3/4] cursor-pointer ${i == 0 && direction === "next" ? "hidden" : ""} ${i == 4 && direction === "prev" ? "hidden" : ""}`}
                             onClick={() => {
                                 const originalIndex = products.findIndex(p => p.id === product.id);
                                 if (originalIndex >= 0) setCurrentIndex(originalIndex);
                             }}
                         >
+                            {/* Product card with shadow */}
                             <div className="relative w-full h-full">
-                                {product.img.length > 0 ? (
-                                    <Image
-                                        src={product.img}
-                                        alt={product.name}
-                                        fill
-                                        className="object-contain"
-                                    />
-                                ) : (
-                                    <div className="bg-gray-200 w-full h-full flex items-center justify-center">
-                                        <span className="text-gray-400 text-xs md:text-sm">No image</span>
-                                    </div>
-                                )}
+                                {/* Product image */}
+                                <div className="relative w-full h-full drop-shadow-2xl">
+                                    {product.img.length > 0 ? (
+                                        <Image
+                                            src={product.img}
+                                            alt={product.name}
+                                            fill
+                                            className="object-contain"
+                                        />
+                                    ) : (
+                                        <div className="bg-white/80 backdrop-blur-sm w-full h-full flex items-center justify-center rounded-lg">
+                                            <span className="text-gray-400 text-xs md:text-sm">No image</span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Floor shadow for each product */}
+                                <div
+                                    className="absolute w-[80%] h-8 bg-black/30 blur-xl rounded-full"
+                                    style={{
+                                        // transform: `translateX(-50%) scale(${currentPos.scale})`,
+                                        opacity: currentPos.opacity * 0.6
+                                    }}
+                                />
                             </div>
                         </motion.div>
                     );
                 })}
             </div>
-            
-            {/* Center product name displayed outside carousel */}
-            <motion.div 
-                key={centerProduct.id}
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ 
-                    type: "spring", 
-                    stiffness: 400, 
-                    damping: 20,
-                    duration: 8.8
-                }}
-                className="text-center"
-            >
-                <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
-                    {centerProduct.name}
-                </h2>
-                <p className="text-xl md:text-2xl font-semibold text-blue-600 mt-2">
-                    ${centerProduct.price.toFixed(2)}
-                </p>
-            </motion.div>
+            <div>
+                <motion.div
+                    key={centerProduct.id}
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 20,
+                        duration: 8.8
+                    }}
+                    className="text-center"
+                >
+                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+                        {centerProduct.name}
+                    </h2>
+                    <p className="text-xl md:text-2xl font-semibold text-blue-600 mt-2">
+                        ${centerProduct.price.toFixed(2)}
+                    </p>
+                </motion.div>
+            </div>
         </div>
     );
 }
