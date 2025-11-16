@@ -135,7 +135,7 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
 
     return (
         <div className="w-full min-h-[320px] flex items-center justify-center p-8">
-            <div className="relative w-[720px] h-[220px]">
+            <div className="relative w-[720px] h-[420px]">
                 {/* Boxes: render all five so stacking/animation looks natural */}
                 {displayProducts.map((product, i) => {
                     const currentPos = getPosition(i, direction);
