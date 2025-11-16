@@ -111,8 +111,7 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
     const centerProduct = products[currentIndex];
 
     return (
-        <div className="w-full flex flex-col items-center justify-center p-4 md:p-8 gap-6">
-
+        <div className="w-full flex flex-col">
             {/* Product carousel container */}
             <div className="relative w-full h-full pt-12">
                 {/* Boxes: render all five so stacking/animation looks natural */}
