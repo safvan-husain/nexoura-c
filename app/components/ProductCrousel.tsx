@@ -14,7 +14,6 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
     const [direction, setDirection] = useState<'next' | 'prev' | 'idle'>('idle');
     const [displayProducts, setDisplayProducts] = useState(products.slice(0, 5));
     const prevIndexRef = useRef(currentIndex);
-    const isAnimatingRef = useRef(false);
 
     // Sync displayProducts centered around currentIndex
     useEffect(() => {
@@ -40,7 +39,7 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
 
     // Watch for currentIndex changes and trigger animation
     useEffect(() => {
-        if (isAnimatingRef.current || products.length < 2) return;
+        if (products.length < 2) return;
 
         const prevIndex = prevIndexRef.current;
         const totalProducts = products.length;
@@ -59,16 +58,16 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
             animDirection = currentIndex > prevIndex ? 'next' : 'prev';
         }
 
-        isAnimatingRef.current = true;
         setDirection(animDirection);
 
         // After animation completes, reset to idle
-        setTimeout(() => {
+        const timer = setTimeout(() => {
             setDirection('idle');
-            isAnimatingRef.current = false;
-        }, 800);
+        }, 50);
 
         prevIndexRef.current = currentIndex;
+
+        return () => clearTimeout(timer);
     }, [currentIndex, products.length]);
 
     // Get position for a slot index based on current animation state
@@ -157,14 +156,25 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
             </div>
             
             {/* Center product name displayed outside carousel */}
-            <div className="text-center">
+            <motion.div 
+                key={centerProduct.id}
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ 
+                    type: "spring", 
+                    stiffness: 400, 
+                    damping: 20,
+                    duration: 8.8
+                }}
+                className="text-center"
+            >
                 <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
                     {centerProduct.name}
                 </h2>
                 <p className="text-xl md:text-2xl font-semibold text-blue-600 mt-2">
                     ${centerProduct.price.toFixed(2)}
                 </p>
-            </div>
+            </motion.div>
         </div>
     );
 }
