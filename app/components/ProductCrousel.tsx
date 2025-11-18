@@ -72,43 +72,42 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
 
     // Get position for a slot index based on current animation state
     // Using percentage-based positioning for responsive layout
-    // Card width is 30%, so positions: 0%, 35%, 70% (30% + 5% gap between cards)
+    // Card width is 30%, so positions: 10%, 35%, 60% (tighter spacing)
     const getPosition = (index: number, animState: 'idle' | 'next' | 'prev') => {
         if (animState === 'idle') {
-            // Default idle positions (percentage-based with spacing)
-            if (index === 0) return { x: '0%', y: 12, scale: 0.4, zIndex: 5, opacity: 0 };
-            if (index === 1) return { x: '0%', y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
+            // Default idle positions (percentage-based with tighter spacing)
+            if (index === 0) return { x: '10%', y: 12, scale: 0.4, zIndex: 5, opacity: 0 };
+            if (index === 1) return { x: '10%', y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
             if (index === 2) return { x: '35%', y: 0, scale: 1, zIndex: 50, opacity: 1 };
-            if (index === 3) return { x: '70%', y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
-            if (index === 4) return { x: '70%', y: 12, scale: 0.4, zIndex: 5, opacity: 0 };
+            if (index === 3) return { x: '60%', y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
+            if (index === 4) return { x: '60%', y: 12, scale: 0.4, zIndex: 5, opacity: 0 };
         }
 
         if (animState === 'next') {
             // Next: shift right (reversed - items move right when going to next)
-            if (index === 0) return { x: '0%', y: 12, scale: 0.4, zIndex: 5, opacity: 0 };
-            if (index === 1) return { x: '0%', y: 12, scale: 0.35, zIndex: 5, opacity: 0.7 };
-            if (index === 2) return { x: '0%', y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
+            if (index === 0) return { x: '10%', y: 12, scale: 0.4, zIndex: 5, opacity: 0 };
+            if (index === 1) return { x: '10%', y: 12, scale: 0.35, zIndex: 5, opacity: 0.7 };
+            if (index === 2) return { x: '10%', y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
             if (index === 3) return { x: '35%', y: 0, scale: 1, zIndex: 50, opacity: 1 };
-            if (index === 4) return { x: '70%', y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
+            if (index === 4) return { x: '60%', y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
         }
 
         if (animState === 'prev') {
             // Prev: shift left (reversed - items move left when going to previous)
-            if (index === 0) return { x: '0%', y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
+            if (index === 0) return { x: '10%', y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
             if (index === 1) return { x: '35%', y: 0, scale: 1, zIndex: 50, opacity: 1 };
-            if (index === 2) return { x: '70%', y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
-            if (index === 3) return { x: '70%', y: 12, scale: 0.35, zIndex: 5, opacity: 0.7 };
-            if (index === 4) return { x: '0%', y: 12, scale: 0.4, zIndex: 5, opacity: 0 };
+            if (index === 2) return { x: '60%', y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
+            if (index === 3) return { x: '60%', y: 12, scale: 0.35, zIndex: 5, opacity: 0.7 };
+            if (index === 4) return { x: '10%', y: 12, scale: 0.4, zIndex: 5, opacity: 0 };
         }
 
-        return { x: '0%', y: 0, scale: 1, zIndex: 10, opacity: 0 };
+        return { x: '10%', y: 0, scale: 1, zIndex: 10, opacity: 0 };
     };
 
     if (displayProducts.length === 0) {
         return <div className="text-center text-gray-500">No products available</div>;
     }
 
-    const centerProduct = products[currentIndex];
 
     return (
         <div className="w-full flex flex-col">
