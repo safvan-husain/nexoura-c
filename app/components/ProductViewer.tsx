@@ -137,30 +137,53 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
   }
 
   return (
-    <div className="flex gap-4 max-w-[1600px] min-h-screen mx-auto px-4 py-4">
-      {/* Filter Panel on the Left */}
-      {/* <div className="">
-        <FilterPanel onFilterChange={handleFilterChange} />
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-gray-100 to-gray-200">
+      {/* 3D Floor Effect */}
+      {/* <div className="absolute inset-0 pointer-events-none">
+        <div 
+          className="absolute bottom-0 left-0 right-0 h-[300vh] bg-gradient-to-b from-transparent via-gray-300/40 to-gray-400/60"
+          style={{
+            transform: 'perspective(1000px) rotateX(60deg)',
+            transformOrigin: 'bottom center',
+            backgroundImage: `
+              linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
+              linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px)
+            `,
+            backgroundSize: '80px 80px',
+            boxShadow: 'inset 0 -100px 100px -50px rgba(0,0,0,0.2)'
+          }}
+        /> */}
+        {/* Floor shadow gradient */}
+        {/* <div 
+          className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/10 to-transparent"
+          style={{ transform: 'translateY(50%)' }}
+        />
       </div> */}
 
-      {/* Main Content */}
-      <div className="flex-1 min-w-0">
-        <ProductCrousel
-          products={products.map(p => ({
-            img: p.variants?.[0]?.images?.[0]?.url || '',
-            name: p.name,
-            price: p.price,
-            id: p._id
-          }))}
-          currentIndex={currentIndex}
-          setCurrentIndex={handleProductSelect}
-        />
-      </div>
+      <div className="relative z-10 flex gap-4 max-w-[1600px] min-h-screen mx-auto px-4 py-4">
+        {/* Filter Panel on the Left */}
+        {/* <div className="">
+          <FilterPanel onFilterChange={handleFilterChange} />
+        </div> */}
 
-      {/* Other Products Gallery - Right Corner Vertical Grid */}
-      <div className="w-28">
-        <div className="bg-white rounded-lg shadow-md p-3 sticky top-4">
-          <div className="grid grid-cols-2 gap-3 max-h-[calc(100vh-2rem)] overflow-hidden">
+        {/* Main Content */}
+        <div className="flex-1 min-w-0">
+          <ProductCrousel
+            products={products.map(p => ({
+              img: p.variants?.[0]?.images?.[0]?.url || '',
+              name: p.name,
+              price: p.price,
+              id: p._id
+            }))}
+            currentIndex={currentIndex}
+            setCurrentIndex={handleProductSelect}
+          />
+        </div>
+
+        {/* Other Products Gallery - Right Corner Vertical Grid */}
+        <div className="w-28">
+          <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-3 sticky top-4">
+            <div className="grid grid-cols-2 gap-3 max-h-[calc(100vh-2rem)] overflow-hidden">
             {products.map((product, index) => {
               const variant = product.variants?.[0]
               const image = variant?.images?.[0]
@@ -204,6 +227,7 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
                 </button>
               )
             })}
+            </div>
           </div>
         </div>
       </div>

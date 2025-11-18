@@ -33,6 +33,27 @@ export default function RootLayout({
           <Navbar />
         </Suspense>
         {children}
+        <div className="absolute inset-0 pointer-events-none">
+          <div
+            className="absolute left-0 right-0 h-[60vh] bg-gradient-to-b from-transparent via-gray-300/40 to-gray-400/60"
+            style={{
+              bottom: '20%',
+              transform: 'perspective(1200px) rotateX(75deg)',
+              transformOrigin: 'center bottom',
+              backgroundImage: `
+              linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
+              linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px)
+            `,
+              backgroundSize: '80px 80px',
+              boxShadow: 'inset 0 -100px 100px -50px rgba(0,0,0,0.2)'
+            }}
+          />
+          {/* Floor shadow gradient */}
+          <div
+            className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/10 to-transparent"
+            style={{ transform: 'translateY(50%)' }}
+          />
+        </div>
       </body>
     </html>
   );
