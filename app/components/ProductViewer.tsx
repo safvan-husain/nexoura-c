@@ -6,6 +6,7 @@ import Image from 'next/image'
 import FilterPanel, { FilterState } from './FilterPanel'
 import VariantFilterPanel from './VariantFilterPanel'
 import { ProductCrousel } from './ProductCrousel'
+import { div } from 'framer-motion/client'
 
 interface ProductViewerProps {
   products: any[]
@@ -141,8 +142,9 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
 
       <div className="relative z-10 flex gap-4 h-[850px] mx-auto px-4 py-4">
         {/* Main Content */}
-        <div className='absolute top-0 left-0'>
-          <p>Heloow</p>
+        <div className='absolute top-20 left-8'>
+          <h2 className='text-4xl font-bold text-transparent mb-2' style={{ WebkitTextStroke: '2px black' }}>SHOES</h2>
+          <p className='text-lg text-gray-700'>$99.99</p>
         </div>
         <div className="flex-grow min-w-0">
           <ProductCrousel
