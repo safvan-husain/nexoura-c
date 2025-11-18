@@ -23,15 +23,15 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
   const [prevProduct, setPrevProduct] = useState(products[initialIndex])
   const [selectedColor, setSelectedColor] = useState<string | null>(null)
   const [selectedSize, setSelectedSize] = useState<string | null>(null)
-  
+
   const currentProduct = products[currentIndex]
   const currentVariant = currentProduct?.variants?.[currentVariantIndex]
   const images = currentVariant?.images || []
   const currentImage = images[currentImageIndex]
-  
+
   const prevVariant = prevProduct?.variants?.[0]
   const prevImage = prevVariant?.images?.[0]
-  
+
   // Get unique colors and sizes
   const availableColors = Array.from(new Set(currentProduct?.variants?.map((v: any) => v.color) || [])) as string[]
   const availableSizes = Array.from(new Set(currentProduct?.variants?.map((v: any) => v.size) || [])) as string[]
@@ -44,7 +44,7 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
     // Trigger transitions when product changes
     setImageTransition(true)
     setDetailsTransition(true)
-    
+
     // After rotation completes, update prevProduct and disable transition
     const timer = setTimeout(() => {
       setPrevProduct(currentProduct)
@@ -54,20 +54,20 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
         setImageTransition(false)
       }, 50)
     }, 800)
-    
+
     return () => clearTimeout(timer)
   }, [currentIndex])
-  
+
   // Handle variant selection by color/size
   const findAndSetVariant = (color: string | null, size: string | null) => {
     if (!currentProduct?.variants) return
-    
+
     const matchingVariant = currentProduct.variants.findIndex((v: any) => {
       const colorMatch = !color || v.color === color
       const sizeMatch = !size || v.size === size
       return colorMatch && sizeMatch
     })
-    
+
     if (matchingVariant >= 0) {
       setCurrentVariantIndex(matchingVariant)
       setCurrentImageIndex(0)
@@ -78,7 +78,7 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
     setSelectedColor(color)
     findAndSetVariant(color, selectedSize)
   }
-  
+
   const handleSizeSelect = (size: string | null) => {
     setSelectedSize(size)
     findAndSetVariant(selectedColor, size)
@@ -145,60 +145,16 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
 
       {/* Main Content */}
       <div className="flex-1 min-w-0">
-        {/* Main Product View */}
-        <div className="flex gap-4">
-          {/* Image Section with Navigation */}
-          <ProductCrousel 
-            products={products.map(p => ({
-              img: p.variants?.[0]?.images?.[0]?.url || '',
-              name: p.name,
-              price: p.price,
-              id: p._id
-            }))}
-            currentIndex={currentIndex}
-            setCurrentIndex={handleProductSelect}
-          /> 
-          
-          {/* Variant Image Thumbnails - Vertical */}
-          <div className="flex flex-col gap-2 h-[50vh] overflow-y-auto pr-2">
-            {images.map((img: any, idx: number) => (
-              <button
-                key={idx}
-                onClick={() => setCurrentImageIndex(idx)}
-                className={`relative w-16 h-16 flex-shrink-0 rounded-md overflow-hidden transition-all ${
-                  idx === currentImageIndex 
-                    ? 'ring-2 ring-blue-500 scale-105' 
-                    : 'hover:scale-105 opacity-70 hover:opacity-100'
-                }`}
-              >
-                <Image
-                  src={img.url}
-                  alt={img.alt || `Image ${idx + 1}`}
-                  fill
-                  className="object-cover"
-                />
-              </button>
-            ))}
-          </div>
-
-          {/* Product Details Card */}
-          {/* <ProductDetailsCard
-            product={currentProduct}
-            currentVariant={currentVariant}
-            detailsTransition={detailsTransition}
-          /> */}
-          
-          {/* Variant Filter Panel - Right Side */}
-          <VariantFilterPanel
-            availableColors={availableColors}
-            availableSizes={availableSizes}
-            selectedColor={selectedColor}
-            selectedSize={selectedSize}
-            currentVariant={currentVariant}
-            onColorSelect={handleColorSelect}
-            onSizeSelect={handleSizeSelect}
-          />
-        </div>
+        <ProductCrousel
+          products={products.map(p => ({
+            img: p.variants?.[0]?.images?.[0]?.url || '',
+            name: p.name,
+            price: p.price,
+            id: p._id
+          }))}
+          currentIndex={currentIndex}
+          setCurrentIndex={handleProductSelect}
+        />
       </div>
 
       {/* Other Products Gallery - Right Corner Vertical Grid */}
@@ -208,16 +164,15 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
             {products.map((product, index) => {
               const variant = product.variants?.[0]
               const image = variant?.images?.[0]
-              
+
               return (
                 <button
                   key={product._id}
                   onClick={() => handleProductSelect(index)}
-                  className={`flex-shrink-0 transition-all ${
-                    index === currentIndex 
-                      ? 'ring-2 ring-blue-500 scale-105' 
+                  className={`flex-shrink-0 transition-all ${index === currentIndex
+                      ? 'ring-2 ring-blue-500 scale-105'
                       : 'hover:scale-105'
-                  }`}
+                    }`}
                 >
                   <div className="relative aspect-square bg-gray-100 rounded-md overflow-hidden mb-1">
                     {image ? (
@@ -235,9 +190,9 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
                           viewBox="0 0 24 24"
                           xmlns="http://www.w3.org/2000/svg"
                         >
-                          <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6h-6z"/>
-                          <path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4V6h16v12z"/>
-                          <path d="M12 8.5c0-.83-.67-1.5-1.5-1.5S9 7.67 9 8.5 9.67 10 10.5 10s1.5-.67 1.5-1.5z"/>
+                          <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6h-6z" />
+                          <path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4V6h16v12z" />
+                          <path d="M12 8.5c0-.83-.67-1.5-1.5-1.5S9 7.67 9 8.5 9.67 10 10.5 10s1.5-.67 1.5-1.5z" />
                         </svg>
                       </div>
                     )}
