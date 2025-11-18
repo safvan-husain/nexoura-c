@@ -139,9 +139,12 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
   return (
     <div className="relative overflow-hidden">
 
-      <div className="relative z-10 flex gap-4 max-w-[1600px] min-h-screen mx-auto px-4 py-4">
+      <div className="relative z-10 flex gap-4 h-[850px] mx-auto px-4 py-4">
         {/* Main Content */}
-        <div className="flex-1 min-w-0">
+        <div className='absolute top-0 left-0'>
+          <p>Heloow</p>
+        </div>
+        <div className="flex-grow min-w-0">
           <ProductCrousel
             products={products.map(p => ({
               img: p.variants?.[0]?.images?.[0]?.url || '',

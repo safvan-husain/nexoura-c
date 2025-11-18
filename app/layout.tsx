@@ -28,7 +28,7 @@ export default function RootLayout({
     <html lang="en">
       <body
         style={{
-          background: 'linear-gradient(to bottom, #3b83f634 0%, #5348ec59 20%, #0000005b 40%, #f0fcf8ff 100%)'
+          background: 'linear-gradient(to bottom, #3b83f634 0%, #5348ec59 20%, #0000003b 60%, #f0fcf8ff 100%)'
         }}
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}
       >
