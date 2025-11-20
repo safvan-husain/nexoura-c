@@ -19,12 +19,10 @@ export function ProductCrousel({
     spacingStep = 16,
     centerPosition = 40
 }: ProductCrouselProps) {
-    const [direction, setDirection] = useState<'next' | 'prev' | 'idle'>('idle');
+    const [direction, setDirection] = useState<'next' | 'prev' | 'idle'>('prev');
     const [displayProducts, setDisplayProducts] = useState(products.slice(0, 5));
     const prevIndexRef = useRef(currentIndex);
     const slotPositions = Array.from({ length: 5 }, (_, idx) => centerPosition + (idx - 2) * spacingStep);
-    const extendedLeft = centerPosition - 3 * spacingStep;
-    const extendedRight = centerPosition + 3 * spacingStep;
 
     // Sync displayProducts centered around currentIndex
     useEffect(() => {
@@ -91,13 +89,13 @@ export function ProductCrousel({
             if (index === 1) return { x: `${slotPositions[1]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
             if (index === 2) return { x: `${slotPositions[2]}%`, y: 0, scale: 1, zIndex: 50, opacity: 1 };
             if (index === 3) return { x: `${slotPositions[3]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
-            if (index === 4) return { x: `${slotPositions[4]}%`, y: 12, scale: 0.4, zIndex: 5, opacity: 0 };
+            if (index === 4) return { x: `${slotPositions[3]}%`, y: 12, scale: 0.4, zIndex: 5, opacity: 0 };
         }
 
         if (animState === 'next') {
             // Next: shift right (reversed - items move right when going to next)
             if (index === 0) return { x: `${slotPositions[1]}%`, y: 12, scale: 0.4, zIndex: 5, opacity: 0 };
-            if (index === 1) return { x: `${Math.max(extendedLeft, slotPositions[0] - spacingStep)}%`, y: 12, scale: 0.35, zIndex: 5, opacity: 0.7 };
+            if (index === 1) return { x: `${slotPositions[2]}%`, y: 12, scale: 0.35, zIndex: 5, opacity: 0.7 };
             if (index === 2) return { x: `${slotPositions[1]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
             if (index === 3) return { x: `${slotPositions[2]}%`, y: 0, scale: 1, zIndex: 50, opacity: 1 };
             if (index === 4) return { x: `${slotPositions[3]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
@@ -105,11 +103,11 @@ export function ProductCrousel({
 
         if (animState === 'prev') {
             // Prev: shift left (reversed - items move left when going to previous)
-            if (index === 0) return { x: `${slotPositions[1]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
+            if (index === 0) return { x: `${slotPositions[1]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0 };
             if (index === 1) return { x: `${slotPositions[2]}%`, y: 0, scale: 1, zIndex: 50, opacity: 1 };
             if (index === 2) return { x: `${slotPositions[3]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
-            if (index === 3) return { x: `${Math.min(extendedRight, slotPositions[4] + spacingStep)}%`, y: 12, scale: 0.35, zIndex: 5, opacity: 0.7 };
-            if (index === 4) return { x: `${extendedRight}%`, y: 12, scale: 0.4, zIndex: 5, opacity: 0 };
+            if (index === 3) return { x: `${slotPositions[4]}%`, y: 12, scale: 0.35, zIndex: 5, opacity: 0.7 };
+            if (index === 4) return { x: `${slotPositions[4]}%`, y: 12, scale: 0.4, zIndex: 5, opacity: 0 };
         }
 
         return { x: '0%', y: 0, scale: 1, zIndex: 10, opacity: 0 };
@@ -131,6 +129,10 @@ export function ProductCrousel({
                     return (
                         <motion.div
                             key={product.id}
+                            initial={{
+                                left: `${slotPositions[2]}%`,
+                                opacity: 0
+                            }}
                             animate={{
                                 left: currentPos.x,
                                 y: currentPos.y,
@@ -139,7 +141,7 @@ export function ProductCrousel({
                             }}
                             transition={{ type: "spring", stiffness: 320, damping: 30 }}
                             style={{ zIndex: currentPos.zIndex }}
-                            className={`absolute top-4 md:top-8 w-[30%] aspect-[3/4] cursor-pointer ${i == 0 && direction !== "prev" ? "hidden" : ""} ${i == 4 && direction !== "next" ? "hidden" : ""}`}
+                            className={`absolute top-4 md:top-8 w-[30%] aspect-[3/4] cursor-pointer `} //${i == 0 && direction !== "prev" ? "hidden" : ""} ${i == 4 && direction !== "next" ? "hidden" : ""}
                             onClick={() => {
                                 const originalIndex = products.findIndex(p => p.id === product.id);
                                 if (originalIndex >= 0) setCurrentIndex(originalIndex);
