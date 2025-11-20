@@ -8,6 +8,8 @@ type ProductCrouselProps = {
     products: { img: string, name: string, price: number, id: number }[],
     currentIndex: number,
     setCurrentIndex: (index: number) => void,
+    height: number,
+    width: number,
     spacingStep?: number,
     centerPosition?: number
 }
@@ -16,8 +18,10 @@ export function ProductCrousel({
     products,
     currentIndex,
     setCurrentIndex,
-    spacingStep = 16,
-    centerPosition = 40
+    spacingStep = 20,
+    height,
+    width,
+    centerPosition = 30
 }: ProductCrouselProps) {
     const [direction, setDirection] = useState<'next' | 'prev' | 'idle'>('prev');
     const [displayProducts, setDisplayProducts] = useState(products.slice(0, 5));
@@ -121,7 +125,7 @@ export function ProductCrousel({
     return (
         <div className="w-full flex flex-col ">
             {/* Product carousel container */}
-            <div className="relative w-full pb-12 min-h-screen bg-blue-500 overflow-hidden">
+            <div className="relative w-full pb-12 min-h-screen overflow-hidden">
                 {/* Boxes: render all five so stacking/animation looks natural */}
                 {displayProducts.map((product, i) => {
                     const currentPos = getPosition(i, direction);
@@ -141,7 +145,7 @@ export function ProductCrousel({
                             }}
                             transition={{ type: "spring", stiffness: 320, damping: 30 }}
                             style={{ zIndex: currentPos.zIndex }}
-                            className={`absolute top-4 md:top-8 w-[30%] aspect-[3/4] cursor-pointer `} //${i == 0 && direction !== "prev" ? "hidden" : ""} ${i == 4 && direction !== "next" ? "hidden" : ""}
+                            className={`absolute top-4 md:top-8 w-[35%] aspect-[3/4] cursor-pointer `} //${i == 0 && direction !== "prev" ? "hidden" : ""} ${i == 4 && direction !== "next" ? "hidden" : ""}
                             onClick={() => {
                                 const originalIndex = products.findIndex(p => p.id === product.id);
                                 if (originalIndex >= 0) setCurrentIndex(originalIndex);
@@ -177,7 +181,7 @@ export function ProductCrousel({
                         </motion.div>
                     );
                 })}
-                <div className='absolute bottom-40 left-2/3 -translate-x-2/3 w-full h-12'>
+                <div className='absolute bottom-40 left-1/2 -translate-x-1/2 w-full h-12'>
                     {/* Buy buttons anchored to bottom of carousel area */}
                     <div className="flex items-center justify-center gap-6">
                         <button className="px-8 py-3 rounded-2xl bg-black text-white font-semibold shadow-md hover:bg-gray-800">BUY NOW</button>
