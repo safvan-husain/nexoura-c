@@ -21,7 +21,7 @@ export function ProductCrousel({
     spacingStep = 20,
     height,
     width,
-    centerPosition = 30
+    centerPosition = 32.5
 }: ProductCrouselProps) {
     const [direction, setDirection] = useState<'next' | 'prev' | 'idle'>('prev');
     const [displayProducts, setDisplayProducts] = useState(products.slice(0, 5));
@@ -123,7 +123,7 @@ export function ProductCrousel({
 
 
     return (
-        <div className="w-full flex flex-col ">
+        <div className="w-full flex flex-col bg-red-500">
             {/* Product carousel container */}
             <div className="relative w-full pb-12 min-h-screen overflow-hidden">
                 {/* Boxes: render all five so stacking/animation looks natural */}
