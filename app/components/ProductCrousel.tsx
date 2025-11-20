@@ -7,13 +7,24 @@ import Image from "next/image";
 type ProductCrouselProps = {
     products: { img: string, name: string, price: number, id: number }[],
     currentIndex: number,
-    setCurrentIndex: (index: number) => void
+    setCurrentIndex: (index: number) => void,
+    spacingStep?: number,
+    centerPosition?: number
 }
 
-export function ProductCrousel({ products, currentIndex, setCurrentIndex }: ProductCrouselProps) {
+export function ProductCrousel({
+    products,
+    currentIndex,
+    setCurrentIndex,
+    spacingStep = 16,
+    centerPosition = 40
+}: ProductCrouselProps) {
     const [direction, setDirection] = useState<'next' | 'prev' | 'idle'>('idle');
     const [displayProducts, setDisplayProducts] = useState(products.slice(0, 5));
     const prevIndexRef = useRef(currentIndex);
+    const slotPositions = Array.from({ length: 5 }, (_, idx) => centerPosition + (idx - 2) * spacingStep);
+    const extendedLeft = centerPosition - 3 * spacingStep;
+    const extendedRight = centerPosition + 3 * spacingStep;
 
     // Sync displayProducts centered around currentIndex
     useEffect(() => {
@@ -72,33 +83,33 @@ export function ProductCrousel({ products, currentIndex, setCurrentIndex }: Prod
 
     // Get position for a slot index based on current animation state
     // Using percentage-based positioning for responsive layout
-    // Card width is 30%, so positions: 10%, 35%, 60% (tighter spacing)
+    // Card width is 30%, so positions derive from centerPosition & spacingStep (dynamic spacing)
     const getPosition = (index: number, animState: 'idle' | 'next' | 'prev') => {
         if (animState === 'idle') {
             // Default idle positions (percentage-based with tighter spacing)
-            if (index === 0) return { x: '10%', y: 12, scale: 0.4, zIndex: 5, opacity: 0 };
-            if (index === 1) return { x: '10%', y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
-            if (index === 2) return { x: '35%', y: 0, scale: 1, zIndex: 50, opacity: 1 };
-            if (index === 3) return { x: '60%', y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
-            if (index === 4) return { x: '60%', y: 12, scale: 0.4, zIndex: 5, opacity: 0 };
+            if (index === 0) return { x: `${slotPositions[0]}%`, y: 12, scale: 0.4, zIndex: 5, opacity: 0 };
+            if (index === 1) return { x: `${slotPositions[1]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
+            if (index === 2) return { x: `${slotPositions[2]}%`, y: 0, scale: 1, zIndex: 50, opacity: 1 };
+            if (index === 3) return { x: `${slotPositions[3]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
+            if (index === 4) return { x: `${slotPositions[4]}%`, y: 12, scale: 0.4, zIndex: 5, opacity: 0 };
         }
 
         if (animState === 'next') {
             // Next: shift right (reversed - items move right when going to next)
-            if (index === 0) return { x: '10%', y: 12, scale: 0.4, zIndex: 5, opacity: 0 };
-            if (index === 1) return { x: '10%', y: 12, scale: 0.35, zIndex: 5, opacity: 0.7 };
-            if (index === 2) return { x: '10%', y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
-            if (index === 3) return { x: '35%', y: 0, scale: 1, zIndex: 50, opacity: 1 };
-            if (index === 4) return { x: '60%', y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
+            if (index === 0) return { x: `${slotPositions[0]}%`, y: 12, scale: 0.4, zIndex: 5, opacity: 0 };
+            if (index === 1) return { x: `${Math.max(extendedLeft, slotPositions[0] - spacingStep)}%`, y: 12, scale: 0.35, zIndex: 5, opacity: 0.7 };
+            if (index === 2) return { x: `${slotPositions[1]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
+            if (index === 3) return { x: `${slotPositions[2]}%`, y: 0, scale: 1, zIndex: 50, opacity: 1 };
+            if (index === 4) return { x: `${slotPositions[3]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
         }
 
         if (animState === 'prev') {
             // Prev: shift left (reversed - items move left when going to previous)
-            if (index === 0) return { x: '10%', y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
-            if (index === 1) return { x: '35%', y: 0, scale: 1, zIndex: 50, opacity: 1 };
-            if (index === 2) return { x: '60%', y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
-            if (index === 3) return { x: '60%', y: 12, scale: 0.35, zIndex: 5, opacity: 0.7 };
-            if (index === 4) return { x: '10%', y: 12, scale: 0.4, zIndex: 5, opacity: 0 };
+            if (index === 0) return { x: `${slotPositions[1]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
+            if (index === 1) return { x: `${slotPositions[2]}%`, y: 0, scale: 1, zIndex: 50, opacity: 1 };
+            if (index === 2) return { x: `${slotPositions[3]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
+            if (index === 3) return { x: `${Math.min(extendedRight, slotPositions[4] + spacingStep)}%`, y: 12, scale: 0.35, zIndex: 5, opacity: 0.7 };
+            if (index === 4) return { x: `${extendedRight}%`, y: 12, scale: 0.4, zIndex: 5, opacity: 0 };
         }
 
         return { x: '10%', y: 0, scale: 1, zIndex: 10, opacity: 0 };

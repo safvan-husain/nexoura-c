@@ -11,6 +11,26 @@ export default function ProductDetailsCard({
   currentVariant,
   detailsTransition,
 }: ProductDetailsCardProps) {
+  const colors =
+    Array.from(
+      new Set(
+        (product?.variants || [])
+          .map((variant: any) => variant?.colorHex || variant?.color)
+          .filter(Boolean)
+      )
+    ) || []
+
+  const sizes =
+    Array.from(
+      new Set((product?.variants || []).map((variant: any) => variant?.size).filter(Boolean))
+    ) || []
+
+  const rating = typeof product?.rating === 'number' ? product.rating : 4.8
+  const reviews = product?.reviewsCount ?? 241
+  const price = typeof product?.price === 'number' ? product.price : 0
+  const category = product?.category || 'Category'
+  const brand = product?.brand || 'Addesjan'
+
   return (
     <>
       <style jsx>{`
@@ -30,56 +50,100 @@ export default function ProductDetailsCard({
         }
       `}</style>
 
-      <div className={`bg-white rounded-lg shadow-md h-[50vh] flex flex-col ${
-        detailsTransition ? 'fade-up' : ''
-      }`}>
-        {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto p-4">
-          <h1 className="text-2xl font-bold mb-3">{product.name || 'Product Name'}</h1>
-          
-          <div className="flex items-baseline gap-2 mb-4">
-            <span className="text-3xl font-bold text-blue-600">
-              ${product.price?.toFixed(2) || '0.00'}
-            </span>
-            {product.compareAtPrice && (
-              <span className="text-lg text-gray-400 line-through">
-                ${product.compareAtPrice.toFixed(2)}
-              </span>
-            )}
-          </div>
-
-          {product.shortDescription && (
-            <p className="text-gray-600 mb-3 text-sm">{product.shortDescription}</p>
-          )}
-
-          <div className="mb-4">
-            <h3 className="font-semibold mb-1 text-sm">Description</h3>
-            <p className="text-gray-700 text-sm">{product.description || 'No description available'}</p>
-          </div>
+      <div
+        className={`relative rounded-[32px] border border-white/40 bg-gradient-to-b from-[#f9f2e6] via-[#f4e9da] to-[#eee0cf] p-6 text-gray-900 shadow-[0_25px_50px_rgba(82,55,31,0.15)] transition-all duration-500 ${
+          detailsTransition ? 'fade-up' : ''
+        }`}
+      >
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute -top-10 -right-6 h-32 w-32 rounded-full bg-white/30 blur-3xl" />
+          <div className="absolute bottom-6 right-10 h-20 w-20 rounded-full bg-white/20 blur-2xl" />
         </div>
-        
-        {/* Fixed Bottom Section */}
-        <div className="border-t bg-white p-4">
+
+        <div className="relative z-10 flex flex-col gap-5">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.5em] text-gray-600">{category}</p>
+            <h1 className="mt-2 text-3xl font-semibold leading-tight">
+              {product.name || 'Oversized Black Hoodie'}
+            </h1>
+          </div>
+
+          <div className="flex items-center gap-4 text-sm text-gray-600">
+            <div className="flex text-[#f1c40f]">
+              {Array.from({ length: 5 }).map((_, index) => (
+                <svg key={index} viewBox="0 0 24 24" className="h-4 w-4 fill-current">
+                  <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21z" />
+                </svg>
+              ))}
+            </div>
+            <span className="font-semibold text-gray-900">{rating.toFixed(1)}</span>
+            <span className="text-gray-500">({reviews} reviews)</span>
+          </div>
+
+          <div className="text-4xl font-semibold tracking-tight">${price.toFixed(2)}</div>
+
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.5em] text-gray-500">
+              Colors
+            </p>
+            <div className="mt-3 flex gap-3">
+              {(colors.length ? colors : ['#111827', '#d1d5db', '#d1b68f']).map(color => (
+                <button
+                  key={color}
+                  className="h-10 w-10 rounded-full border border-white/70 shadow-sm outline-offset-2 transition hover:scale-105"
+                  style={{ backgroundColor: color }}
+                  aria-label={`Color ${color}`}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.5em] text-gray-500">
+              Sizes
+            </p>
+            <div className="mt-3 flex gap-3">
+              {(sizes.length ? sizes : ['XS', 'S', 'M', 'XL']).map(size => (
+                <button
+                  key={size}
+                  className="rounded-xl border border-gray-300 bg-white/80 px-4 py-2 text-sm font-semibold text-gray-800 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                >
+                  {size}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-1 text-sm text-gray-700">
+            <p className="uppercase tracking-[0.3em] text-[11px] text-gray-500">{brand}</p>
+            <p>
+              {product.shortDescription ||
+                'A minimalist premium oversized hoodie crafted from organic cotton, featuring a matte texture and relaxed drop-shoulder design.'}
+            </p>
+            <p className="text-gray-600">
+              {product.description ||
+                'Designed for elevated comfort with a matte finish, breathable interior, and tailored silhouette that drapes effortlessly.'}
+            </p>
+          </div>
+
           {currentVariant && (
-            <div className="space-y-2 mb-3">
-              <div className="flex items-center gap-2 text-sm">
-                <span className="font-semibold">SKU:</span>
-                <span className="px-2 py-1 bg-gray-100 rounded text-xs">{currentVariant.sku || 'N/A'}</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <span className="font-semibold">Stock:</span>
-                <span className={`px-2 py-1 rounded text-xs ${
-                  (currentVariant.stock ?? 0) > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                }`}>
-                  {(currentVariant.stock ?? 0) > 0 ? `${currentVariant.stock} available` : 'Out of stock'}
-                </span>
-              </div>
+            <div className="flex flex-wrap gap-3 text-xs text-gray-600">
+              <span className="rounded-full bg-white/70 px-3 py-1 font-semibold uppercase tracking-wider">
+                SKU {currentVariant.sku || 'N/A'}
+              </span>
+              <span
+                className={`rounded-full px-3 py-1 font-semibold uppercase tracking-wider ${
+                  (currentVariant.stock ?? 0) > 0
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-red-100 text-red-800'
+                }`}
+              >
+                {(currentVariant.stock ?? 0) > 0
+                  ? `${currentVariant.stock} in stock`
+                  : 'Out of stock'}
+              </span>
             </div>
           )}
-
-          <button className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors font-semibold text-sm">
-            Add to Cart
-          </button>
         </div>
       </div>
     </>
