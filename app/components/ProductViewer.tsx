@@ -139,8 +139,7 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
   }
 
   return (
-    <div className="relative overflow-hidden">
-
+    <div className="relative">
       <div className="relative z-10 flex gap-4 h-[850px] mx-auto px-4 py-4">
         {/* Left Details Card */}
         <div className="absolute w-[360px] shrink-0 z-60 top-1/2 transform -translate-y-1/2 self-start">
@@ -169,7 +168,7 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
             )
           })()}
         </div>
-        <div className="flex-grow min-w-0 relative">
+        <div className="flex flex-col flex-grow min-w-0 relative">
           <ProductCrousel
             products={products.map(p => ({
               img: p.variants?.[0]?.images?.[0]?.url || '',
@@ -180,64 +179,55 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
             currentIndex={currentIndex}
             setCurrentIndex={handleProductSelect}
           />
-          {/* Buy buttons anchored to bottom of carousel area */}
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[60] flex items-center justify-center gap-6">
-            <button className="px-8 py-3 rounded-2xl bg-black text-white font-semibold shadow-md hover:bg-gray-800">BUY NOW</button>
-            <button className="px-8 py-3 rounded-2xl bg-white text-gray-900 font-semibold shadow-sm border border-gray-200 hover:bg-gray-50">ADD TO CART</button>
-          </div>
-          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-[60] flex items-center justify-center gap-24 text-xs text-gray-600">
-            <span>Free shipping</span>
-            <span>30-day returns</span>
-          </div>
         </div>
 
         {/* Other Products Gallery - Right Corner Vertical Grid */}
         <div className="w-28">
           <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-3 sticky top-4">
             <div className="grid grid-cols-2 gap-3 max-h-[calc(100vh-2rem)] overflow-hidden">
-            {products.map((product, index) => {
-              const variant = product.variants?.[0]
-              const image = variant?.images?.[0]
+              {products.map((product, index) => {
+                const variant = product.variants?.[0]
+                const image = variant?.images?.[0]
 
-              return (
-                <button
-                  key={product._id}
-                  onClick={() => handleProductSelect(index)}
-                  className={`flex-shrink-0 transition-all ${index === currentIndex
+                return (
+                  <button
+                    key={product._id}
+                    onClick={() => handleProductSelect(index)}
+                    className={`flex-shrink-0 transition-all ${index === currentIndex
                       ? 'ring-2 ring-blue-500 scale-105'
                       : 'hover:scale-105'
-                    }`}
-                >
-                  <div className="relative aspect-square bg-gray-100 rounded-md overflow-hidden mb-1">
-                    {image ? (
-                      <Image
-                        src={image.url}
-                        alt={image.alt || product.name}
-                        fill
-                        className="object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <svg
-                          className="w-8 h-8 text-gray-300"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6h-6z" />
-                          <path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4V6h16v12z" />
-                          <path d="M12 8.5c0-.83-.67-1.5-1.5-1.5S9 7.67 9 8.5 9.67 10 10.5 10s1.5-.67 1.5-1.5z" />
-                        </svg>
-                      </div>
-                    )}
-                  </div>
-                  <p className="text-xs font-medium truncate">{product.name}</p>
-                  <p className="text-xs text-blue-600 font-semibold">
-                    ${product.price.toFixed(2)}
-                  </p>
-                </button>
-              )
-            })}
+                      }`}
+                  >
+                    <div className="relative aspect-square bg-gray-100 rounded-md overflow-hidden mb-1">
+                      {image ? (
+                        <Image
+                          src={image.url}
+                          alt={image.alt || product.name}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <svg
+                            className="w-8 h-8 text-gray-300"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6h-6z" />
+                            <path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4V6h16v12z" />
+                            <path d="M12 8.5c0-.83-.67-1.5-1.5-1.5S9 7.67 9 8.5 9.67 10 10.5 10s1.5-.67 1.5-1.5z" />
+                          </svg>
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-xs font-medium truncate">{product.name}</p>
+                    <p className="text-xs text-blue-600 font-semibold">
+                      ${product.price.toFixed(2)}
+                    </p>
+                  </button>
+                )
+              })}
             </div>
           </div>
         </div>

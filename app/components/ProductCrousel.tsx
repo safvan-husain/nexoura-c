@@ -87,7 +87,7 @@ export function ProductCrousel({
     const getPosition = (index: number, animState: 'idle' | 'next' | 'prev') => {
         if (animState === 'idle') {
             // Default idle positions (percentage-based with tighter spacing)
-            if (index === 0) return { x: `${slotPositions[0]}%`, y: 12, scale: 0.4, zIndex: 5, opacity: 0 };
+            if (index === 0) return { x: `${slotPositions[1]}%`, y: 12, scale: 0.4, zIndex: 5, opacity: 0 };
             if (index === 1) return { x: `${slotPositions[1]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
             if (index === 2) return { x: `${slotPositions[2]}%`, y: 0, scale: 1, zIndex: 50, opacity: 1 };
             if (index === 3) return { x: `${slotPositions[3]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
@@ -96,7 +96,7 @@ export function ProductCrousel({
 
         if (animState === 'next') {
             // Next: shift right (reversed - items move right when going to next)
-            if (index === 0) return { x: `${slotPositions[0]}%`, y: 12, scale: 0.4, zIndex: 5, opacity: 0 };
+            if (index === 0) return { x: `${slotPositions[1]}%`, y: 12, scale: 0.4, zIndex: 5, opacity: 0 };
             if (index === 1) return { x: `${Math.max(extendedLeft, slotPositions[0] - spacingStep)}%`, y: 12, scale: 0.35, zIndex: 5, opacity: 0.7 };
             if (index === 2) return { x: `${slotPositions[1]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
             if (index === 3) return { x: `${slotPositions[2]}%`, y: 0, scale: 1, zIndex: 50, opacity: 1 };
@@ -112,7 +112,7 @@ export function ProductCrousel({
             if (index === 4) return { x: `${extendedRight}%`, y: 12, scale: 0.4, zIndex: 5, opacity: 0 };
         }
 
-        return { x: '10%', y: 0, scale: 1, zIndex: 10, opacity: 0 };
+        return { x: '0%', y: 0, scale: 1, zIndex: 10, opacity: 0 };
     };
 
     if (displayProducts.length === 0) {
@@ -121,9 +121,9 @@ export function ProductCrousel({
 
 
     return (
-        <div className="w-full flex flex-col">
+        <div className="w-full flex flex-col ">
             {/* Product carousel container */}
-            <div className="relative w-full h-full pt-12">
+            <div className="relative w-full pb-12 min-h-screen bg-blue-500 overflow-hidden">
                 {/* Boxes: render all five so stacking/animation looks natural */}
                 {displayProducts.map((product, i) => {
                     const currentPos = getPosition(i, direction);
@@ -139,7 +139,7 @@ export function ProductCrousel({
                             }}
                             transition={{ type: "spring", stiffness: 320, damping: 30 }}
                             style={{ zIndex: currentPos.zIndex }}
-                            className={`absolute top-8 md:top-16 w-[30%] aspect-[3/4] cursor-pointer ${i == 0 && direction !== "prev" ? "hidden" : ""} ${i == 4 && direction !== "next" ? "hidden" : ""}`}
+                            className={`absolute top-4 md:top-8 w-[30%] aspect-[3/4] cursor-pointer ${i == 0 && direction !== "prev" ? "hidden" : ""} ${i == 4 && direction !== "next" ? "hidden" : ""}`}
                             onClick={() => {
                                 const originalIndex = products.findIndex(p => p.id === product.id);
                                 if (originalIndex >= 0) setCurrentIndex(originalIndex);
@@ -163,11 +163,11 @@ export function ProductCrousel({
                                     )}
                                 </div>
 
-                                {/* Floor shadow for each product */}
+                                {/* Floor shadow for each product - positioned to stay within card bounds */}
                                 <div
-                                    className="absolute w-[80%] h-8 bg-black/30 blur-xl rounded-full"
+                                    className="absolute left-1/2 -translate-x-1/2 w-[80%] h-8 bg-black/30 blur-xl rounded-full"
                                     style={{
-                                        // transform: `translateX(-50%) scale(${currentPos.scale})`,
+                                        bottom: '4px',
                                         opacity: currentPos.opacity * 0.6
                                     }}
                                 />
@@ -175,28 +175,20 @@ export function ProductCrousel({
                         </motion.div>
                     );
                 })}
+                <div className='absolute bottom-40 left-2/3 -translate-x-2/3 w-full h-12'>
+                    {/* Buy buttons anchored to bottom of carousel area */}
+                    <div className="flex items-center justify-center gap-6">
+                        <button className="px-8 py-3 rounded-2xl bg-black text-white font-semibold shadow-md hover:bg-gray-800">BUY NOW</button>
+                        <button className="px-8 py-3 rounded-2xl bg-white text-gray-900 font-semibold shadow-sm border border-gray-200 hover:bg-gray-50">ADD TO CART</button>
+                    </div>
+                    <div className="flex items-center justify-center gap-24 text-xs text-gray-600">
+                        <span>Free shipping</span>
+                        <span>30-day returns</span>
+                    </div>
+                </div>
             </div>
-            {/* <div>
-                <motion.div
-                    key={centerProduct.id}
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{
-                        type: "spring",
-                        stiffness: 400,
-                        damping: 20,
-                        duration: 8.8
-                    }}
-                    className="text-center"
-                >
-                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
-                        {centerProduct.name}
-                    </h2>
-                    <p className="text-xl md:text-2xl font-semibold text-blue-600 mt-2">
-                        ${centerProduct.price.toFixed(2)}
-                    </p>
-                </motion.div>
-            </div> */}
+
+
         </div>
     );
 }
