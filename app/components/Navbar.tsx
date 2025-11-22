@@ -7,33 +7,28 @@ export async function Navbar() {
 
   return (
     <nav className="bg-transparent">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center">
-          <div className="flex items-center gap-8">
-            <Link href="/" className="text-2xl font-bold text-blue-600">
-              Nexoura
-            </Link>
-            <div className="flex gap-6">
-              <Link 
-                href="/" 
-                className="text-gray-700 hover:text-blue-600 transition-colors"
-              >
-                Home
-              </Link>
-              <Link 
-                href="/products" 
-                className="text-gray-700 hover:text-blue-600 transition-colors"
-              >
-                Products
-              </Link>
-            </div>
-          </div>
-          
+      <div className="inline-flex mx-auto justify-center h-16 items-center bg-black/10 backdrop-blur-sm">
+        <Link href="/" className="text-2xl font-bold text-blue-600">
+          Nexoura
+        </Link>
+        <div className="flex gap-6">
+          <Link
+            href="/"
+            className="text-gray-700 hover:text-blue-600 transition-colors"
+          >
+            Home
+          </Link>
+          <Link
+            href="/products"
+            className="text-gray-700 hover:text-blue-600 transition-colors"
+          >
+            Products
+          </Link>
           <div>
             {user ? (
               <UserMenu user={user} />
             ) : (
-              <Link 
+              <Link
                 href="/login"
                 className="text-gray-700 hover:text-blue-600 transition-colors"
               >

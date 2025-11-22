@@ -140,9 +140,9 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
 
   return (
     <div className="relative">
-      <div className="relative z-10 flex gap-4 h-[850px] mx-auto px-4 py-4">
+      <div className="min-w-screen flex flex-row z-10 gap-4 h-[850px] mx-auto px-4 py-4">
         {/* Left Details Card */}
-        <div className="absolute w-[360px] shrink-0 z-60 top-1/2 transform -translate-y-1/2 self-start">
+        <div className="w-[20%] shrink-0 mt-24 ml-12 z-60 self-start">
           {(() => {
             const dummyProduct = {
               name: 'OVERSIZED BLACK HOODIE',
@@ -168,7 +168,7 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
             )
           })()}
         </div>
-        <div className="flex flex-col flex-grow min-w-0 relative">
+        <div className="flex flex-col flex-grow min-w-0 relative w-[55%] -mt-[50px] px-10">
           <ProductCrousel
             products={products.map(p => ({
               img: p.variants?.[0]?.images?.[0]?.url || '',
@@ -182,9 +182,10 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
         </div>
 
         {/* Other Products Gallery - Right Corner Vertical Grid */}
-        <div className="w-28">
-          <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-3 sticky top-4">
-            <div className="grid grid-cols-2 gap-3 max-h-[calc(100vh-2rem)] overflow-hidden">
+        <div className="w-[20%] shrink-0">
+          <div className="bg-white/10 backdrop-blur-sm rounded-lg shadow-lg p-3 sticky top-4">
+           <p className="text-2xl font-bold text-black/90 mb-2">Related Products</p>
+            <div className="grid grid-cols-3 gap-3 max-h-[calc(100vh-2rem)] overflow-hidden">
               {products.map((product, index) => {
                 const variant = product.variants?.[0]
                 const image = variant?.images?.[0]
@@ -193,7 +194,7 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
                   <button
                     key={product._id}
                     onClick={() => handleProductSelect(index)}
-                    className={`flex-shrink-0 transition-all ${index === currentIndex
+                    className={`flex-shrink-0 transition-all bg-white rounded ${index === currentIndex
                       ? 'ring-2 ring-blue-500 scale-105'
                       : 'hover:scale-105'
                       }`}

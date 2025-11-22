@@ -51,9 +51,8 @@ export default function ProductDetailsCard({
       `}</style>
 
       <div
-        className={`relative rounded-[32px] border border-white/40 bg-gradient-to-b from-[#f9f2e6] via-[#f4e9da] to-[#eee0cf] p-6 text-gray-900 shadow-[0_25px_50px_rgba(82,55,31,0.15)] transition-all duration-500 ${
-          detailsTransition ? 'fade-up' : ''
-        }`}
+        className={`relative rounded-[32px] border border-white/40 p-6 text-gray-900 shadow-[0_25px_50px_rgba(82,55,31,0.15)] transition-all duration-500 ${detailsTransition ? 'fade-up' : ''
+          }`}
       >
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute -top-10 -right-6 h-32 w-32 rounded-full bg-white/30 blur-3xl" />
@@ -87,11 +86,11 @@ export default function ProductDetailsCard({
               Colors
             </p>
             <div className="mt-3 flex gap-3">
-              {(colors.length ? colors : ['#111827', '#d1d5db', '#d1b68f']).map(color => (
+              {(colors.length ? colors : ['#111827', '#d1d5db', '#d1b68f']).map((color, index) => (
                 <button
-                  key={color}
+                  key={`${color}-${index}`}
                   className="h-10 w-10 rounded-full border border-white/70 shadow-sm outline-offset-2 transition hover:scale-105"
-                  style={{ backgroundColor: color }}
+                  style={{ 'backgroundColor': color as any }}
                   aria-label={`Color ${color}`}
                 />
               ))}
@@ -103,12 +102,12 @@ export default function ProductDetailsCard({
               Sizes
             </p>
             <div className="mt-3 flex gap-3">
-              {(sizes.length ? sizes : ['XS', 'S', 'M', 'XL']).map(size => (
+              {(sizes.length ? sizes : ['XS', 'S', 'M', 'XL']).map((size, index) => (
                 <button
-                  key={size}
+                  key={`${size}-${index}`}
                   className="rounded-xl border border-gray-300 bg-white/80 px-4 py-2 text-sm font-semibold text-gray-800 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
                 >
-                  {size}
+                  {size as any}
                 </button>
               ))}
             </div>
@@ -132,11 +131,10 @@ export default function ProductDetailsCard({
                 SKU {currentVariant.sku || 'N/A'}
               </span>
               <span
-                className={`rounded-full px-3 py-1 font-semibold uppercase tracking-wider ${
-                  (currentVariant.stock ?? 0) > 0
+                className={`rounded-full px-3 py-1 font-semibold uppercase tracking-wider ${(currentVariant.stock ?? 0) > 0
                     ? 'bg-green-100 text-green-800'
                     : 'bg-red-100 text-red-800'
-                }`}
+                  }`}
               >
                 {(currentVariant.stock ?? 0) > 0
                   ? `${currentVariant.stock} in stock`

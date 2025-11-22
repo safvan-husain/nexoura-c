@@ -25,10 +25,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         style={{
-          background: 'linear-gradient(to bottom, #cef63b34 0%, #ac862059 20%, #0000003b 60%, #f0fcf8ff 80%)'
+          background: 'linear-gradient(to bottom, #d4c2184b 0%, #ac862059 20%, #00000075 40%, #f0fcf8ff 80%)'
         }}
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}
       >
