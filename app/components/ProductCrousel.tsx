@@ -85,32 +85,32 @@ export function ProductCrousel({
     const getPosition = (index: number, animState: 'idle' | 'next' | 'prev') => {
         if (animState === 'idle') {
             // Default idle positions (percentage-based with tighter spacing)
-            if (index === 0) return { x: `${slotPositions[1]}%`, y: 12, scale: 0.4, zIndex: 5, opacity: 0 };
-            if (index === 1) return { x: `${slotPositions[1]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
-            if (index === 2) return { x: `${slotPositions[2]}%`, y: 0, scale: 1, zIndex: 50, opacity: 1 };
-            if (index === 3) return { x: `${slotPositions[3]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
-            if (index === 4) return { x: `${slotPositions[3]}%`, y: 12, scale: 0.4, zIndex: 5, opacity: 0 };
+            if (index === 0) return { x: `${slotPositions[1]}%`, y: 12, scale: 0.4, zIndex: 5, opacity: 0, blur: 0 };
+            if (index === 1) return { x: `${slotPositions[1]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85, blur: 6 };
+            if (index === 2) return { x: `${slotPositions[2]}%`, y: 0, scale: 1, zIndex: 50, opacity: 1, blur: 0 };
+            if (index === 3) return { x: `${slotPositions[3]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85, blur: 6 };
+            if (index === 4) return { x: `${slotPositions[3]}%`, y: 12, scale: 0.4, zIndex: 5, opacity: 0, blur: 0 };
         }
 
         if (animState === 'next') {
             // Next: shift right (reversed - items move right when going to next)
-            if (index === 0) return { x: `${slotPositions[1]}%`, y: 12, scale: 0.4, zIndex: 5, opacity: 0 };
-            if (index === 1) return { x: `${slotPositions[2]}%`, y: 12, scale: 0.35, zIndex: 5, opacity: 0.7 };
-            if (index === 2) return { x: `${slotPositions[1]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
-            if (index === 3) return { x: `${slotPositions[2]}%`, y: 0, scale: 1, zIndex: 50, opacity: 1 };
-            if (index === 4) return { x: `${slotPositions[3]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
+            if (index === 0) return { x: `${slotPositions[1]}%`, y: 12, scale: 0.4, zIndex: 5, opacity: 0, blur: 0 };
+            if (index === 1) return { x: `${slotPositions[2]}%`, y: 12, scale: 0.35, zIndex: 5, opacity: 0.7, blur: 0 };
+            if (index === 2) return { x: `${slotPositions[1]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85, blur: 6 };
+            if (index === 3) return { x: `${slotPositions[2]}%`, y: 0, scale: 1, zIndex: 50, opacity: 1, blur: 0 };
+            if (index === 4) return { x: `${slotPositions[3]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85, blur: 6 };
         }
 
         if (animState === 'prev') {
             // Prev: shift left (reversed - items move left when going to previous)
-            if (index === 0) return { x: `${slotPositions[1]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0 };
-            if (index === 1) return { x: `${slotPositions[2]}%`, y: 0, scale: 1, zIndex: 50, opacity: 1 };
-            if (index === 2) return { x: `${slotPositions[3]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85 };
-            if (index === 3) return { x: `${slotPositions[4]}%`, y: 12, scale: 0.35, zIndex: 5, opacity: 0.7 };
-            if (index === 4) return { x: `${slotPositions[4]}%`, y: 12, scale: 0.4, zIndex: 5, opacity: 0 };
+            if (index === 0) return { x: `${slotPositions[1]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0, blur: 6 };
+            if (index === 1) return { x: `${slotPositions[2]}%`, y: 0, scale: 1, zIndex: 50, opacity: 1, blur: 0 };
+            if (index === 2) return { x: `${slotPositions[3]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85, blur: 6};
+            if (index === 3) return { x: `${slotPositions[4]}%`, y: 12, scale: 0.35, zIndex: 5, opacity: 0.7, blur: 0 };
+            if (index === 4) return { x: `${slotPositions[4]}%`, y: 12, scale: 0.4, zIndex: 5, opacity: 0, blur: 0 };
         }
 
-        return { x: '0%', y: 0, scale: 1, zIndex: 10, opacity: 0 };
+        return { x: '0%', y: 0, scale: 1, zIndex: 10, opacity: 0, blur: 0 };
     };
 
     if (displayProducts.length === 0) {
@@ -137,7 +137,8 @@ export function ProductCrousel({
                                 left: currentPos.x,
                                 y: currentPos.y,
                                 scale: currentPos.scale,
-                                opacity: currentPos.opacity
+                                opacity: currentPos.opacity,
+                                filter: `blur(${currentPos.blur}px)`
                             }}
                             transition={{ type: "spring", stiffness: 320, damping: 30 }}
                             style={{ zIndex: currentPos.zIndex }}
