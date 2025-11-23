@@ -51,7 +51,7 @@ export default function ProductDetailsCard({
       `}</style>
 
       <div
-        className={`relative rounded-[32px] border border-white/40 p-6 text-gray-900 shadow-[0_25px_50px_rgba(82,55,31,0.15)] transition-all duration-500 ${detailsTransition ? 'fade-up' : ''
+        className={`relative  p-6 text-gray-900  transition-all duration-500 ${detailsTransition ? 'fade-up' : ''
           }`}
       >
         <div className="pointer-events-none absolute inset-0">

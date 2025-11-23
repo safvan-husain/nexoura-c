@@ -17,7 +17,7 @@ export function ProductCrousel({
     currentIndex,
     setCurrentIndex,
     spacingStep = 39,
-    centerPosition = 25
+    centerPosition = 29
 }: ProductCrouselProps) {
     const [direction, setDirection] = useState<'next' | 'prev' | 'idle'>('prev');
     const [displayProducts, setDisplayProducts] = useState(products.slice(0, 5));
@@ -121,7 +121,7 @@ export function ProductCrousel({
     return (
         <div className="w-full flex flex-col">
             {/* Product carousel container */}
-            <div className="relative w-full pb-12 min-h-screen overflow-hidden">
+            <div className="relative w-full pb-12 min-h-screen overflow-hidden flex items-center">
                 {/* Boxes: render all five so stacking/animation looks natural */}
                 {displayProducts.map((product, i) => {
                     const currentPos = getPosition(i, direction);
@@ -141,7 +141,7 @@ export function ProductCrousel({
                             }}
                             transition={{ type: "spring", stiffness: 320, damping: 30 }}
                             style={{ zIndex: currentPos.zIndex }}
-                            className={`absolute top-4 md:top-8 w-[45%] aspect-[3/4] cursor-pointer `} //${i == 0 && direction !== "prev" ? "hidden" : ""} ${i == 4 && direction !== "next" ? "hidden" : ""}
+                            className={`absolute w-[42%] aspect-[3/4] cursor-pointer `} //${i == 0 && direction !== "prev" ? "hidden" : ""} ${i == 4 && direction !== "next" ? "hidden" : ""}
                             onClick={() => {
                                 const originalIndex = products.findIndex(p => p.id === product.id);
                                 if (originalIndex >= 0) setCurrentIndex(originalIndex);

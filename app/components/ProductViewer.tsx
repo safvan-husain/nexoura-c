@@ -140,9 +140,12 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
 
   return (
     <div className="relative">
-      <div className="min-w-screen flex flex-row items-center justify-center z-10 gap-22 h-[850px] mx-auto px-4 py-4">
-        {/* Left Details Card */}
-        {/* <div className="hidden w-[20%] shrink-0 mt-24 ml-12 z-60 self-start">
+      <div className="min-w-screen flex flex-row items-center justify-center z-10 gap-22 h-[850px] px-4 py-4 relative">
+        {/* Placeholder to maintain layout space */}
+        {/* <div className="w-[10%] shrink-0"></div> */}
+
+        {/* Left Details Card - Absolutely Positioned */}
+        <div className="absolute left-4 top-24 w-[20%] z-60">
           {(() => {
             const dummyProduct = {
               name: 'OVERSIZED BLACK HOODIE',
@@ -167,19 +170,19 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
               />
             )
           })()}
-        </div> */}
+        </div>
 
-        <div className="shrink-0 relative w-[55%] -mt-[50px]">
+        <div className="shrink-0 relative w-[65%] -mt-[50px]">
           <ProductCrousel
             products={products.map(p => ({
               img: p.variants?.[0]?.images?.[0]?.url || '',
               name: p.name,
-                price: p.price,
-                id: p._id
-              }))}
-              currentIndex={currentIndex}
-              setCurrentIndex={handleProductSelect}
-            />
+              price: p.price,
+              id: p._id
+            }))}
+            currentIndex={currentIndex}
+            setCurrentIndex={handleProductSelect}
+          />
 
           {/* Other Products Gallery - Right Corner Vertical Grid */}
           {/* <div className="w-[10%] shrink-0"></div> */}
@@ -199,7 +202,7 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
 
         {/* Other Products Gallery - Right Corner Vertical Grid */}
         {/* <div className="w-[10%] shrink-0"> */}
-          {/* <div className="bg-white/10 backdrop-blur-sm rounded-lg shadow-lg p-3 sticky top-4">
+        {/* <div className="bg-white/10 backdrop-blur-sm rounded-lg shadow-lg p-3 sticky top-4">
            <p className="text-2xl font-bold text-black/90 mb-2">Related Products</p>
             <div className="grid grid-cols-3 gap-3 max-h-[calc(100vh-2rem)] overflow-hidden">
               {products.map((product, index) => {
