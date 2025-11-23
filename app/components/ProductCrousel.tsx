@@ -16,8 +16,8 @@ export function ProductCrousel({
     products,
     currentIndex,
     setCurrentIndex,
-    spacingStep = 35,
-    centerPosition = 19
+    spacingStep = 39,
+    centerPosition = 25
 }: ProductCrouselProps) {
     const [direction, setDirection] = useState<'next' | 'prev' | 'idle'>('prev');
     const [displayProducts, setDisplayProducts] = useState(products.slice(0, 5));
@@ -141,7 +141,7 @@ export function ProductCrousel({
                             }}
                             transition={{ type: "spring", stiffness: 320, damping: 30 }}
                             style={{ zIndex: currentPos.zIndex }}
-                            className={`absolute top-4 md:top-8 w-[60%] aspect-[3/4] cursor-pointer `} //${i == 0 && direction !== "prev" ? "hidden" : ""} ${i == 4 && direction !== "next" ? "hidden" : ""}
+                            className={`absolute top-4 md:top-8 w-[45%] aspect-[3/4] cursor-pointer `} //${i == 0 && direction !== "prev" ? "hidden" : ""} ${i == 4 && direction !== "next" ? "hidden" : ""}
                             onClick={() => {
                                 const originalIndex = products.findIndex(p => p.id === product.id);
                                 if (originalIndex >= 0) setCurrentIndex(originalIndex);
