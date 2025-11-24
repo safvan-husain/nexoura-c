@@ -7,34 +7,50 @@ export async function Navbar() {
 
   return (
     <nav className="bg-transparent">
-      <div className="inline-flex mx-auto justify-center h-16 items-center bg-black/10 backdrop-blur-sm">
-        <Link href="/" className="text-2xl font-bold text-blue-600">
-          Nexoura
-        </Link>
-        <div className="flex gap-6">
-          <Link
-            href="/"
-            className="text-gray-700 hover:text-blue-600 transition-colors"
-          >
-            Home
+      <div className="flex mx-auto justify-center h-16 items-center  backdrop-blur-sm">
+        <div className="flex max-w-7xl w-full px-4 gap-6 sm:px-6 lg:px-8 justify-center items-center">
+          <div className="flex gap-6 font-semibold ">
+            <Link
+              href="/"
+              className="uppercase text-gray-700 hover:text-blue-600 transition-colors"
+            >
+              Women
+            </Link>
+            <Link
+              href="/men"
+              className="uppercase text-gray-700 hover:text-blue-600 transition-colors"
+            >
+              Men
+            </Link>
+          </div>
+          <Link href="/" className="text-3xl font-semibold leading-tight text-black">
+            EZRAH
           </Link>
-          <Link
-            href="/products"
-            className="text-gray-700 hover:text-blue-600 transition-colors"
-          >
-            Products
-          </Link>
-          <div>
-            {user ? (
-              <UserMenu user={user} />
-            ) : (
-              <Link
-                href="/login"
-                className="text-gray-700 hover:text-blue-600 transition-colors"
-              >
-                Login
-              </Link>
-            )}
+          <div className="flex gap-6  font-semibold ">
+            <Link
+              href="/"
+              className="text-gray-700 hover:text-blue-600 transition-colors"
+            >
+              Whishlist
+            </Link>
+            <Link
+              href="/products"
+              className="text-gray-700 hover:text-blue-600 transition-colors"
+            >
+              Products
+            </Link>
+            {/* <div>
+              {user ? (
+                <UserMenu user={user} />
+              ) : (
+                <Link
+                  href="/login"
+                  className="text-gray-700 hover:text-blue-600 transition-colors"
+                >
+                  Login
+                </Link>
+              )}
+            </div> */}
           </div>
         </div>
       </div>

@@ -1,17 +1,29 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Poppins } from "next/font/google";
+import localFont from "next/font/local";
 import { Suspense } from "react";
 import "./globals.css";
 import { Navbar } from "./components/Navbar";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const poppins = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const metha = localFont({
+  src: "../public/fonts/Metha-Regular.ttf",
+  variable: "--font-metha",
+});
+
+const mavine = localFont({
+  src: "../public/fonts/Mavine-bold.ttf",
+  variable: "--font-mavine",
+});
+
+const black = localFont({
+  src: "../public/fonts/Black Mustang.ttf",
+  variable: "--font-mavine",
 });
 
 export const metadata: Metadata = {
@@ -28,9 +40,10 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         style={{
-          background: 'linear-gradient(to bottom, #d4c2184b 0%, #ac862059 20%, #00000075 40%, #f0fcf8ff 80%)'
+          // background: 'linear-gradient(to bottom, #d4c2184b 0%, #ac862059 20%, #00000075 40%, #f0fcf8ff 80%)'
+          background: 'bg-white'
         }}
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}
+        className={`${poppins.variable} ${metha.variable} ${mavine.variable} ${black.variable} antialiased min-h-screen font-[family-name:var(--font-poppins)]`}
       >
         <Suspense fallback={<NavbarSkeleton />}>
           <Navbar />

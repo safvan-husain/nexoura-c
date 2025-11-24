@@ -145,7 +145,7 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
         {/* <div className="w-[10%] shrink-0"></div> */}
 
         {/* Left Details Card - Absolutely Positioned */}
-        <div className="absolute left-4 top-24 w-[20%] z-60">
+        <div className="hidden absolute left-4 top-24 w-[20%] z-60">
           {(() => {
             const dummyProduct = {
               name: 'OVERSIZED BLACK HOODIE',

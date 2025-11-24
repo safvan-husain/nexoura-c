@@ -17,7 +17,7 @@ export function ProductCrousel({
     currentIndex,
     setCurrentIndex,
     spacingStep = 39,
-    centerPosition = 29
+    centerPosition = 27
 }: ProductCrouselProps) {
     const [direction, setDirection] = useState<'next' | 'prev' | 'idle'>('prev');
     const [displayProducts, setDisplayProducts] = useState(products.slice(0, 5));
@@ -105,7 +105,7 @@ export function ProductCrousel({
             // Prev: shift left (reversed - items move left when going to previous)
             if (index === 0) return { x: `${slotPositions[1]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0, blur: 6 };
             if (index === 1) return { x: `${slotPositions[2]}%`, y: 0, scale: 1, zIndex: 50, opacity: 1, blur: 0 };
-            if (index === 2) return { x: `${slotPositions[3]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85, blur: 6};
+            if (index === 2) return { x: `${slotPositions[3]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85, blur: 6 };
             if (index === 3) return { x: `${slotPositions[4]}%`, y: 12, scale: 0.35, zIndex: 5, opacity: 0.7, blur: 0 };
             if (index === 4) return { x: `${slotPositions[4]}%`, y: 12, scale: 0.4, zIndex: 5, opacity: 0, blur: 0 };
         }
@@ -142,7 +142,7 @@ export function ProductCrousel({
                             }}
                             transition={{ type: "spring", stiffness: 320, damping: 30 }}
                             style={{ zIndex: currentPos.zIndex }}
-                            className={`absolute w-[42%] aspect-[3/4] cursor-pointer `} //${i == 0 && direction !== "prev" ? "hidden" : ""} ${i == 4 && direction !== "next" ? "hidden" : ""}
+                            className={`absolute w-[42%] -translate-y-[8%] aspect-[3/4] cursor-pointer `} //${i == 0 && direction !== "prev" ? "hidden" : ""} ${i == 4 && direction !== "next" ? "hidden" : ""}
                             onClick={() => {
                                 const originalIndex = products.findIndex(p => p.id === product.id);
                                 if (originalIndex >= 0) setCurrentIndex(originalIndex);
@@ -168,26 +168,29 @@ export function ProductCrousel({
 
                                 {/* Floor shadow for each product - positioned to stay within card bounds */}
                                 <div
-                                    className="absolute left-1/2 -translate-x-1/2 w-[80%] h-8 bg-black/30 blur-xl rounded-full"
+                                    className={`absolute left-1/2 -translate-x-1/2 rounded-full ${i === 2 ? 'w-[75%] h-3 bg-black/70 blur-lg' : 'w-[60%] h-4 bg-black/60 blur-lg'}`}
                                     style={{
-                                        bottom: '4px',
-                                        opacity: currentPos.opacity * 0.6
+                                        bottom: '2px',
+                                        opacity: i === 2 ? currentPos.opacity * 0.9 : currentPos.opacity * 0.8
                                     }}
                                 />
                             </div>
                         </motion.div>
                     );
                 })}
-                <div className='absolute bottom-30 left-1/2 z-50 -translate-x-1/2 w-full h-12'>
+                <div className='absolute flex items-center justify-center bottom-30 left-1/2 z-50 -translate-x-1/2 w-full h-12'>
+                    <h1 className="font-[family-name:var(--font-mavine)] font-black uppercase tracking-[0.05em] text-4xl md:text-8xl text-black">
+                        BALACLAVA
+                    </h1>
                     {/* Buy buttons anchored to bottom of carousel area */}
-                    <div className="flex items-center justify-center gap-6 mb-3">
+                    {/* <div className="flex items-center justify-center gap-6 mb-3">
                         <button className="px-8 py-3 rounded-2xl bg-black text-white font-semibold shadow-md hover:bg-gray-800">BUY NOW</button>
                         <button className="px-8 py-3 rounded-2xl bg-white text-gray-900 font-semibold shadow-sm border border-gray-200 hover:bg-gray-50">ADD TO CART</button>
                     </div>
                     <div className="flex items-center justify-center gap-24 text-xs text-gray-600">
                         <span>Free shipping</span>
                         <span>30-day returns</span>
-                    </div>
+                    </div> */}
                 </div>
             </div>
 
