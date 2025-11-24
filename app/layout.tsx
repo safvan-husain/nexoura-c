@@ -26,6 +26,11 @@ const black = localFont({
   variable: "--font-mavine",
 });
 
+const cloisterBlack = localFont({
+  src: "../public/fonts/CloisterBlack.ttf",
+  variable: "--font-mavine",
+});
+
 export const metadata: Metadata = {
   title: "Nexoura",
   description: "Your product marketplace",
@@ -40,8 +45,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         style={{
-          // background: 'linear-gradient(to bottom, #d4c2184b 0%, #ac862059 20%, #00000075 40%, #f0fcf8ff 80%)'
-          background: 'bg-white'
+          background: 'linear-gradient(to bottom, #dddddbff 0%, #ebebebff 50%, #ffffff 60%, #ffffff 100%)'
         }}
         className={`${poppins.variable} ${metha.variable} ${mavine.variable} ${black.variable} antialiased min-h-screen font-[family-name:var(--font-poppins)]`}
       >

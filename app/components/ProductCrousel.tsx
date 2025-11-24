@@ -121,7 +121,7 @@ export function ProductCrousel({
     return (
         <div className="w-full flex flex-col">
             {/* Product carousel container */}
-            <div className="relative w-full pb-12 min-h-screen overflow-hidden flex items-center">
+            <div className="relative w-full pb-12 h-[600px] md:h-[700px] lg:h-[800px] overflow-hidden flex items-center">
                 {/* Boxes: render all five so stacking/animation looks natural */}
                 {displayProducts.map((product, i) => {
                     const currentPos = getPosition(i, direction);
@@ -142,14 +142,14 @@ export function ProductCrousel({
                             }}
                             transition={{ type: "spring", stiffness: 320, damping: 30 }}
                             style={{ zIndex: currentPos.zIndex }}
-                            className={`absolute w-[42%] -translate-y-[8%] aspect-[3/4] cursor-pointer `} //${i == 0 && direction !== "prev" ? "hidden" : ""} ${i == 4 && direction !== "next" ? "hidden" : ""}
+                            className={`absolute w-[42%] -translate-y-[8%] aspect-[3/5] cursor-pointer `} //${i == 0 && direction !== "prev" ? "hidden" : ""} ${i == 4 && direction !== "next" ? "hidden" : ""}
                             onClick={() => {
                                 const originalIndex = products.findIndex(p => p.id === product.id);
                                 if (originalIndex >= 0) setCurrentIndex(originalIndex);
                             }}
                         >
                             {/* Product card with shadow */}
-                            <div className="relative w-full h-full">
+                            <div className="flex relative w-full h-full">
                                 {/* Product image */}
                                 <div className="relative w-full h-full drop-shadow-2xl">
                                     {product.img.length > 0 ? (
@@ -168,23 +168,26 @@ export function ProductCrousel({
 
                                 {/* Floor shadow for each product - positioned to stay within card bounds */}
                                 <div
-                                    className={`absolute left-1/2 -translate-x-1/2 rounded-full ${i === 2 ? 'w-[75%] h-3 bg-black/70 blur-lg' : 'w-[60%] h-4 bg-black/60 blur-lg'}`}
+                                    className={`absolute left-1/2 -translate-x-1/2 rounded-full ${i === 2 ? 'w-[65%] h-3 bg-black/70 blur-md' : 'w-[60%] h-4 bg-black/60 blur-lg'}`}
                                     style={{
-                                        bottom: '2px',
+                                        bottom: '18%',
                                         opacity: i === 2 ? currentPos.opacity * 0.9 : currentPos.opacity * 0.8
                                     }}
                                 />
                             </div>
+
                         </motion.div>
                     );
                 })}
-                <div className='absolute flex items-center justify-center bottom-30 left-1/2 z-50 -translate-x-1/2 w-full h-12'>
+                <div className='-ml-4 absolute flex flex-col items-center justify-center bottom-20 left-1/2 z-50 -translate-x-1/2 w-full h-12'>
                     <h1 className="font-[family-name:var(--font-mavine)] font-black uppercase tracking-[0.05em] text-4xl md:text-8xl text-black">
                         BALACLAVA
                     </h1>
+                    <h3 className="text-sm font-semibold text-black font-sans">Full face covering hoodi | 7738</h3>
+
+                    <button className="px-6 py-2 mt-8 rounded-2xl bg-gray-600 shadow-md text-white font-semibold shadow-md hover:bg-gray-800">BUY NOW</button>
                     {/* Buy buttons anchored to bottom of carousel area */}
                     {/* <div className="flex items-center justify-center gap-6 mb-3">
-                        <button className="px-8 py-3 rounded-2xl bg-black text-white font-semibold shadow-md hover:bg-gray-800">BUY NOW</button>
                         <button className="px-8 py-3 rounded-2xl bg-white text-gray-900 font-semibold shadow-sm border border-gray-200 hover:bg-gray-50">ADD TO CART</button>
                     </div>
                     <div className="flex items-center justify-center gap-24 text-xs text-gray-600">

@@ -24,18 +24,18 @@ export async function Navbar() {
             </Link>
           </div>
           <Link href="/" className="text-3xl font-semibold leading-tight text-black">
-            EZRAH
+            EZRRAH
           </Link>
           <div className="flex gap-6  font-semibold ">
             <Link
               href="/"
-              className="text-gray-700 hover:text-blue-600 transition-colors"
+              className="uppercase text-gray-700 hover:text-blue-600 transition-colors"
             >
               Whishlist
             </Link>
             <Link
               href="/products"
-              className="text-gray-700 hover:text-blue-600 transition-colors"
+              className="uppercase text-gray-700 hover:text-blue-600 transition-colors"
             >
               Products
             </Link>
