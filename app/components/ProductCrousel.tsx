@@ -21,6 +21,7 @@ export function ProductCrousel({
 }: ProductCrouselProps) {
     const [direction, setDirection] = useState<'next' | 'prev' | 'idle'>('prev');
     const [displayProducts, setDisplayProducts] = useState(products.slice(0, 5));
+    const [isTransitioning, setIsTransitioning] = useState(false);
     const prevIndexRef = useRef(currentIndex);
     const slotPositions = Array.from({ length: 5 }, (_, idx) => centerPosition + (idx - 2) * spacingStep);
 
@@ -46,6 +47,17 @@ export function ProductCrousel({
         setDisplayProducts(newDisplay.reverse());
     }, [products, currentIndex]);
 
+    // Auto-rotate carousel every 1 second
+    useEffect(() => {
+        if (products.length < 2) return;
+
+        const interval = setInterval(() => {
+            setCurrentIndex((currentIndex + 1) % products.length);
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [currentIndex, products.length, setCurrentIndex]);
+
     // Watch for currentIndex changes and trigger animation
     useEffect(() => {
         if (products.length < 2) return;
@@ -54,6 +66,9 @@ export function ProductCrousel({
         const totalProducts = products.length;
 
         if (prevIndex === currentIndex) return;
+
+        // Trigger text transition
+        setIsTransitioning(true);
 
         // Determine direction based on index change
         let animDirection: 'next' | 'prev';
@@ -72,7 +87,8 @@ export function ProductCrousel({
         // After animation completes, reset to idle
         const timer = setTimeout(() => {
             setDirection('idle');
-        }, 50);
+            setIsTransitioning(false);
+        }, 300);
 
         prevIndexRef.current = currentIndex;
 
@@ -95,7 +111,7 @@ export function ProductCrousel({
         if (animState === 'next') {
             // Next: shift right (reversed - items move right when going to next)
             if (index === 0) return { x: `${slotPositions[1]}%`, y: 12, scale: 0.4, zIndex: 5, opacity: 0, blur: 0 };
-            if (index === 1) return { x: `${slotPositions[2]}%`, y: 12, scale: 0.35, zIndex: 5, opacity: 0.7, blur: 0 };
+            if (index === 1) return { x: `${slotPositions[2]}%`, y: 12, scale: 0.35, zIndex: 5, opacity: 0, blur: 0 };
             if (index === 2) return { x: `${slotPositions[1]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85, blur: 6 };
             if (index === 3) return { x: `${slotPositions[2]}%`, y: 0, scale: 1, zIndex: 50, opacity: 1, blur: 0 };
             if (index === 4) return { x: `${slotPositions[3]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85, blur: 6 };
@@ -179,10 +195,17 @@ export function ProductCrousel({
                         </motion.div>
                     );
                 })}
-                <div className='-ml-4 absolute flex flex-col items-center justify-center bottom-20 left-1/2 z-50 -translate-x-1/2 w-full h-12'>
-                    <h1 className="font-[family-name:var(--font-mavine)] font-black uppercase tracking-[0.05em] text-4xl md:text-8xl text-black">
-                        BALACLAVA
-                    </h1>
+                <div className='-ml-4 absolute flex flex-col items-center justify-center bottom-0 left-1/2 z-50 -translate-x-1/2 w-full'>
+                    <div className="overflow-hidden h-[3rem] md:h-[6rem] flex items-center justify-center">
+                        <h1 
+                            key={currentIndex}
+                            className={`uppercase line-clamp-1 font-[family-name:var(--font-mavine)] font-black tracking-[0.05em] text-4xl md:text-8xl text-black transition-all duration-50 ease-in-out ${
+                                isTransitioning ? 'translate-y-[-100%] opacity-0' : 'translate-y-0 opacity-100'
+                            }`}
+                        >
+                            {products[currentIndex]?.name || 'Product'}
+                        </h1>
+                    </div>
                     <h3 className="text-sm font-semibold text-black font-sans">Full face covering hoodi | 7738</h3>
 
                     <button className="px-6 py-2 mt-8 rounded-2xl bg-gray-600 shadow-md text-white font-semibold shadow-md hover:bg-gray-800">BUY NOW</button>
