@@ -47,7 +47,7 @@ export default function RootLayout({
         style={{
           background: 'linear-gradient(to bottom, #dddddbff 0%, #ebebebff 50%, #ffffff 60%, #ffffff 100%)'
         }}
-        className={`${poppins.variable} ${metha.variable} ${mavine.variable} ${black.variable} antialiased min-h-screen font-[family-name:var(--font-poppins)]`}
+        className={`${poppins.variable} ${metha.variable} ${mavine.variable} ${black.variable} antialiased min-h-screen overflow-x-hidden font-[family-name:var(--font-poppins)]`}
       >
         <Suspense fallback={<NavbarSkeleton />}>
           <Navbar />

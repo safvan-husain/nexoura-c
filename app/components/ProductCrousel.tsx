@@ -119,7 +119,7 @@ export function ProductCrousel({
 
 
     return (
-        <div className="w-full flex flex-col">
+        <div className="w-full flex flex-col overflow-hidden">
             {/* Product carousel container */}
             <div className="relative w-full pb-12 h-[600px] md:h-[700px] lg:h-[800px] overflow-hidden flex items-center">
                 {/* Boxes: render all five so stacking/animation looks natural */}
