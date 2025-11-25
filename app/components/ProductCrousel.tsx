@@ -84,11 +84,11 @@ export function ProductCrousel({
 
         setDirection(animDirection);
 
-        // After animation completes, reset to idle
+        // After animation completes, reset to idle (match spring animation duration ~500ms)
         const timer = setTimeout(() => {
             setDirection('idle');
             setIsTransitioning(false);
-        }, 300);
+        }, 500);
 
         prevIndexRef.current = currentIndex;
 
@@ -199,14 +199,22 @@ export function ProductCrousel({
                     <div className="overflow-hidden h-[3rem] md:h-[6rem] flex items-center justify-center">
                         <h1 
                             key={currentIndex}
-                            className={`uppercase line-clamp-1 font-[family-name:var(--font-mavine)] font-black tracking-[0.05em] text-4xl md:text-8xl text-black transition-all duration-50 ease-in-out ${
+                            className={`uppercase line-clamp-1 font-[family-name:var(--font-mavine)] font-black tracking-[0.05em] text-4xl md:text-8xl text-black transition-all duration-500 ease-out ${
                                 isTransitioning ? 'translate-y-[-100%] opacity-0' : 'translate-y-0 opacity-100'
                             }`}
                         >
                             {products[currentIndex]?.name || 'Product'}
                         </h1>
                     </div>
-                    <h3 className="text-sm font-semibold text-black font-sans">Full face covering hoodi | 7738</h3>
+                    <div className="overflow-hidden h-[1.5rem] flex items-center justify-center">
+                        <h3 
+                            className={`text-sm font-semibold text-black font-sans transition-all duration-500 ease-out ${
+                                isTransitioning ? 'translate-y-[-100%] opacity-0' : 'translate-y-0 opacity-100'
+                            }`}
+                        >
+                            Full face covering hoodi | 7738
+                        </h3>
+                    </div>
 
                     <button className="px-6 py-2 mt-8 rounded-2xl bg-gray-600 shadow-md text-white font-semibold shadow-md hover:bg-gray-800">BUY NOW</button>
                     {/* Buy buttons anchored to bottom of carousel area */}

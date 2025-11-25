@@ -172,7 +172,7 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
           })()}
         </div>
 
-        <div className="shrink-0 relative w-[65%] -mt-[50px]">
+        <div className="shrink-0 relative w-[67%] -mt-[50px]">
           <ProductCrousel
             products={products.map(p => ({
               img: p.variants?.[0]?.images?.[0]?.url || '',
