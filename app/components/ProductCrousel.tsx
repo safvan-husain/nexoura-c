@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 
 type ProductCrouselProps = {
@@ -21,7 +21,6 @@ export function ProductCrousel({
 }: ProductCrouselProps) {
     const [direction, setDirection] = useState<'next' | 'prev' | 'idle'>('prev');
     const [displayProducts, setDisplayProducts] = useState(products.slice(0, 5));
-    const [isTransitioning, setIsTransitioning] = useState(false);
     const prevIndexRef = useRef(currentIndex);
     const slotPositions = Array.from({ length: 5 }, (_, idx) => centerPosition + (idx - 2) * spacingStep);
 
@@ -67,9 +66,6 @@ export function ProductCrousel({
 
         if (prevIndex === currentIndex) return;
 
-        // Trigger text transition
-        setIsTransitioning(true);
-
         // Determine direction based on index change
         let animDirection: 'next' | 'prev';
 
@@ -82,13 +78,13 @@ export function ProductCrousel({
             animDirection = currentIndex > prevIndex ? 'next' : 'prev';
         }
 
+        // Start animation
         setDirection(animDirection);
 
-        // After animation completes, reset to idle (match spring animation duration ~500ms)
+        // After animation completes, reset to idle
         const timer = setTimeout(() => {
             setDirection('idle');
-            setIsTransitioning(false);
-        }, 500);
+        }, 50);
 
         prevIndexRef.current = currentIndex;
 
@@ -197,23 +193,32 @@ export function ProductCrousel({
                 })}
                 <div className='-ml-4 absolute flex flex-col items-center justify-center bottom-0 left-1/2 z-50 -translate-x-1/2 w-full'>
                     <div className="overflow-hidden h-[3rem] md:h-[6rem] flex items-center justify-center">
-                        <h1 
-                            key={currentIndex}
-                            className={`uppercase line-clamp-1 font-[family-name:var(--font-mavine)] font-black tracking-[0.05em] text-4xl md:text-8xl text-black transition-all duration-500 ease-out ${
-                                isTransitioning ? 'translate-y-[-100%] opacity-0' : 'translate-y-0 opacity-100'
-                            }`}
-                        >
-                            {products[currentIndex]?.name || 'Product'}
-                        </h1>
+                        <AnimatePresence mode="wait">
+                            <motion.h1 
+                                key={currentIndex}
+                                initial={{ y: 0, opacity: 1 }}
+                                exit={{ y: '-100%', opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                transition={{ type: "spring", stiffness: 320, damping: 30 }}
+                                className="uppercase line-clamp-1 font-[family-name:var(--font-mavine)] font-black tracking-[0.05em] text-4xl md:text-8xl text-black"
+                            >
+                                {products[currentIndex]?.name || 'Product'}
+                            </motion.h1>
+                        </AnimatePresence>
                     </div>
                     <div className="overflow-hidden h-[1.5rem] flex items-center justify-center">
-                        <h3 
-                            className={`text-sm font-semibold text-black font-sans transition-all duration-500 ease-out ${
-                                isTransitioning ? 'translate-y-[-100%] opacity-0' : 'translate-y-0 opacity-100'
-                            }`}
-                        >
-                            Full face covering hoodi | 7738
-                        </h3>
+                        <AnimatePresence mode="wait">
+                            <motion.h3 
+                                key={currentIndex}
+                                initial={{ y: 0, opacity: 1 }}
+                                exit={{ y: '-100%', opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                transition={{ type: "spring", stiffness: 320, damping: 30 }}
+                                className="text-sm font-semibold text-black font-sans"
+                            >
+                                Full face covering hoodi | 7738
+                            </motion.h3>
+                        </AnimatePresence>
                     </div>
 
                     <button className="px-6 py-2 mt-8 rounded-2xl bg-gray-600 shadow-md text-white font-semibold shadow-md hover:bg-gray-800">BUY NOW</button>
