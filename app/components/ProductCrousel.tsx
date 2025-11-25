@@ -193,11 +193,11 @@ export function ProductCrousel({
                 })}
                 <div className='-ml-4 absolute flex flex-col items-center justify-center bottom-0 left-1/2 z-50 -translate-x-1/2 w-full'>
                     <div className="overflow-hidden h-[3rem] md:h-[6rem] flex items-center justify-center">
-                        <AnimatePresence mode="wait">
+                        <AnimatePresence mode="popLayout">
                             <motion.h1 
                                 key={currentIndex}
-                                initial={{ y: 0, opacity: 1 }}
-                                exit={{ y: '-100%', opacity: 0 }}
+                                initial={{ y: '-100%', opacity: 0 }}
+                                exit={{ y: '100%', opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ type: "spring", stiffness: 320, damping: 30 }}
                                 className="uppercase line-clamp-1 font-[family-name:var(--font-mavine)] font-black tracking-[0.05em] text-4xl md:text-8xl text-black"
@@ -207,11 +207,11 @@ export function ProductCrousel({
                         </AnimatePresence>
                     </div>
                     <div className="overflow-hidden h-[1.5rem] flex items-center justify-center">
-                        <AnimatePresence mode="wait">
+                        <AnimatePresence mode="popLayout">
                             <motion.h3 
                                 key={currentIndex}
-                                initial={{ y: 0, opacity: 1 }}
-                                exit={{ y: '-100%', opacity: 0 }}
+                                initial={{ y: '-100%', opacity: 0 }}
+                                exit={{ y: '100%', opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ type: "spring", stiffness: 320, damping: 30 }}
                                 className="text-sm font-semibold text-black font-sans"
