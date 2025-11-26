@@ -20,17 +20,13 @@ export function ProductCrousel({
 }: ProductCrouselProps) {
     const [direction, setDirection] = useState<'next' | 'prev' | 'idle'>('idle');
     const [displayProducts, setDisplayProducts] = useState(products.slice(0, 5));
-    const [textKey, setTextKey] = useState(0);
-    const [isTransitioning, setIsTransitioning] = useState(false);
-    const [prevProductName, setPrevProductName] = useState(products[currentIndex]?.name || 'Product');
-    const [prevSubtitle, setPrevSubtitle] = useState('Full face covering hoodi | 7738');
     const prevIndexRef = useRef(currentIndex);
     const slotPositions = Array.from({ length: 5 }, (_, idx) => centerPosition + (idx - 2) * spacingStep);
 
     // Helper function to calculate display products
     const calculateDisplayProducts = (index: number) => {
         if (products.length === 0) return [];
-        
+
         const totalProducts = products.length;
         const displayCount = Math.min(5, totalProducts);
         const newDisplay = [];
@@ -80,18 +76,13 @@ export function ProductCrousel({
 
         // Update everything simultaneously - no delay
         const newDisplay = calculateDisplayProducts(currentIndex);
-        
+
         setDisplayProducts(newDisplay);
         setDirection(animDirection);
-        setIsTransitioning(true);
-        setPrevProductName(products[prevIndex]?.name || 'Product'); // Store current product name before change
-        setPrevSubtitle('Full face covering hoodi | 7738'); // Store current subtitle before change
-        setTextKey(prev => prev + 1);
 
         // After animation completes, reset to idle
         const timer = setTimeout(() => {
             setDirection('idle');
-            setIsTransitioning(false);
         }, 500);
 
         prevIndexRef.current = currentIndex;
@@ -179,39 +170,42 @@ export function ProductCrousel({
                     );
                 })}
                 <div className='-ml-4 absolute flex flex-col items-center justify-center bottom-0 left-1/2 z-50 -translate-x-1/2 w-full'>
-                    <div className="overflow-visible h-[3rem] md:h-[6rem] flex items-center justify-center relative">
-                        {/* Outgoing product name - slides down and exits */}
-                        {isTransitioning && (
-                            <h1 
-                                className="uppercase line-clamp-1 font-[family-name:var(--font-mavine)] font-black tracking-[0.05em] text-4xl md:text-8xl text-black animate-slideDownExit absolute"
-                            >
-                                {prevProductName}
-                            </h1>
-                        )}
-                        {/* Incoming product name - slides down from top */}
-                        <h1 
-                            key={textKey}
-                            className="uppercase line-clamp-1 font-[family-name:var(--font-mavine)] font-black tracking-[0.05em] text-4xl md:text-8xl text-black animate-slideDown absolute"
+                    {/* Product name carousel */}
+                    <div className="overflow-hidden h-[3rem] md:h-[6rem] flex items-center justify-center relative">
+                        <div 
+                            className="flex flex-col transition-transform duration-500 ease-out"
+                            style={{
+                                transform: `translateY(${-currentIndex * (100 / products.length)}%)`
+                            }}
                         >
-                            {products[currentIndex]?.name || 'Product'}
-                        </h1>
+                            {[...products].map((product, idx) => (
+                                <h1
+                                    key={product.id}
+                                    className="uppercase line-clamp-1 font-[family-name:var(--font-mavine)] font-black tracking-[0.05em] text-4xl md:text-8xl text-black h-[3rem] md:h-[6rem] flex items-center justify-center"
+                                >
+                                    {product.name}
+                                </h1>
+                            ))}
+                        </div>
                     </div>
-                    <div className="overflow-visible h-[1.5rem] flex items-center justify-center relative">
-                        {/* Outgoing text - slides down and exits */}
-                        {isTransitioning && (
-                            <h3 
-                                className="text-sm font-semibold text-black font-sans animate-slideDownExit absolute"
-                            >
-                                {prevSubtitle}
-                            </h3>
-                        )}
-                        {/* Incoming text - slides down from top */}
-                        <h3 
-                            key={`subtitle-${textKey}`}
-                            className="text-sm font-semibold text-black font-sans animate-slideDown absolute"
+                    
+                    {/* Subtitle carousel */}
+                    <div className="overflow-hidden h-[1.5rem] flex items-center justify-center relative">
+                        <div 
+                            className="flex flex-col transition-transform duration-500 ease-out"
+                            style={{
+                                transform: `translateY(${-currentIndex * (100 / products.length)}%)`
+                            }}
                         >
-                            Full face covering hoodi | 7738
-                        </h3>
+                            {[...products].map((product, idx) => (
+                                <h3
+                                    key={`subtitle-${product.id}`}
+                                    className="text-sm font-semibold text-black font-sans h-[1.5rem] flex items-center justify-center"
+                                >
+                                    Full face covering hoodi | 7738
+                                </h3>
+                            ))}
+                        </div>
                     </div>
 
                     <button className="px-6 py-2 mt-8 rounded-2xl bg-gray-600 shadow-md text-white font-semibold shadow-md hover:bg-gray-800 transition-colors">BUY NOW</button>
