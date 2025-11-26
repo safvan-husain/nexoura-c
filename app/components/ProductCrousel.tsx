@@ -21,6 +21,9 @@ export function ProductCrousel({
     const [direction, setDirection] = useState<'next' | 'prev' | 'idle'>('idle');
     const [displayProducts, setDisplayProducts] = useState(products.slice(0, 5));
     const [textKey, setTextKey] = useState(0);
+    const [isTransitioning, setIsTransitioning] = useState(false);
+    const [prevProductName, setPrevProductName] = useState(products[currentIndex]?.name || 'Product');
+    const [prevSubtitle, setPrevSubtitle] = useState('Full face covering hoodi | 7738');
     const prevIndexRef = useRef(currentIndex);
     const slotPositions = Array.from({ length: 5 }, (_, idx) => centerPosition + (idx - 2) * spacingStep);
 
@@ -90,6 +93,9 @@ export function ProductCrousel({
         console.log(`[${Date.now()}] 🔧 Setting state - displayProducts, direction (${animDirection}), textKey`);
         setDisplayProducts(newDisplay);
         setDirection(animDirection);
+        setIsTransitioning(true);
+        setPrevProductName(products[prevIndex]?.name || 'Product'); // Store current product name before change
+        setPrevSubtitle('Full face covering hoodi | 7738'); // Store current subtitle before change
         setTextKey(prev => prev + 1);
         console.log(`[${Date.now()}] ✅ State updates queued`);
 
@@ -97,6 +103,7 @@ export function ProductCrousel({
         const timer = setTimeout(() => {
             console.log(`[${Date.now()}] 💤 Setting direction to idle`);
             setDirection('idle');
+            setIsTransitioning(false);
         }, 500);
 
         prevIndexRef.current = currentIndex;
@@ -191,18 +198,36 @@ export function ProductCrousel({
                     );
                 })}
                 <div className='-ml-4 absolute flex flex-col items-center justify-center bottom-0 left-1/2 z-50 -translate-x-1/2 w-full'>
-                    <div className="overflow-hidden h-[3rem] md:h-[6rem] flex items-center justify-center relative">
+                    <div className="overflow-visible h-[3rem] md:h-[6rem] flex items-center justify-center relative">
+                        {/* Outgoing product name - slides down and exits */}
+                        {isTransitioning && (
+                            <h1 
+                                className="uppercase line-clamp-1 font-[family-name:var(--font-mavine)] font-black tracking-[0.05em] text-4xl md:text-8xl text-black animate-slideDownExit absolute"
+                            >
+                                {prevProductName}
+                            </h1>
+                        )}
+                        {/* Incoming product name - slides down from top */}
                         <h1 
                             key={textKey}
-                            className="uppercase line-clamp-1 font-[family-name:var(--font-mavine)] font-black tracking-[0.05em] text-4xl md:text-8xl text-black animate-slideUpFade"
+                            className="uppercase line-clamp-1 font-[family-name:var(--font-mavine)] font-black tracking-[0.05em] text-4xl md:text-8xl text-black animate-slideDown absolute"
                         >
                             {products[currentIndex]?.name || 'Product'}
                         </h1>
                     </div>
-                    <div className="overflow-hidden h-[1.5rem] flex items-center justify-center relative">
+                    <div className="overflow-visible h-[1.5rem] flex items-center justify-center relative">
+                        {/* Outgoing text - slides down and exits */}
+                        {isTransitioning && (
+                            <h3 
+                                className="text-sm font-semibold text-black font-sans animate-slideDownExit absolute"
+                            >
+                                {prevSubtitle}
+                            </h3>
+                        )}
+                        {/* Incoming text - slides down from top */}
                         <h3 
                             key={`subtitle-${textKey}`}
-                            className="text-sm font-semibold text-black font-sans animate-slideUpFade"
+                            className="text-sm font-semibold text-black font-sans animate-slideDown absolute"
                         >
                             Full face covering hoodi | 7738
                         </h3>
