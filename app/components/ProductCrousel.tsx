@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 
 type ProductCrouselProps = {
@@ -19,52 +18,56 @@ export function ProductCrousel({
     spacingStep = 39,
     centerPosition = 27
 }: ProductCrouselProps) {
-    const [direction, setDirection] = useState<'next' | 'prev' | 'idle'>('prev');
+    const [direction, setDirection] = useState<'next' | 'prev' | 'idle'>('idle');
     const [displayProducts, setDisplayProducts] = useState(products.slice(0, 5));
+    const [textKey, setTextKey] = useState(0);
     const prevIndexRef = useRef(currentIndex);
     const slotPositions = Array.from({ length: 5 }, (_, idx) => centerPosition + (idx - 2) * spacingStep);
 
-    // Sync displayProducts centered around currentIndex
-    useEffect(() => {
-        if (products.length === 0) {
-            setDisplayProducts([]);
-            return;
-        }
-
+    // Helper function to calculate display products
+    const calculateDisplayProducts = (index: number) => {
+        if (products.length === 0) return [];
+        
         const totalProducts = products.length;
         const displayCount = Math.min(5, totalProducts);
         const newDisplay = [];
 
-        // Calculate positions: currentIndex should be at position 2 (3rd element, 0-indexed)
-        // So we need 2 items before currentIndex and 2 items after
         for (let i = 0; i < displayCount; i++) {
-            const offset = i - 2; // -2, -1, 0, 1, 2
-            let index = (currentIndex + offset + totalProducts) % totalProducts;
-            newDisplay.push(products[index]);
+            const offset = i - 2;
+            let productIndex = (index + offset + totalProducts) % totalProducts;
+            newDisplay.push(products[productIndex]);
         }
 
-        setDisplayProducts(newDisplay.reverse());
-    }, [products, currentIndex]);
+        return newDisplay.reverse();
+    };
 
     // Auto-rotate carousel every 1 second
     useEffect(() => {
         if (products.length < 2) return;
 
         const interval = setInterval(() => {
+            console.log(`[${Date.now()}] 🔄 Auto-rotate: setting currentIndex to`, (currentIndex + 1) % products.length);
             setCurrentIndex((currentIndex + 1) % products.length);
         }, 1000);
 
         return () => clearInterval(interval);
     }, [currentIndex, products.length, setCurrentIndex]);
 
-    // Watch for currentIndex changes and trigger animation
+    // Watch for currentIndex changes and trigger animation + update display simultaneously
     useEffect(() => {
+        console.log(`[${Date.now()}] 📍 useEffect triggered - currentIndex:`, currentIndex);
+        
         if (products.length < 2) return;
 
         const prevIndex = prevIndexRef.current;
         const totalProducts = products.length;
 
-        if (prevIndex === currentIndex) return;
+        if (prevIndex === currentIndex) {
+            console.log(`[${Date.now()}] ⏭️  Skipping - same index`);
+            return;
+        }
+
+        console.log(`[${Date.now()}] 🎯 Index changed from ${prevIndex} to ${currentIndex}`);
 
         // Determine direction based on index change
         let animDirection: 'next' | 'prev';
@@ -78,49 +81,46 @@ export function ProductCrousel({
             animDirection = currentIndex > prevIndex ? 'next' : 'prev';
         }
 
-        // Start animation
+        console.log(`[${Date.now()}] 🧭 Direction determined:`, animDirection);
+
+        // Update everything simultaneously - no delay
+        const newDisplay = calculateDisplayProducts(currentIndex);
+        console.log(`[${Date.now()}] 📦 Calculated new display products:`, newDisplay.map(p => p.name));
+        
+        console.log(`[${Date.now()}] 🔧 Setting state - displayProducts, direction (${animDirection}), textKey`);
+        setDisplayProducts(newDisplay);
         setDirection(animDirection);
+        setTextKey(prev => prev + 1);
+        console.log(`[${Date.now()}] ✅ State updates queued`);
 
         // After animation completes, reset to idle
         const timer = setTimeout(() => {
+            console.log(`[${Date.now()}] 💤 Setting direction to idle`);
             setDirection('idle');
-        }, 50);
+        }, 500);
 
         prevIndexRef.current = currentIndex;
 
         return () => clearTimeout(timer);
     }, [currentIndex, products.length]);
 
+    // Initialize displayProducts on mount
+    useEffect(() => {
+        console.log(`[${Date.now()}] 🚀 Initializing displayProducts on mount`);
+        setDisplayProducts(calculateDisplayProducts(currentIndex));
+    }, [products]);
+
     // Get position for a slot index based on current animation state
     // Using percentage-based positioning for responsive layout
     // Card width is 30%, so positions derive from centerPosition & spacingStep (dynamic spacing)
     const getPosition = (index: number, animState: 'idle' | 'next' | 'prev') => {
-        if (animState === 'idle') {
-            // Default idle positions (percentage-based with tighter spacing)
-            if (index === 0) return { x: `${slotPositions[1]}%`, y: 12, scale: 0.4, zIndex: 5, opacity: 0, blur: 0 };
-            if (index === 1) return { x: `${slotPositions[1]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85, blur: 6 };
-            if (index === 2) return { x: `${slotPositions[2]}%`, y: 0, scale: 1, zIndex: 50, opacity: 1, blur: 0 };
-            if (index === 3) return { x: `${slotPositions[3]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85, blur: 6 };
-            if (index === 4) return { x: `${slotPositions[3]}%`, y: 12, scale: 0.4, zIndex: 5, opacity: 0, blur: 0 };
-        }
-
-        if (animState === 'next') {
-            // Next: shift right (reversed - items move right when going to next)
-            if (index === 0) return { x: `${slotPositions[1]}%`, y: 12, scale: 0.4, zIndex: 5, opacity: 0, blur: 0 };
-            if (index === 1) return { x: `${slotPositions[2]}%`, y: 12, scale: 0.35, zIndex: 5, opacity: 0, blur: 0 };
-            if (index === 2) return { x: `${slotPositions[1]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85, blur: 6 };
-            if (index === 3) return { x: `${slotPositions[2]}%`, y: 0, scale: 1, zIndex: 50, opacity: 1, blur: 0 };
-            if (index === 4) return { x: `${slotPositions[3]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85, blur: 6 };
-        }
-
-        if (animState === 'prev') {
-            // Prev: shift left (reversed - items move left when going to previous)
-            if (index === 0) return { x: `${slotPositions[1]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0, blur: 6 };
-            if (index === 1) return { x: `${slotPositions[2]}%`, y: 0, scale: 1, zIndex: 50, opacity: 1, blur: 0 };
-            if (index === 2) return { x: `${slotPositions[3]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85, blur: 6 };
-            if (index === 3) return { x: `${slotPositions[4]}%`, y: 12, scale: 0.35, zIndex: 5, opacity: 0.7, blur: 0 };
-            if (index === 4) return { x: `${slotPositions[4]}%`, y: 12, scale: 0.4, zIndex: 5, opacity: 0, blur: 0 };
-        }
+        // All states should have index 2 at center - only difference is the animation happens during state change
+        // Default idle positions (percentage-based with tighter spacing)
+        if (index === 0) return { x: `${slotPositions[1]}%`, y: 12, scale: 0.4, zIndex: 5, opacity: 0, blur: 0 };
+        if (index === 1) return { x: `${slotPositions[1]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85, blur: 6 };
+        if (index === 2) return { x: `${slotPositions[2]}%`, y: 0, scale: 1, zIndex: 50, opacity: 1, blur: 0 };
+        if (index === 3) return { x: `${slotPositions[3]}%`, y: 4, scale: .55, zIndex: 20, opacity: 0.85, blur: 6 };
+        if (index === 4) return { x: `${slotPositions[3]}%`, y: 12, scale: 0.4, zIndex: 5, opacity: 0, blur: 0 };
 
         return { x: '0%', y: 0, scale: 1, zIndex: 10, opacity: 0, blur: 0 };
     };
@@ -130,6 +130,8 @@ export function ProductCrousel({
     }
 
 
+    console.log(`[${Date.now()}] 🎨 RENDER - direction: ${direction}, textKey: ${textKey}, displayProducts:`, displayProducts.map(p => p.name));
+
     return (
         <div className="w-full flex flex-col overflow-hidden">
             {/* Product carousel container */}
@@ -137,24 +139,21 @@ export function ProductCrousel({
                 {/* Boxes: render all five so stacking/animation looks natural */}
                 {displayProducts.map((product, i) => {
                     const currentPos = getPosition(i, direction);
+                    if (i === 2) {
+                        console.log(`[${Date.now()}] 🖼️  Center product (index 2): ${product.name}, position:`, currentPos);
+                    }
 
                     return (
-                        <motion.div
+                        <div
                             key={product.id}
-                            initial={{
-                                left: `${slotPositions[2]}%`,
-                                opacity: 0
-                            }}
-                            animate={{
+                            style={{
                                 left: currentPos.x,
-                                y: currentPos.y,
-                                scale: currentPos.scale,
+                                transform: `translateY(${currentPos.y}px) translateY(-8%) scale(${currentPos.scale})`,
                                 opacity: currentPos.opacity,
-                                filter: `blur(${currentPos.blur}px)`
+                                filter: `blur(${currentPos.blur}px)`,
+                                zIndex: currentPos.zIndex,
                             }}
-                            transition={{ type: "spring", stiffness: 320, damping: 30 }}
-                            style={{ zIndex: currentPos.zIndex }}
-                            className={`absolute w-[42%] -translate-y-[8%] aspect-[3/5] cursor-pointer `} //${i == 0 && direction !== "prev" ? "hidden" : ""} ${i == 4 && direction !== "next" ? "hidden" : ""}
+                            className={`absolute w-[42%] aspect-[3/5] cursor-pointer transition-all duration-500 ease-out`}
                             onClick={() => {
                                 const originalIndex = products.findIndex(p => p.id === product.id);
                                 if (originalIndex >= 0) setCurrentIndex(originalIndex);
@@ -180,7 +179,7 @@ export function ProductCrousel({
 
                                 {/* Floor shadow for each product - positioned to stay within card bounds */}
                                 <div
-                                    className={`absolute left-1/2 -translate-x-1/2 rounded-full ${i === 2 ? 'w-[65%] h-3 bg-black/70 blur-md' : 'w-[60%] h-4 bg-black/60 blur-lg'}`}
+                                    className={`absolute left-1/2 -translate-x-1/2 rounded-full transition-opacity duration-500 ${i === 2 ? 'w-[65%] h-3 bg-black/70 blur-md' : 'w-[60%] h-4 bg-black/60 blur-lg'}`}
                                     style={{
                                         bottom: '18%',
                                         opacity: i === 2 ? currentPos.opacity * 0.9 : currentPos.opacity * 0.8
@@ -188,52 +187,30 @@ export function ProductCrousel({
                                 />
                             </div>
 
-                        </motion.div>
+                        </div>
                     );
                 })}
                 <div className='-ml-4 absolute flex flex-col items-center justify-center bottom-0 left-1/2 z-50 -translate-x-1/2 w-full'>
-                    <div className="overflow-hidden h-[3rem] md:h-[6rem] flex items-center justify-center">
-                        <AnimatePresence mode="popLayout">
-                            <motion.h1 
-                                key={currentIndex}
-                                initial={{ y: '-100%', opacity: 0 }}
-                                exit={{ y: '100%', opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
-                                transition={{ type: "spring", stiffness: 320, damping: 30 }}
-                                className="uppercase line-clamp-1 font-[family-name:var(--font-mavine)] font-black tracking-[0.05em] text-4xl md:text-8xl text-black"
-                            >
-                                {products[currentIndex]?.name || 'Product'}
-                            </motion.h1>
-                        </AnimatePresence>
+                    <div className="overflow-hidden h-[3rem] md:h-[6rem] flex items-center justify-center relative">
+                        <h1 
+                            key={textKey}
+                            className="uppercase line-clamp-1 font-[family-name:var(--font-mavine)] font-black tracking-[0.05em] text-4xl md:text-8xl text-black animate-slideUpFade"
+                        >
+                            {products[currentIndex]?.name || 'Product'}
+                        </h1>
                     </div>
-                    <div className="overflow-hidden h-[1.5rem] flex items-center justify-center">
-                        <AnimatePresence mode="popLayout">
-                            <motion.h3 
-                                key={currentIndex}
-                                initial={{ y: '-100%', opacity: 0 }}
-                                exit={{ y: '100%', opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
-                                transition={{ type: "spring", stiffness: 320, damping: 30 }}
-                                className="text-sm font-semibold text-black font-sans"
-                            >
-                                Full face covering hoodi | 7738
-                            </motion.h3>
-                        </AnimatePresence>
+                    <div className="overflow-hidden h-[1.5rem] flex items-center justify-center relative">
+                        <h3 
+                            key={`subtitle-${textKey}`}
+                            className="text-sm font-semibold text-black font-sans animate-slideUpFade"
+                        >
+                            Full face covering hoodi | 7738
+                        </h3>
                     </div>
 
-                    <button className="px-6 py-2 mt-8 rounded-2xl bg-gray-600 shadow-md text-white font-semibold shadow-md hover:bg-gray-800">BUY NOW</button>
-                    {/* Buy buttons anchored to bottom of carousel area */}
-                    {/* <div className="flex items-center justify-center gap-6 mb-3">
-                        <button className="px-8 py-3 rounded-2xl bg-white text-gray-900 font-semibold shadow-sm border border-gray-200 hover:bg-gray-50">ADD TO CART</button>
-                    </div>
-                    <div className="flex items-center justify-center gap-24 text-xs text-gray-600">
-                        <span>Free shipping</span>
-                        <span>30-day returns</span>
-                    </div> */}
+                    <button className="px-6 py-2 mt-8 rounded-2xl bg-gray-600 shadow-md text-white font-semibold shadow-md hover:bg-gray-800 transition-colors">BUY NOW</button>
                 </div>
             </div>
-
-
         </div>
     );
 }

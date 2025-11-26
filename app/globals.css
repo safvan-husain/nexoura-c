@@ -22,3 +22,18 @@ body {
   color: var(--foreground);
   font-family: var(--font-poppins), sans-serif;
 }
+
+@keyframes slideUpFade {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slideUpFade {
+  animation: slideUpFade 0.5s ease-out;
+}
