@@ -49,7 +49,6 @@ export function ProductCrousel({
         if (products.length < 2) return;
 
         const interval = setInterval(() => {
-            console.log(`[${Date.now()}] 🔄 Auto-rotate: setting currentIndex to`, (currentIndex + 1) % products.length);
             setCurrentIndex((currentIndex + 1) % products.length);
         }, 1000);
 
@@ -58,19 +57,14 @@ export function ProductCrousel({
 
     // Watch for currentIndex changes and trigger animation + update display simultaneously
     useEffect(() => {
-        console.log(`[${Date.now()}] 📍 useEffect triggered - currentIndex:`, currentIndex);
-        
         if (products.length < 2) return;
 
         const prevIndex = prevIndexRef.current;
         const totalProducts = products.length;
 
         if (prevIndex === currentIndex) {
-            console.log(`[${Date.now()}] ⏭️  Skipping - same index`);
             return;
         }
-
-        console.log(`[${Date.now()}] 🎯 Index changed from ${prevIndex} to ${currentIndex}`);
 
         // Determine direction based on index change
         let animDirection: 'next' | 'prev';
@@ -84,24 +78,18 @@ export function ProductCrousel({
             animDirection = currentIndex > prevIndex ? 'next' : 'prev';
         }
 
-        console.log(`[${Date.now()}] 🧭 Direction determined:`, animDirection);
-
         // Update everything simultaneously - no delay
         const newDisplay = calculateDisplayProducts(currentIndex);
-        console.log(`[${Date.now()}] 📦 Calculated new display products:`, newDisplay.map(p => p.name));
         
-        console.log(`[${Date.now()}] 🔧 Setting state - displayProducts, direction (${animDirection}), textKey`);
         setDisplayProducts(newDisplay);
         setDirection(animDirection);
         setIsTransitioning(true);
         setPrevProductName(products[prevIndex]?.name || 'Product'); // Store current product name before change
         setPrevSubtitle('Full face covering hoodi | 7738'); // Store current subtitle before change
         setTextKey(prev => prev + 1);
-        console.log(`[${Date.now()}] ✅ State updates queued`);
 
         // After animation completes, reset to idle
         const timer = setTimeout(() => {
-            console.log(`[${Date.now()}] 💤 Setting direction to idle`);
             setDirection('idle');
             setIsTransitioning(false);
         }, 500);
@@ -113,7 +101,6 @@ export function ProductCrousel({
 
     // Initialize displayProducts on mount
     useEffect(() => {
-        console.log(`[${Date.now()}] 🚀 Initializing displayProducts on mount`);
         setDisplayProducts(calculateDisplayProducts(currentIndex));
     }, [products]);
 
@@ -137,8 +124,6 @@ export function ProductCrousel({
     }
 
 
-    console.log(`[${Date.now()}] 🎨 RENDER - direction: ${direction}, textKey: ${textKey}, displayProducts:`, displayProducts.map(p => p.name));
-
     return (
         <div className="w-full flex flex-col overflow-hidden">
             {/* Product carousel container */}
@@ -146,10 +131,6 @@ export function ProductCrousel({
                 {/* Boxes: render all five so stacking/animation looks natural */}
                 {displayProducts.map((product, i) => {
                     const currentPos = getPosition(i, direction);
-                    if (i === 2) {
-                        console.log(`[${Date.now()}] 🖼️  Center product (index 2): ${product.name}, position:`, currentPos);
-                    }
-
                     return (
                         <div
                             key={product.id}
