@@ -32,6 +32,8 @@ export function InfiniteVerticalScroller({
     const copyHeightRef = useRef(0);
     const runningRef = useRef(true);
     const itemHeightRef = useRef(0);
+    const prevIndexRef = useRef<number | undefined>(currentIndex);
+    const currentOffsetRef = useRef(0); // Track actual scroll position for infinite wrapping
 
 
     // Measure one list item and compute copy height
@@ -67,26 +69,50 @@ export function InfiniteVerticalScroller({
         };
     }, [names]);
 
-    // Sync with currentIndex when provided
+    // Sync with currentIndex when provided - with infinite wrap-around
     useEffect(() => {
         if (currentIndex !== undefined && innerRef.current) {
             const itemH = itemHeightRef.current || 0;
-            if (itemH > 0) {
-                const offset = currentIndex * itemH;
-                innerRef.current.style.transition = 'transform 0.5s ease-out';
-                innerRef.current.style.transform = `translateY(${-offset}px)`;
+            const copyH = copyHeightRef.current || 0;
+            
+            if (itemH > 0 && names.length > 0) {
+                const prevIndex = prevIndexRef.current ?? currentIndex;
                 
-                // Remove transition after animation completes
+                // Detect wrap-around
+                let targetOffset: number;
+                
+                if (prevIndex === names.length - 1 && currentIndex === 0) {
+                    // Going forward: last -> first (continue forward through second copy)
+                    targetOffset = names.length * itemH;
+                } else if (prevIndex === 0 && currentIndex === names.length - 1) {
+                    // Going backward: first -> last (go backward to -1 position)
+                    targetOffset = -itemH;
+                } else {
+                    // Normal navigation
+                    targetOffset = currentIndex * itemH;
+                }
+                
+                // Apply transition
+                innerRef.current.style.transition = 'transform 0.5s ease-out';
+                innerRef.current.style.transform = `translateY(${-targetOffset}px)`;
+                currentOffsetRef.current = targetOffset;
+                
+                // After transition, snap to equivalent position in first copy
                 const timer = setTimeout(() => {
                     if (innerRef.current) {
                         innerRef.current.style.transition = '';
+                        const normalizedOffset = currentIndex * itemH;
+                        innerRef.current.style.transform = `translateY(${-normalizedOffset}px)`;
+                        currentOffsetRef.current = normalizedOffset;
                     }
                 }, 500);
+                
+                prevIndexRef.current = currentIndex;
                 
                 return () => clearTimeout(timer);
             }
         }
-    }, [currentIndex]);
+    }, [currentIndex, names.length]);
 
     useEffect(() => {
         // Only auto-scroll if currentIndex is not provided
