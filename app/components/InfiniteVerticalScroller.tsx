@@ -6,6 +6,7 @@ type InfiniteVerticalScrollerProps = {
     names?: string[];
     speed?: number;
     className?: string;
+    currentIndex?: number; // Add this to sync with carousel
 }
 
 // InfiniteVerticalScroller (single-item viewport)
@@ -21,6 +22,7 @@ export function InfiniteVerticalScroller({
     // duration in milliseconds for each item transition
     speed = 3000,
     className = "",
+    currentIndex,
 }: InfiniteVerticalScrollerProps) {
     const viewportRef = useRef<HTMLDivElement>(null);
     const innerRef = useRef<HTMLDivElement>(null);
@@ -65,7 +67,31 @@ export function InfiniteVerticalScroller({
         };
     }, [names]);
 
+    // Sync with currentIndex when provided
     useEffect(() => {
+        if (currentIndex !== undefined && innerRef.current) {
+            const itemH = itemHeightRef.current || 0;
+            if (itemH > 0) {
+                const offset = currentIndex * itemH;
+                innerRef.current.style.transition = 'transform 0.5s ease-out';
+                innerRef.current.style.transform = `translateY(${-offset}px)`;
+                
+                // Remove transition after animation completes
+                const timer = setTimeout(() => {
+                    if (innerRef.current) {
+                        innerRef.current.style.transition = '';
+                    }
+                }, 500);
+                
+                return () => clearTimeout(timer);
+            }
+        }
+    }, [currentIndex]);
+
+    useEffect(() => {
+        // Only auto-scroll if currentIndex is not provided
+        if (currentIndex !== undefined) return;
+
         // Ease-in-out function (cubic)
         const easeInOutCubic = (t: number): number => {
             return t < 0.5 
@@ -113,7 +139,7 @@ export function InfiniteVerticalScroller({
             if (rafRef.current) cancelAnimationFrame(rafRef.current);
             rafRef.current = null;
         };
-    }, [speed, names.length]);
+    }, [speed, names.length, currentIndex]);
 
     // pause on hover
     useEffect(() => {
