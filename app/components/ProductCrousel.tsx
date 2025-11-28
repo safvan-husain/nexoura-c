@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import { InfiniteVerticalScroller } from "./InfiniteVerticalScroller";
 
 type ProductCrouselProps = {
     products: { img: string, name: string, price: number, id: number }[],
@@ -45,7 +46,14 @@ export function ProductCrousel({
         if (products.length < 2) return;
 
         const interval = setInterval(() => {
-            setCurrentIndex((currentIndex + 1) % products.length);
+            const nextIndex = (currentIndex + 1) % products.length;
+            console.log('🔄 AUTO-ROTATE:', {
+                from: currentIndex,
+                to: nextIndex,
+                productName: products[nextIndex]?.name,
+                timestamp: new Date().toISOString()
+            });
+            setCurrentIndex(nextIndex);
         }, 1000);
 
         return () => clearInterval(interval);
@@ -77,12 +85,27 @@ export function ProductCrousel({
         // Update everything simultaneously - no delay
         const newDisplay = calculateDisplayProducts(currentIndex);
 
+        console.log('📊 INDEX CHANGE:', {
+            prevIndex,
+            currentIndex,
+            direction: animDirection,
+            currentProduct: products[currentIndex]?.name,
+            centerDisplayProduct: newDisplay[2]?.name,
+            allDisplayProducts: newDisplay.map(p => p.name),
+            timestamp: new Date().toISOString()
+        });
+
         setDisplayProducts(newDisplay);
         setDirection(animDirection);
 
         // After animation completes, reset to idle
         const timer = setTimeout(() => {
             setDirection('idle');
+            console.log('✅ ANIMATION COMPLETE:', {
+                currentIndex,
+                currentProduct: products[currentIndex]?.name,
+                centerDisplayProduct: newDisplay[2]?.name // Use newDisplay instead of stale displayProducts
+            });
         }, 500);
 
         prevIndexRef.current = currentIndex;
@@ -90,10 +113,7 @@ export function ProductCrousel({
         return () => clearTimeout(timer);
     }, [currentIndex, products.length]);
 
-    // Initialize displayProducts on mount
-    useEffect(() => {
-        setDisplayProducts(calculateDisplayProducts(currentIndex));
-    }, [products]);
+   
 
     // Get position for a slot index based on current animation state
     // Using percentage-based positioning for responsive layout
@@ -170,45 +190,19 @@ export function ProductCrousel({
                     );
                 })}
                 <div className='-ml-4 absolute flex flex-col items-center justify-center bottom-0 left-1/2 z-50 -translate-x-1/2 w-full'>
-                    {/* Product name carousel */}
-                    <div className="overflow-hidden h-[3rem] md:h-[6rem] flex items-center justify-center relative">
-                        <div 
-                            className="flex flex-col transition-transform duration-500 ease-out"
-                            style={{
-                                transform: `translateY(${-currentIndex * (100 / products.length)}%)`
-                            }}
-                        >
-                            {[...products].map((product, idx) => (
-                                <h1
-                                    key={product.id}
-                                    className="uppercase line-clamp-1 font-[family-name:var(--font-mavine)] font-black tracking-[0.05em] text-4xl md:text-8xl text-black h-[3rem] md:h-[6rem] flex items-center justify-center"
-                                >
-                                    {product.name}
-                                </h1>
-                            ))}
-                        </div>
-                    </div>
+                    {/* Product name carousel - Infinite Vertical Scroller */}
+                    <InfiniteVerticalScroller 
+                        names={products.map(p => p.name)}
+                        speed={36}
+                        className="mb-2"
+                    />
                     
-                    {/* Subtitle carousel */}
-                    <div className="overflow-hidden h-[1.5rem] flex items-center justify-center relative">
-                        <div 
-                            className="flex flex-col transition-transform duration-500 ease-out"
-                            style={{
-                                transform: `translateY(${-currentIndex * (100 / products.length)}%)`
-                            }}
-                        >
-                            {[...products].map((product, idx) => (
-                                <h3
-                                    key={`subtitle-${product.id}`}
-                                    className="text-sm font-semibold text-black font-sans h-[1.5rem] flex items-center justify-center"
-                                >
-                                    Full face covering hoodi | 7738
-                                </h3>
-                            ))}
-                        </div>
-                    </div>
+                    {/* Subtitle */}
+                    <h3 className="text-sm font-semibold text-black font-sans mb-8">
+                        Full face covering hoodi | 7738
+                    </h3>
 
-                    <button className="px-6 py-2 mt-8 rounded-2xl bg-gray-600 shadow-md text-white font-semibold shadow-md hover:bg-gray-800 transition-colors">BUY NOW</button>
+                    <button className="px-6 py-2 rounded-2xl bg-gray-600 shadow-md text-white font-semibold hover:bg-gray-800 transition-colors">BUY NOW</button>
                 </div>
             </div>
         </div>
