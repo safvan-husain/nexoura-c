@@ -193,7 +193,7 @@ export function ProductCrousel({
                     {/* Product name carousel - Infinite Vertical Scroller */}
                     <InfiniteVerticalScroller 
                         names={products.map(p => p.name)}
-                        speed={36}
+                        speed={3000}
                         className="mb-2"
                     />
                     

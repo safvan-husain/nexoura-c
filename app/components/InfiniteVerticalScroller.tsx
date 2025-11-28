@@ -18,18 +18,19 @@ type InfiniteVerticalScrollerProps = {
 // - copyHeight = itemHeight * names.length (height of one full copy).
 export function InfiniteVerticalScroller({
     names = ["Alice", "Bob", "Charlie", "Diana", "Eve", "Frank", "Grace"],
-    // speed is pixels per second (one item height per second = itemHeight px/sec)
-    speed = 40,
+    // duration in milliseconds for each item transition
+    speed = 3000,
     className = "",
 }: InfiniteVerticalScrollerProps) {
     const viewportRef = useRef<HTMLDivElement>(null);
     const innerRef = useRef<HTMLDivElement>(null);
     const rafRef = useRef<number | null>(null);
-    const lastTimeRef = useRef<number | null>(null);
-    const offsetRef = useRef(0);
+    const startTimeRef = useRef<number | null>(null);
+
     const copyHeightRef = useRef(0);
     const runningRef = useRef(true);
     const itemHeightRef = useRef(0);
+
 
     // Measure one list item and compute copy height
     const measure = () => {
@@ -37,18 +38,20 @@ export function InfiniteVerticalScroller({
         const vp = viewportRef.current;
         if (!inner || !vp) return;
 
-        // find the first li inside the first copy
+        // find the first div (content) inside the first li
         const firstLi = inner.querySelector('.copy-0 li');
-        if (!firstLi) return;
+        const firstDiv = firstLi?.querySelector('div');
+        if (!firstDiv) return;
 
-        const itemH = Math.ceil(firstLi.getBoundingClientRect().height);
-        itemHeightRef.current = itemH;
+        // Measure only the content div height (excludes li padding)
+        const contentH = Math.ceil(firstDiv.getBoundingClientRect().height);
+        itemHeightRef.current = contentH;
 
-        // set viewport height to item height so only one item fits fully
-        vp.style.height = `${itemH - 30}px`;
+        // set viewport height to content height so only one item's content fits
+        vp.style.height = `${contentH}px`;
 
-        // one copy height = itemH * number of names
-        copyHeightRef.current = itemH * names.length;
+        // one copy height = contentH * number of names
+        copyHeightRef.current = contentH * names.length;
     };
 
     // measure on mount and resize
@@ -63,19 +66,41 @@ export function InfiniteVerticalScroller({
     }, [names]);
 
     useEffect(() => {
+        // Ease-in-out function (cubic)
+        const easeInOutCubic = (t: number): number => {
+            return t < 0.5 
+                ? 4 * t * t * t 
+                : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        };
+
         const step = (time: number) => {
-            if (!lastTimeRef.current) lastTimeRef.current = time;
-            const dt = (time - lastTimeRef.current) / 1000;
-            lastTimeRef.current = time;
+            if (!startTimeRef.current) startTimeRef.current = time;
 
             if (runningRef.current) {
-                offsetRef.current += speed * dt; // pixels scrolled
+                const elapsed = time - startTimeRef.current;
+                const duration = speed; // speed is now duration in ms
+                const itemH = itemHeightRef.current || 0;
                 const H = copyHeightRef.current || 0;
-                if (H > 0 && offsetRef.current >= H) {
-                    offsetRef.current = offsetRef.current % H;
-                }
-                if (innerRef.current) {
-                    innerRef.current.style.transform = `translateY(${-offsetRef.current}px)`;
+
+                if (itemH > 0) {
+                    // Calculate progress (0 to 1) within current transition
+                    let progress = (elapsed % duration) / duration;
+                    
+                    // Apply easing
+                    const easedProgress = easeInOutCubic(progress);
+                    
+                    // Calculate which item we're transitioning from
+                    const itemIndex = Math.floor(elapsed / duration) % names.length;
+                    
+                    // Calculate offset: start of current item + eased progress to next item
+                    const offset = (itemIndex * itemH) + (easedProgress * itemH);
+                    
+                    // Wrap around when we exceed one copy height
+                    const wrappedOffset = H > 0 ? offset % H : offset;
+                    
+                    if (innerRef.current) {
+                        innerRef.current.style.transform = `translateY(${-wrappedOffset}px)`;
+                    }
                 }
             }
 
@@ -88,7 +113,7 @@ export function InfiniteVerticalScroller({
             if (rafRef.current) cancelAnimationFrame(rafRef.current);
             rafRef.current = null;
         };
-    }, [speed]);
+    }, [speed, names.length]);
 
     // pause on hover
     useEffect(() => {
@@ -97,7 +122,7 @@ export function InfiniteVerticalScroller({
 
         const onEnter = () => (runningRef.current = false);
         const onLeave = () => {
-            lastTimeRef.current = null;
+            startTimeRef.current = null;
             runningRef.current = true;
         };
 
@@ -125,10 +150,11 @@ export function InfiniteVerticalScroller({
                         alignItems: 'center',
                         justifyContent: 'center',
                         height: 'auto',
-                        padding: '6px 0'
+                        padding: 0,
+                        margin: 0
                     }}
                 >
-                    <div className="px-4 text-center text-lg w-full uppercase font-[family-name:var(--font-mavine)] font-black tracking-[0.05em] text-4xl md:text-8xl text-black">
+                    <div  className="px-4 text-center text-lg w-full uppercase font-[family-name:var(--font-mavine)] font-black tracking-[0.05em] text-4xl md:text-8xl text-black">
                         {n}
                     </div>
                 </li>
