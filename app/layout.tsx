@@ -45,7 +45,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         style={{
-          background: 'linear-gradient(to bottom, #dddddbff 0%, #ebebebff 50%, #ffffff 60%, #ffffff 100%)'
+          background: 'linear-gradient(to bottom, #afaeaeff 0%, #ebebebff 50%, #ffffff 60%, #ffffff 100%)'
         }}
         className={`${poppins.variable} ${metha.variable} ${mavine.variable} ${black.variable} antialiased min-h-screen overflow-x-hidden font-[family-name:var(--font-poppins)]`}
       >
