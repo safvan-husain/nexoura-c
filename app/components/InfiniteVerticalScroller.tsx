@@ -74,13 +74,13 @@ export function InfiniteVerticalScroller({
         if (currentIndex !== undefined && innerRef.current) {
             const itemH = itemHeightRef.current || 0;
             const copyH = copyHeightRef.current || 0;
-            
+
             if (itemH > 0 && names.length > 0) {
                 const prevIndex = prevIndexRef.current ?? currentIndex;
-                
+
                 // Detect wrap-around
                 let targetOffset: number;
-                
+
                 if (prevIndex === names.length - 1 && currentIndex === 0) {
                     // Going forward: last -> first (continue forward through second copy)
                     targetOffset = names.length * itemH;
@@ -91,12 +91,12 @@ export function InfiniteVerticalScroller({
                     // Normal navigation
                     targetOffset = currentIndex * itemH;
                 }
-                
+
                 // Apply transition
                 innerRef.current.style.transition = 'transform 0.5s ease-out';
                 innerRef.current.style.transform = `translateY(${-targetOffset}px)`;
                 currentOffsetRef.current = targetOffset;
-                
+
                 // After transition, snap to equivalent position in first copy
                 const timer = setTimeout(() => {
                     if (innerRef.current) {
@@ -106,9 +106,9 @@ export function InfiniteVerticalScroller({
                         currentOffsetRef.current = normalizedOffset;
                     }
                 }, 500);
-                
+
                 prevIndexRef.current = currentIndex;
-                
+
                 return () => clearTimeout(timer);
             }
         }
@@ -120,8 +120,8 @@ export function InfiniteVerticalScroller({
 
         // Ease-in-out function (cubic)
         const easeInOutCubic = (t: number): number => {
-            return t < 0.5 
-                ? 4 * t * t * t 
+            return t < 0.5
+                ? 4 * t * t * t
                 : 1 - Math.pow(-2 * t + 2, 3) / 2;
         };
 
@@ -137,19 +137,19 @@ export function InfiniteVerticalScroller({
                 if (itemH > 0) {
                     // Calculate progress (0 to 1) within current transition
                     let progress = (elapsed % duration) / duration;
-                    
+
                     // Apply easing
                     const easedProgress = easeInOutCubic(progress);
-                    
+
                     // Calculate which item we're transitioning from
                     const itemIndex = Math.floor(elapsed / duration) % names.length;
-                    
+
                     // Calculate offset: start of current item + eased progress to next item
                     const offset = (itemIndex * itemH) + (easedProgress * itemH);
-                    
+
                     // Wrap around when we exceed one copy height
                     const wrappedOffset = H > 0 ? offset % H : offset;
-                    
+
                     if (innerRef.current) {
                         innerRef.current.style.transform = `translateY(${-wrappedOffset}px)`;
                     }
@@ -206,7 +206,7 @@ export function InfiniteVerticalScroller({
                         margin: 0
                     }}
                 >
-                    <div  className="px-4 text-center text-lg w-full uppercase font-[family-name:var(--font-mavine)] font-black tracking-[0.05em] text-4xl md:text-8xl text-black">
+                    <div className="px-4 text-center w-full uppercase font-[family-name:var(--font-mavine)] font-black tracking-[0.05em] text-6xl md:text-8xl text-black">
                         {n}
                     </div>
                 </li>
