@@ -140,11 +140,11 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
 
   return (
     <div className="relative">
-      <div className="min-w-screen flex flex-row items-center justify-center z-10 gap-22 h-[850px] px-4 py-4 relative">
+      <div className="w-full max-w-full overflow-x-hidden flex flex-col lg:flex-row items-center justify-center z-10 gap-4 lg:gap-22 min-h-[50dvh] lg:h-[850px] px-4 py-4 relative">
         {/* Placeholder to maintain layout space */}
         {/* <div className="w-[10%] shrink-0"></div> */}
 
-        {/* Left Details Card - Absolutely Positioned */}
+        {/* Left Details Card - Absolutely Positioned - Hidden for now as originally coded */}
         <div className="hidden absolute left-4 top-24 w-[20%] z-60">
           {(() => {
             const dummyProduct = {
@@ -172,17 +172,19 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
           })()}
         </div>
 
-        <div className="shrink-0 relative w-[67%] -mt-[50px]">
-          <ProductCrousel
-            products={products.map(p => ({
-              img: p.variants?.[0]?.images?.[0]?.url || '',
-              name: p.name,
-              price: p.price,
-              id: p._id
-            }))}
-            currentIndex={currentIndex}
-            setCurrentIndex={handleProductSelect}
-          />
+        <div className="shrink-0 w-full lg:w-[67%] overflow-hidden mt-0 lg:-mt-[50px] relative h-[600px] md:h-full">
+          <div className="ml-4 sm:ml-0 absolute w-[220%] md:w-full left-1/2 -translate-x-1/2 md:left-auto md:translate-x-0 h-full">
+            <ProductCrousel
+              products={products.map(p => ({
+                img: p.variants?.[0]?.images?.[0]?.url || '',
+                name: p.name,
+                price: p.price,
+                id: p._id
+              }))}
+              currentIndex={currentIndex}
+              setCurrentIndex={handleProductSelect}
+            />
+          </div>
 
           {/* Other Products Gallery - Right Corner Vertical Grid */}
           {/* <div className="w-[10%] shrink-0"></div> */}

@@ -21,6 +21,14 @@
 body {
   color: var(--foreground);
   font-family: var(--font-poppins), sans-serif;
+  max-width: 100%;
+  overflow-x: hidden;
+  position: relative;
+}
+
+html {
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 @keyframes slideUpFade {

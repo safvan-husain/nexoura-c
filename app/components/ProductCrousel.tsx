@@ -113,7 +113,7 @@ export function ProductCrousel({
         return () => clearTimeout(timer);
     }, [currentIndex, products.length]);
 
-   
+
 
     // Get position for a slot index based on current animation state
     // Using percentage-based positioning for responsive layout
@@ -191,13 +191,13 @@ export function ProductCrousel({
                 })}
                 <div className='-ml-4 absolute flex flex-col items-center justify-center bottom-0 left-1/2 z-50 -translate-x-1/2 w-full'>
                     {/* Product name carousel - Infinite Vertical Scroller */}
-                    <InfiniteVerticalScroller 
+                    <InfiniteVerticalScroller
                         names={products.map(p => p.name)}
                         currentIndex={currentIndex}
                         speed={3000}
                         className="mb-2"
                     />
-                    
+
                     {/* Subtitle */}
                     <h3 className="text-sm font-semibold text-black font-sans mb-8">
                         Full face covering hoodi | 7738

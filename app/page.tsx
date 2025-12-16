@@ -6,7 +6,7 @@ import ProductViewer from './components/ProductViewer'
 export default function HomePage({
   searchParams,
 }: {
-  searchParams: Promise<{ 
+  searchParams: Promise<{
     productId?: string
   }>
 }) {
@@ -26,17 +26,17 @@ async function ProductViewerWrapper({
 }) {
   const params = await searchParamsPromise
   const productId = params.productId
-  
+
   // Read images from public/images/no-bg folder
   const imagesDirectory = path.join(process.cwd(), 'public', 'images', 'no-bg')
   const imageFiles = await fs.readdir(imagesDirectory)
-  
+
   // Filter only image files
   const validImageExtensions = ['.png', '.jpg', '.jpeg', '.webp', '.gif']
-  const images = imageFiles.filter(file => 
+  const images = imageFiles.filter(file =>
     validImageExtensions.some(ext => file.toLowerCase().endsWith(ext))
   )
-  
+
   if (images.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -44,12 +44,12 @@ async function ProductViewerWrapper({
       </div>
     )
   }
-  
+
   // Convert images to product format with placeholder data
   const products = images.map((filename, index) => {
     const cleanName = filename.replace(/\.(png|jpg|jpeg|webp|gif)$/i, '').replace(/[-_]/g, ' ')
     const price = Math.floor(Math.random() * 100) + 20
-    
+
     return {
       _id: `img-${index}`,
       name: cleanName,
@@ -73,13 +73,13 @@ async function ProductViewerWrapper({
     }
   })
 
-  const currentIndex = productId 
+  const currentIndex = productId
     ? products.findIndex((p: any) => p._id === productId)
     : 0
-  
+
   return (
-    <ProductViewer 
-      products={products} 
+    <ProductViewer
+      products={products}
       initialIndex={currentIndex >= 0 ? currentIndex : 0}
     />
   )
