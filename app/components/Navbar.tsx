@@ -6,36 +6,36 @@ export async function Navbar() {
   const user = await getCurrentUser();
 
   return (
-    <nav className="bg-transparent">
+    <nav className="bg-[#2B2C31]">
       <div className="flex mx-auto justify-center h-16 items-center backdrop-blur-sm">
         <div className="flex max-w-7xl w-full px-4 sm:px-6 lg:px-8 items-center justify-center gap-4 md:gap-12">
-          <div className="hidden md:flex gap-6 font-semibold">
+          <div className="text-gray-200 hover:text-blue-600 hidden md:flex gap-6 font-semibold">
             <Link
               href="/"
-              className="uppercase text-gray-700 hover:text-blue-600 transition-colors"
+              className="uppercase transition-colors"
             >
               Women
             </Link>
             <Link
               href="/men"
-              className="uppercase text-gray-700 hover:text-blue-600 transition-colors"
+              className="uppercase transition-colors"
             >
               Men
             </Link>
           </div>
-          <Link href="/" className="text-3xl font-semibold leading-tight text-black">
+          <Link href="/" className="text-3xl font-semibold leading-tight text-white">
             EZRRAH
           </Link>
           <div className="hidden md:flex gap-6 font-semibold">
             <Link
               href="/"
-              className="uppercase text-gray-700 hover:text-blue-600 transition-colors"
+              className="uppercase transition-colors"
             >
               Whishlist
             </Link>
             <Link
               href="/products"
-              className="uppercase text-gray-700 hover:text-blue-600 transition-colors"
+              className="uppercase transition-colors"
             >
               Products
             </Link>
