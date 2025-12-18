@@ -186,6 +186,8 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
             />
           </div>
 
+          
+
           {/* Other Products Gallery - Right Corner Vertical Grid */}
           {/* <div className="w-[10%] shrink-0"></div> */}
         </div>
@@ -254,6 +256,7 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
           </div> */}
         {/* </div> */}
       </div>
+      <div className='bg-red-500 w-[30%] h-[40%] shrink-0 absolute right-10 bottom-10'></div>
     </div>
   )
 }
