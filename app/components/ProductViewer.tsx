@@ -186,7 +186,7 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
             />
           </div>
 
-          
+
 
           {/* Other Products Gallery - Right Corner Vertical Grid */}
           {/* <div className="w-[10%] shrink-0"></div> */}
@@ -256,7 +256,35 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
           </div> */}
         {/* </div> */}
       </div>
-      <div className='bg-red-500 w-[30%] h-[40%] shrink-0 absolute right-10 bottom-10'></div>
+      <div className='hidden lg:block w-[30%] shrink-0 absolute left-10 bottom-10 flex flex-col gap-8 p-6 z-20'>
+        <div className="flex items-center gap-2  border-b border-black/20">
+          <div className="right-0 bottom-4">
+            <svg className="w-6 h-6 text-black/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          <input
+            type="text"
+            placeholder="SEARCH products"
+            className="w-full bg-transparent py-3 text-4xl font-black text-transparent [-webkit-text-stroke:1px_rgba(0,0,0,0.4)] placeholder:text-black/20 focus:outline-none focus:border-black focus:[-webkit-text-stroke:1px_black] transition-all uppercase"
+          />
+
+        </div>
+
+        <div className="flex flex-col gap-4">
+          <span className="text-[10px] tracking-[0.4em] text-black/40 font-bold uppercase transition-colors hover:text-black/60 cursor-default">Suggested Items</span>
+          <div className="flex flex-col items-start gap-3">
+            {['Minimalist Hoodie', 'Reflective Techwear', 'Urban Utility Cargo', 'Essential Basics'].map((item) => (
+              <button
+                key={item}
+                className="text-3xl font-black uppercase transition-all duration-500 hover:[-webkit-text-stroke:1px_black] hover:translate-x-3 text-transparent [-webkit-text-stroke:1px_rgba(0,0,0,0.3)] text-left"
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
