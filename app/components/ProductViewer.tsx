@@ -145,7 +145,7 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
         {/* <div className="w-[10%] shrink-0"></div> */}
 
         {/* Left Details Card - Absolutely Positioned - Hidden for now as originally coded */}
-        <div className="hidden absolute left-4 top-24 w-[20%] z-60">
+        <div className="hidden lg:block absolute left-4 top-24 w-[20%] z-60">
           {(() => {
             const dummyProduct = {
               name: 'OVERSIZED BLACK HOODIE',
@@ -185,78 +185,9 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
               setCurrentIndex={handleProductSelect}
             />
           </div>
-
-
-
-          {/* Other Products Gallery - Right Corner Vertical Grid */}
-          {/* <div className="w-[10%] shrink-0"></div> */}
         </div>
-        {/* <div className="flex flex-col flex-grow min-w-0 relative w-[55%] -mt-[50px] px-10">
-          <ProductCrousel
-            products={products.map(p => ({
-              img: p.variants?.[0]?.images?.[0]?.url || '',
-              name: p.name,
-              price: p.price,
-              id: p._id
-            }))}
-            currentIndex={currentIndex}
-            setCurrentIndex={handleProductSelect}
-          />
-        </div> */}
-
-        {/* Other Products Gallery - Right Corner Vertical Grid */}
-        {/* <div className="w-[10%] shrink-0"> */}
-        {/* <div className="bg-white/10 backdrop-blur-sm rounded-lg shadow-lg p-3 sticky top-4">
-           <p className="text-2xl font-bold text-black/90 mb-2">Related Products</p>
-            <div className="grid grid-cols-3 gap-3 max-h-[calc(100vh-2rem)] overflow-hidden">
-              {products.map((product, index) => {
-                const variant = product.variants?.[0]
-                const image = variant?.images?.[0]
-
-                return (
-                  <button
-                    key={product._id}
-                    onClick={() => handleProductSelect(index)}
-                    className={`flex-shrink-0 transition-all bg-white rounded ${index === currentIndex
-                      ? 'ring-2 ring-blue-500 scale-105'
-                      : 'hover:scale-105'
-                      }`}
-                  >
-                    <div className="relative aspect-square bg-gray-100 rounded-md overflow-hidden mb-1">
-                      {image ? (
-                        <Image
-                          src={image.url}
-                          alt={image.alt || product.name}
-                          fill
-                          className="object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <svg
-                            className="w-8 h-8 text-gray-300"
-                            fill="currentColor"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6h-6z" />
-                            <path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4V6h16v12z" />
-                            <path d="M12 8.5c0-.83-.67-1.5-1.5-1.5S9 7.67 9 8.5 9.67 10 10.5 10s1.5-.67 1.5-1.5z" />
-                          </svg>
-                        </div>
-                      )}
-                    </div>
-                    <p className="text-xs font-medium truncate">{product.name}</p>
-                    <p className="text-xs text-blue-600 font-semibold">
-                      ${product.price.toFixed(2)}
-                    </p>
-                  </button>
-                )
-              })}
-            </div>
-          </div> */}
-        {/* </div> */}
       </div>
-      <div className='hidden lg:block w-[30%] shrink-0 absolute left-10 bottom-10 flex flex-col gap-8 p-6 z-20'>
+      <div className='hidden lg:block w-[30%] shrink-0 absolute right-10 bottom-10 flex flex-col gap-8 p-6 z-20'>
         <div className="flex items-center gap-2  border-b border-black/20">
           <div className="right-0 bottom-4">
             <svg className="w-6 h-6 text-black/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
