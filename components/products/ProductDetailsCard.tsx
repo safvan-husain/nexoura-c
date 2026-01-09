@@ -60,13 +60,8 @@ export default function ProductDetailsCard({
         </div>
 
         <div className="relative z-10 flex flex-col gap-5">
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.5em] text-gray-600">{category}</p>
-            <h1 className="mt-2 text-3xl font-semibold leading-tight">
-              {product.name || 'Oversized Black Hoodie'}
-            </h1>
-          </div>
 
+          <div className="text-4xl font-semibold tracking-tight">${price.toFixed(2)}</div>
           <div className="flex items-center gap-4 text-sm text-gray-600">
             <div className="flex text-[#f1c40f]">
               {Array.from({ length: 5 }).map((_, index) => (
@@ -75,11 +70,8 @@ export default function ProductDetailsCard({
                 </svg>
               ))}
             </div>
-            <span className="font-semibold text-gray-900">{rating.toFixed(1)}</span>
-            <span className="text-gray-500">({reviews} reviews)</span>
           </div>
 
-          <div className="text-4xl font-semibold tracking-tight">${price.toFixed(2)}</div>
 
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.5em] text-gray-500">

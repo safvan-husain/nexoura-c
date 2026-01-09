@@ -16,7 +16,7 @@ export function ProductCrousel({
     products,
     currentIndex,
     setCurrentIndex,
-    spacingStep = 39,
+    spacingStep = 35,
     centerPosition = 27
 }: ProductCrouselProps) {
     const [direction, setDirection] = useState<'next' | 'prev' | 'idle'>('idle');

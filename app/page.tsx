@@ -10,7 +10,7 @@ export default function HomePage({
   }>
 }) {
   return (
-    <div className="-mt-20">
+    <div className="-mt-12 lg:-mt-22">
       <Suspense fallback={<ProductViewerLoading />}>
         <ProductViewerWrapper searchParamsPromise={searchParams} />
       </Suspense>

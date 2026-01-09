@@ -2,12 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import Image from 'next/image'
-import FilterPanel, { FilterState } from './FilterPanel'
-import VariantFilterPanel from './VariantFilterPanel'
+import { FilterState } from './FilterPanel'
 import { ProductCrousel } from './ProductCrousel'
 import ProductDetailsCard from './ProductDetailsCard'
-import { div } from 'framer-motion/client'
 
 interface ProductViewerProps {
   products: any[]
@@ -145,7 +142,7 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
         {/* <div className="w-[10%] shrink-0"></div> */}
 
         {/* Left Details Card - Absolutely Positioned - Hidden for now as originally coded */}
-        <div className="hidden lg:block absolute left-4 top-24 w-[20%] z-60">
+        <div className="hidden lg:block absolute left-4 bottom-24 w-[20%] z-60">
           {(() => {
             const dummyProduct = {
               name: 'OVERSIZED BLACK HOODIE',
@@ -172,7 +169,7 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
           })()}
         </div>
 
-        <div className="shrink-0 w-full lg:w-[67%] overflow-hidden -mt-[50px] relative h-[600px] md:h-full">
+        <div className="shrink-0 w-full lg:w-[70%] overflow-hidden relative h-[600px] md:h-full">
           <div className="ml-4 sm:ml-0 absolute w-[220%] md:w-full left-1/2 -translate-x-1/2 md:left-auto md:translate-x-0 h-full">
             <ProductCrousel
               products={products.map(p => ({
