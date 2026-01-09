@@ -3,7 +3,7 @@ import { Poppins } from "next/font/google";
 import localFont from "next/font/local";
 import { Suspense } from "react";
 import "./globals.css";
-import { Navbar } from "./components/Navbar";
+import { Navbar } from "@/components/layout/Navbar";
 
 const poppins = Poppins({
   variable: "--font-poppins",

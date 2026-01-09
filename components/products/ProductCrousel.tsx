@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { InfiniteVerticalScroller } from "./InfiniteVerticalScroller";
+import { InfiniteVerticalScroller } from "@/components/ui/InfiniteVerticalScroller";
 
 type ProductCrouselProps = {
     products: { img: string, name: string, price: number, id: number }[],

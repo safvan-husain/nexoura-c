@@ -86,11 +86,11 @@ export function CarouselDemo() {
     const transition = isJumping
         ? { duration: 0 }
         : {
-              type: 'spring',
-              stiffness: 160,
-              damping: 24,
-              mass: 1,
-          };
+            type: 'spring',
+            stiffness: 160,
+            damping: 24,
+            mass: 1,
+        };
 
     const viewportWidth = VISIBLE_COUNT * CARD_WIDTH + (VISIBLE_COUNT - 1) * CARD_GAP;
 
@@ -126,7 +126,7 @@ export function CarouselDemo() {
                 <motion.div
                     className="relative"
                     animate={{ x: offset }}
-                    transition={transition}
+                    transition={transition as any}
                 >
                     <div className="flex" style={{ gap: `${CARD_GAP}px` }}>
                         {extendedCards.map((card, idx) => (
