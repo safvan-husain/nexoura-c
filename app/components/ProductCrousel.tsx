@@ -212,7 +212,7 @@ export function ProductCrousel({
                             VIEW DETAILS
                         </button>
                         <button className="w-full md:w-auto min-w-[200px] px-8 py-3 md:py-4 rounded-2xl bg-white/10 backdrop-blur-md border border-zinc-900/10 text-zinc-900 font-bold hover:bg-zinc-900 hover:text-white transition-all shadow-lg active:scale-95 text-[10px] md:text-xs tracking-[0.2em] uppercase mt-1 md:mt-0">
-                            VIEW ALL PRODUCTS
+                            VIEW ALL
                         </button>
                     </div>
                 </div>
