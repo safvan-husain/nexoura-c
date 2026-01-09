@@ -152,7 +152,7 @@ export function ProductCrousel({
                                 filter: `blur(${currentPos.blur}px)`,
                                 zIndex: currentPos.zIndex,
                             }}
-                            className={`absolute w-[42%] aspect-[3/5] cursor-pointer transition-all duration-500 ease-out`}
+                            className={`absolute -mt-28 md:mt-0 w-[42%] aspect-[3/5] cursor-pointer transition-all duration-500 ease-out`}
                             onClick={() => {
                                 const originalIndex = products.findIndex(p => p.id === product.id);
                                 if (originalIndex >= 0) setCurrentIndex(originalIndex);
@@ -189,7 +189,7 @@ export function ProductCrousel({
                         </div>
                     );
                 })}
-                <div className='-ml-4 absolute flex flex-col items-center justify-center bottom-0 left-1/2 z-50 -translate-x-1/2 w-full'>
+                <div className='-ml-4  absolute flex flex-col items-center justify-center bottom-0 left-1/2 z-50 -translate-x-1/2 w-full'>
                     {/* Product name carousel - Infinite Vertical Scroller */}
                     <InfiniteVerticalScroller
                         names={products.map(p => p.name)}
@@ -203,7 +203,18 @@ export function ProductCrousel({
                         Full face covering hoodi | 7738
                     </h3>
 
-                    <button className="px-6 py-2 rounded-2xl bg-gray-600 shadow-md text-white font-semibold hover:bg-gray-800 transition-colors">BUY NOW</button>
+                    {/* Action Buttons */}
+                    <div className="flex flex-wrap justify-center gap-3 md:gap-4 w-full px-6 w-screen">
+                        <button className="flex-1 md:flex-none min-w-[140px] md:min-w-[160px] px-6 py-3 md:py-4 rounded-2xl bg-zinc-900 text-white font-bold hover:bg-black transition-all shadow-[0_10px_20px_rgba(0,0,0,0.3)] active:scale-95 text-[10px] md:text-xs tracking-[0.2em] uppercase border border-white/10">
+                            BUY NOW
+                        </button>
+                        <button className="hidden lg:block flex-1 md:flex-none min-w-[140px] md:min-w-[160px] px-6 py-3 md:py-4 rounded-2xl bg-zinc-800 text-white font-bold hover:bg-zinc-700 transition-all shadow-[0_10px_20px_rgba(0,0,0,0.2)] active:scale-95 text-[10px] md:text-xs tracking-[0.2em] uppercase border border-white/10">
+                            VIEW DETAILS
+                        </button>
+                        <button className="w-full md:w-auto min-w-[200px] px-8 py-3 md:py-4 rounded-2xl bg-white/10 backdrop-blur-md border border-zinc-900/10 text-zinc-900 font-bold hover:bg-zinc-900 hover:text-white transition-all shadow-lg active:scale-95 text-[10px] md:text-xs tracking-[0.2em] uppercase mt-1 md:mt-0">
+                            VIEW ALL PRODUCTS
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
