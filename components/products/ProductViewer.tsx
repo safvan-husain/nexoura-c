@@ -5,9 +5,11 @@ import { useRouter } from 'next/navigation'
 import { FilterState } from './FilterPanel'
 import { ProductCrousel } from './ProductCrousel'
 import ProductDetailsCard from './ProductDetailsCard'
+import ProductGridOverlay from './ProductGridOverlay'
+import { Product } from '@/lib/services/product-service'
 
 interface ProductViewerProps {
-  products: any[]
+  products: Product[]
   initialIndex: number
 }
 
@@ -22,6 +24,7 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
   const [prevProduct, setPrevProduct] = useState(products[initialIndex])
   const [selectedColor, setSelectedColor] = useState<string | null>(null)
   const [selectedSize, setSelectedSize] = useState<string | null>(null)
+  const [isOverlayOpen, setIsOverlayOpen] = useState(false)
 
   const currentProduct = products[currentIndex]
   const currentVariant = currentProduct?.variants?.[currentVariantIndex]
@@ -135,23 +138,66 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
     // This is just a callback for the FilterPanel
   }
 
+  // Scroll to top when overlay opens to ensure navbar is visible
+  useEffect(() => {
+    if (isOverlayOpen) {
+      window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
+    }
+  }, [isOverlayOpen])
+
+  // Scroll/Wheel detection to trigger overlay
+  useEffect(() => {
+    let touchStartY = 0;
+
+    const handleWheel = (e: WheelEvent) => {
+      if (isOverlayOpen) return
+
+      const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 10
+
+      if (isAtBottom && e.deltaY > 30) {
+        setIsOverlayOpen(true)
+      }
+    }
+
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStartY = e.touches[0].clientY
+    }
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (isOverlayOpen) return
+
+      const touchEndY = e.touches[0].clientY
+      const deltaY = touchStartY - touchEndY // Positive if scrolling down (finger moving up)
+      const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 10
+
+      if (isAtBottom && deltaY > 50) { // Threshold of 50px for mobile
+        setIsOverlayOpen(true)
+      }
+    }
+
+    window.addEventListener('wheel', handleWheel)
+    window.addEventListener('touchstart', handleTouchStart)
+    window.addEventListener('touchmove', handleTouchMove)
+
+    return () => {
+      window.removeEventListener('wheel', handleWheel)
+      window.removeEventListener('touchstart', handleTouchStart)
+      window.removeEventListener('touchmove', handleTouchMove)
+    }
+  }, [isOverlayOpen])
+
   return (
     <div className="relative">
-      <div className="w-full h-screen max-w-full overflow-x-hidden flex flex-col lg:flex-row items-center justify-center z-10 gap-4 lg:gap-22 min-h-[50dvh] lg:h-[850px] px-4 py-4 relative">
-        {/* Placeholder to maintain layout space */}
-        {/* <div className="w-[10%] shrink-0"></div> */}
-
-        {/* Left Details Card - Absolutely Positioned - Hidden for now as originally coded */}
+      <div className="w-full h-[93vh] max-w-full overflow-x-hidden flex flex-col lg:flex-row items-center justify-center z-10 gap-4 lg:gap-22 min-h-[50dvh] lg:h-[850px] px-4 py-4 relative">
+        {/* Left Details Card - Absolutely Positioned */}
         <div className="hidden lg:block absolute left-4 bottom-24 w-[20%] z-60">
           {(() => {
             const dummyProduct = {
               name: 'OVERSIZED BLACK HOODIE',
               price: 99.99,
               compareAtPrice: 129.99,
-              shortDescription:
-                'A minimalist premium oversized hoodie crafted from organic cotton.',
-              description:
-                'Featuring a matte texture and relaxed drop-shoulder design.',
+              shortDescription: 'A minimalist premium oversized hoodie crafted from organic cotton.',
+              description: 'Featuring a matte texture and relaxed drop-shoulder design.',
             }
 
             const dummyVariant = {
@@ -180,10 +226,12 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
               }))}
               currentIndex={currentIndex}
               setCurrentIndex={handleProductSelect}
+              onViewAll={() => setIsOverlayOpen(true)}
             />
           </div>
         </div>
       </div>
+
       <div className='hidden lg:block w-[30%] shrink-0 absolute right-10 bottom-10 flex flex-col gap-8 p-6 z-20'>
         <div className="flex items-center gap-2  border-b border-black/20">
           <div className="right-0 bottom-4">
@@ -196,7 +244,6 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
             placeholder="SEARCH products"
             className="w-full bg-transparent py-3 text-4xl font-black text-transparent [-webkit-text-stroke:1px_rgba(0,0,0,0.4)] placeholder:text-black/20 focus:outline-none focus:border-black focus:[-webkit-text-stroke:1px_black] transition-all uppercase"
           />
-
         </div>
 
         <div className="flex flex-col gap-4">
@@ -213,6 +260,12 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
           </div>
         </div>
       </div>
+
+      <ProductGridOverlay
+        products={products}
+        isOpen={isOverlayOpen}
+        onClose={() => setIsOverlayOpen(false)}
+      />
     </div>
   )
 }

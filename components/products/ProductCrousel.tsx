@@ -5,9 +5,10 @@ import Image from "next/image";
 import { InfiniteVerticalScroller } from "@/components/ui/InfiniteVerticalScroller";
 
 type ProductCrouselProps = {
-    products: { img: string, name: string, price: number, id: number }[],
+    products: { img: string, name: string, price: number, id: string }[],
     currentIndex: number,
     setCurrentIndex: (index: number) => void,
+    onViewAll?: () => void,
     spacingStep?: number,
     centerPosition?: number
 }
@@ -16,6 +17,7 @@ export function ProductCrousel({
     products,
     currentIndex,
     setCurrentIndex,
+    onViewAll,
     spacingStep = 35,
     centerPosition = 27
 }: ProductCrouselProps) {
@@ -211,7 +213,10 @@ export function ProductCrousel({
                         <button className="hidden lg:block flex-1 md:flex-none min-w-[140px] md:min-w-[160px] px-6 py-3 md:py-4 rounded-2xl bg-zinc-800 text-white font-bold hover:bg-zinc-700 transition-all shadow-[0_10px_20px_rgba(0,0,0,0.2)] active:scale-95 text-[10px] md:text-xs tracking-[0.2em] uppercase border border-white/10">
                             VIEW DETAILS
                         </button>
-                        <button className="w-full md:w-auto min-w-[200px] px-8 py-3 md:py-4 rounded-2xl bg-white/10 backdrop-blur-md border border-zinc-900/10 text-zinc-900 font-bold hover:bg-zinc-900 hover:text-white transition-all shadow-lg active:scale-95 text-[10px] md:text-xs tracking-[0.2em] uppercase mt-1 md:mt-0">
+                        <button
+                            onClick={onViewAll}
+                            className="w-full md:w-auto min-w-[200px] px-8 py-3 md:py-4 rounded-2xl bg-white/10 backdrop-blur-md border border-zinc-900/10 text-zinc-900 font-bold hover:bg-zinc-900 hover:text-white transition-all shadow-lg active:scale-95 text-[10px] md:text-xs tracking-[0.2em] uppercase mt-1 md:mt-0"
+                        >
                             VIEW ALL
                         </button>
                     </div>
