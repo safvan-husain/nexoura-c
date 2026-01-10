@@ -1,3 +1,8 @@
+---
+trigger: glob
+globs: app
+---
+
 ## 🎨 Frontend Architecture Rules
 
 This document defines the frontend conventions using Next.js 16 and Cache Components.
@@ -20,12 +25,14 @@ This document defines the frontend conventions using Next.js 16 and Cache Compon
 ### 📡 Data Fetching & Caching
 * **Runtime APIs**: When using `searchParams` or `params`, pass them as promises to child components wrapped in Suspense.
 * **Revalidation**: Use `revalidateTag` after mutations in Server Actions.
+* **Error Handling**: Use `handleApiError(response, showToast)` from `@/lib/utils/api-error-handler` for client-side fetch requests to show consistent error toasts with "Copy Details" capability.
 
 ---
 
 ### 🔄 Server Actions & Forms
 * Place all mutations in Server Actions (`lib/actions/*.ts`).
 * Use the `action` prop in forms to call Server Actions directly.
+* Use `useToast()` to display feedback for both success and error states.
 
 ---
 

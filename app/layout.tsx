@@ -36,6 +36,8 @@ export const metadata: Metadata = {
   description: "Your product marketplace",
 };
 
+import { ToastProvider } from "@/components/ui/Toast";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -49,10 +51,12 @@ export default function RootLayout({
         }}
         className={`${poppins.variable} ${metha.variable} ${mavine.variable} ${black.variable} antialiased min-h-screen overflow-x-hidden font-[family-name:var(--font-poppins)]`}
       >
-        <Suspense fallback={<NavbarSkeleton />}>
-          <Navbar />
-        </Suspense>
-        {children}
+        <ToastProvider>
+          <Suspense fallback={<NavbarSkeleton />}>
+            <Navbar />
+          </Suspense>
+          {children}
+        </ToastProvider>
       </body>
     </html>
   );

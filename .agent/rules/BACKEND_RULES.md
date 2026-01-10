@@ -1,3 +1,8 @@
+---
+trigger: glob
+globs: lib, app/api
+---
+
 ## 🔙 Backend Architecture Rules
 
 This document defines the backend architecture, focusing on the logic living inside `/lib` and the API route handlers.
@@ -8,6 +13,7 @@ This document defines the backend architecture, focusing on the logic living ins
 * Only place where `Request` and `NextResponse` are used.
 * Must stay extremely small.
 * Responsibilities: Parse request, call controller, convert controller output → `NextResponse`.
+* **Important**: Always include `'x-request-method': 'METHOD'` in headers for frontend error handling.
 * **No business logic.**
 
 #### **2. Controllers (`*.controller.ts`)**
@@ -15,6 +21,7 @@ This document defines the backend architecture, focusing on the logic living ins
 * Validate input using Zod.
 * Call service functions.
 * Return a normalized response: `{ status: number, body: any }`.
+* **Important**: Use `catchError(err)` from `@/lib/errors/app-error` to ensure consistent error formats.
 * **Controllers DO NOT:** Access MongoDB directly, contain business logic, or import from `app/`.
 
 #### **3. Services (`*.service.ts`)**

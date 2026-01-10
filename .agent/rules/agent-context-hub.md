@@ -1,3 +1,7 @@
+---
+trigger: always_on
+---
+
 ## 🧠 Agent Context Hub
 
 This document is the entry point for the coding agent. It defines high-level project rules and directs the agent to specialized context files based on the task being performed.

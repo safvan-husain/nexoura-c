@@ -20,11 +20,17 @@ export async function GET(req: Request) {
   if (searchParams.get('maxStock')) query.maxStock = parseInt(searchParams.get('maxStock')!);
 
   const { status, body } = await handleGetProducts(query);
-  return NextResponse.json(body, { status });
+  return NextResponse.json(body, {
+    status,
+    headers: { 'x-request-method': 'GET' }
+  });
 }
 
 export async function POST(req: Request) {
   const data = await req.json();
   const { status, body } = await handleCreateProduct(data);
-  return NextResponse.json(body, { status });
+  return NextResponse.json(body, {
+    status,
+    headers: { 'x-request-method': 'POST' }
+  });
 }
