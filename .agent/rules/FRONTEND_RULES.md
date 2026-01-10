@@ -41,4 +41,7 @@ This document defines the frontend conventions using Next.js 16 and Cache Compon
 ---
 
 ### 🎨 Design Aesthetics
-Use only white mode for the storefront, and for the admin panel, we have a manual switching between white and dark mode. 
+Use only white mode for the storefront, and for the admin panel, we have a manual switching between white and dark mode.
+
+### Learnings:
+export const dynamic is incompatible with the cacheComponents flag enabled in Next.js 16. With cacheComponents, data fetching defaults to runtime execution (dynamic) unless explicitly cached, so the force-dynamic configuration is redundant and effectively disallowed.
