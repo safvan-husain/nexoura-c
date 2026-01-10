@@ -8,7 +8,6 @@
     "start": "next start",
     "lint": "eslint",
     "seed": "ts-node --project scripts/tsconfig.json scripts/seed.ts",
-    "seed:admin": "tsx scripts/seed-admin.ts",
     "remove-bg": "tsx scripts/remove-backgrounds.ts",
     "update-images": "tsx scripts/update-image-extensions.ts",
     "test": "jest",

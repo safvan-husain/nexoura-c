@@ -24,21 +24,19 @@ async function updateImageExtensions() {
     for (const product of products) {
       let productModified = false;
 
-      // Update variant images
-      for (const variant of product.variants) {
-        if (variant.images && variant.images.length > 0) {
-          for (const image of variant.images) {
-            const oldUrl = image.url;
-            
-            // Replace extension with .png
-            const newUrl = oldUrl.replace(/\.(jpg|jpeg|webp|gif|bmp)$/i, '.png');
-            
-            if (oldUrl !== newUrl) {
-              image.url = newUrl;
-              productModified = true;
-              totalImagesUpdated++;
-              console.log(`  📸 Updated: ${oldUrl} → ${newUrl}`);
-            }
+      // Update product images
+      if (product.images && product.images.length > 0) {
+        for (const image of product.images) {
+          const oldUrl = image.url;
+
+          // Replace extension with .png
+          const newUrl = oldUrl.replace(/\.(jpg|jpeg|webp|gif|bmp)$/i, '.png');
+
+          if (oldUrl !== newUrl) {
+            image.url = newUrl;
+            productModified = true;
+            totalImagesUpdated++;
+            console.log(`  📸 Updated: ${oldUrl} → ${newUrl}`);
           }
         }
       }
