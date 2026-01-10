@@ -1,7 +1,6 @@
 import { GET as productsGET, POST as productsPOST } from '@/app/api/products/route';
 import { GET as productGET, PUT as productPUT, DELETE as productDELETE } from '@/app/api/products/[id]/route';
 import { ProductModel } from '@/lib/models/product.model';
-import { CategoryModel } from '@/lib/models/category.model';
 
 // Helper to create mock Request
 function createMockRequest(method: string, body?: any, url?: string): Request {
@@ -9,36 +8,25 @@ function createMockRequest(method: string, body?: any, url?: string): Request {
     method,
     headers: { 'Content-Type': 'application/json' },
   };
-  
+
   if (body) {
     options.body = JSON.stringify(body);
   }
-  
+
   return new Request(url || 'http://localhost:3000', options);
 }
 
 describe('Products Integration Tests', () => {
-  let testCategory: any;
-
-  beforeAll(async () => {
-    testCategory = await CategoryModel.create({
-      name: 'Test Category',
-      slug: 'test-category',
-    });
-  });
-
   describe('POST /api/products', () => {
     it('should create a new product', async () => {
       const req = createMockRequest('POST', {
         name: 'E2E Product',
-        slug: 'e2e-product',
+        slug: 'e2e-product-unique',
         description: 'E2E test product',
         price: 29.99,
-        categories: [testCategory._id.toString()],
         tags: ['e2e'],
-        variants: [
-          { name: 'Default', sku: 'E2E-001', stock: 100 }
-        ],
+        stock: 100,
+        images: [{ url: 'https://example.com/image.jpg', isPrimary: true }]
       });
 
       const response = await productsPOST(req);
@@ -52,7 +40,7 @@ describe('Products Integration Tests', () => {
     it('should return 400 for invalid data', async () => {
       const req = createMockRequest('POST', {
         name: 'Invalid Product',
-        // Missing required fields
+        // Missing required fields like slug, description, price
       });
 
       const response = await productsPOST(req);
@@ -68,7 +56,7 @@ describe('Products Integration Tests', () => {
         slug: 'duplicate-slug',
         description: 'Description',
         price: 10,
-        variants: [{ name: 'Default', sku: 'FIRST-001', stock: 50 }],
+        stock: 50,
       });
 
       const req = createMockRequest('POST', {
@@ -76,7 +64,7 @@ describe('Products Integration Tests', () => {
         slug: 'duplicate-slug',
         description: 'Description',
         price: 20,
-        variants: [{ name: 'Default', sku: 'SECOND-001', stock: 30 }],
+        stock: 30,
       });
 
       const response = await productsPOST(req);
@@ -92,29 +80,27 @@ describe('Products Integration Tests', () => {
       await ProductModel.create([
         {
           name: 'Product 1',
-          slug: 'product-1',
+          slug: 'product-1-e2e',
           description: 'Description 1',
           price: 10,
-          categories: [testCategory._id],
           status: 'published',
-          variants: [{ name: 'Default', sku: 'PROD-001', stock: 50 }],
+          stock: 50,
         },
         {
           name: 'Product 2',
-          slug: 'product-2',
+          slug: 'product-2-e2e',
           description: 'Description 2',
           price: 20,
-          categories: [],
           status: 'published',
-          variants: [{ name: 'Default', sku: 'PROD-002', stock: 30 }],
+          stock: 30,
         },
         {
           name: 'Product 3',
-          slug: 'product-3',
+          slug: 'product-3-e2e',
           description: 'Description 3',
           price: 30,
           status: 'archived',
-          variants: [{ name: 'Default', sku: 'PROD-003', stock: 0 }],
+          stock: 0,
         },
       ]);
     });
@@ -131,16 +117,6 @@ describe('Products Integration Tests', () => {
 
     it('should filter by search term', async () => {
       const req = createMockRequest('GET', undefined, 'http://localhost:3000/api/products?search=Product 1');
-      const response = await productsGET(req);
-      const body = await response.json();
-
-      expect(response.status).toBe(200);
-      expect(body.products).toHaveLength(1);
-      expect(body.products[0].name).toBe('Product 1');
-    });
-
-    it('should filter by category', async () => {
-      const req = createMockRequest('GET', undefined, `http://localhost:3000/api/products?category=${testCategory._id.toString()}`);
       const response = await productsGET(req);
       const body = await response.json();
 
@@ -193,10 +169,10 @@ describe('Products Integration Tests', () => {
     it('should get product by id', async () => {
       const product = await ProductModel.create({
         name: 'Get By ID',
-        slug: 'get-by-id',
+        slug: 'get-by-id-test',
         description: 'Description',
         price: 10,
-        variants: [{ name: 'Default', sku: 'GET-001', stock: 50 }],
+        stock: 50,
       });
 
       const req = createMockRequest('GET');
@@ -222,10 +198,10 @@ describe('Products Integration Tests', () => {
     it('should update product', async () => {
       const product = await ProductModel.create({
         name: 'Original Name',
-        slug: 'original-slug',
+        slug: 'original-slug-put',
         description: 'Description',
         price: 10,
-        variants: [{ name: 'Default', sku: 'UPDATE-001', stock: 50 }],
+        stock: 50,
       });
 
       const req = createMockRequest('PUT', {
@@ -255,10 +231,10 @@ describe('Products Integration Tests', () => {
     it('should delete product', async () => {
       const product = await ProductModel.create({
         name: 'To Delete',
-        slug: 'to-delete',
+        slug: 'to-delete-e2e',
         description: 'Description',
         price: 10,
-        variants: [{ name: 'Default', sku: 'DELETE-001', stock: 50 }],
+        stock: 50,
       });
 
       const req = createMockRequest('DELETE');

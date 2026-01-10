@@ -7,7 +7,6 @@ import {
   deleteProduct,
 } from '../product.service';
 import { ProductModel } from '@/lib/models/product.model';
-import { CategoryModel } from '@/lib/models/category.model';
 import { AppError } from '@/lib/errors/app-error';
 
 describe('Product Service', () => {
@@ -15,13 +14,13 @@ describe('Product Service', () => {
     it('should create a new product successfully', async () => {
       const productData = {
         name: 'New Product',
-        slug: 'new-product',
+        slug: 'new-product-service',
         description: 'A new product',
         price: 29.99,
-        variants: [{ name: 'Default', sku: 'NEW-001', stock: 100 }],
+        stock: 100,
       };
 
-      const product = await createProduct(productData);
+      const product = await createProduct(productData as any);
 
       expect(product.name).toBe(productData.name);
       expect(product.slug).toBe(productData.slug);
@@ -34,8 +33,8 @@ describe('Product Service', () => {
         slug: 'duplicate-slug',
         description: 'Description',
         price: 10,
-        variants: [{ name: 'Default', sku: 'SKU-001', stock: 50 }],
-      });
+        stock: 50,
+      } as any);
 
       await expect(
         createProduct({
@@ -43,73 +42,35 @@ describe('Product Service', () => {
           slug: 'duplicate-slug',
           description: 'Description',
           price: 20,
-          variants: [{ name: 'Default', sku: 'SKU-002', stock: 30 }],
-        })
+          stock: 30,
+        } as any)
       ).rejects.toMatchObject({
         statusCode: 409,
         message: 'PRODUCT_ALREADY_EXISTS',
       });
     });
-
-    it('should throw error for duplicate variant sku', async () => {
-      await createProduct({
-        name: 'Product 1',
-        slug: 'product-1',
-        description: 'Description',
-        price: 10,
-        variants: [{ name: 'Default', sku: 'DUPLICATE-SKU', stock: 50 }],
-      });
-
-      await expect(
-        createProduct({
-          name: 'Product 2',
-          slug: 'product-2',
-          description: 'Description',
-          price: 20,
-          variants: [{ name: 'Default', sku: 'DUPLICATE-SKU', stock: 30 }],
-        })
-      ).rejects.toMatchObject({
-        statusCode: 409,
-        message: 'VARIANT_SKU_ALREADY_EXISTS',
-      });
-    });
   });
 
   describe('getProducts', () => {
-    let electronicsCategory: any;
-    let clothingCategory: any;
-
     beforeEach(async () => {
-      electronicsCategory = await CategoryModel.create({
-        name: 'Electronics',
-        slug: 'electronics',
-      });
-
-      clothingCategory = await CategoryModel.create({
-        name: 'Clothing',
-        slug: 'clothing',
-      });
-
       await ProductModel.create([
         {
           name: 'Product A',
           slug: 'product-a',
           description: 'Description A',
           price: 10,
-          categories: [electronicsCategory._id],
           tags: ['new'],
           status: 'published',
-          variants: [{ name: 'Default', sku: 'SKU-A', stock: 50 }],
+          stock: 50,
         },
         {
           name: 'Product B',
           slug: 'product-b',
           description: 'Description B',
           price: 20,
-          categories: [clothingCategory._id],
           tags: ['sale'],
           status: 'published',
-          variants: [{ name: 'Default', sku: 'SKU-B', stock: 30 }],
+          stock: 30,
         },
         {
           name: 'Product C',
@@ -117,7 +78,7 @@ describe('Product Service', () => {
           description: 'Description C',
           price: 30,
           status: 'archived',
-          variants: [{ name: 'Default', sku: 'SKU-C', stock: 0 }],
+          stock: 0,
         },
       ]);
     });
@@ -140,19 +101,6 @@ describe('Product Service', () => {
         page: 1,
         limit: 20,
         search: 'Product A',
-        sortBy: 'createdAt',
-        sortOrder: 'desc',
-      });
-
-      expect(result.products).toHaveLength(1);
-      expect(result.products[0].name).toBe('Product A');
-    });
-
-    it('should filter by category', async () => {
-      const result = await getProducts({
-        page: 1,
-        limit: 20,
-        category: electronicsCategory._id.toString(),
         sortBy: 'createdAt',
         sortOrder: 'desc',
       });
@@ -216,10 +164,10 @@ describe('Product Service', () => {
     it('should get product by id', async () => {
       const created = await ProductModel.create({
         name: 'Test Product',
-        slug: 'test-product',
+        slug: 'test-product-by-id',
         description: 'Description',
         price: 10,
-        variants: [{ name: 'Default', sku: 'TEST-001', stock: 50 }],
+        stock: 50,
       });
 
       const product = await getProductById(created._id.toString());
@@ -240,13 +188,13 @@ describe('Product Service', () => {
     it('should get product by slug', async () => {
       await ProductModel.create({
         name: 'Slug Product',
-        slug: 'slug-product',
+        slug: 'slug-product-test',
         description: 'Description',
         price: 10,
-        variants: [{ name: 'Default', sku: 'SLUG-001', stock: 50 }],
+        stock: 50,
       });
 
-      const product = await getProductBySlug('slug-product');
+      const product = await getProductBySlug('slug-product-test');
 
       expect(product.name).toBe('Slug Product');
     });
@@ -266,7 +214,7 @@ describe('Product Service', () => {
         slug: 'original-slug',
         description: 'Description',
         price: 10,
-        variants: [{ name: 'Default', sku: 'ORIG-001', stock: 50 }],
+        stock: 50,
       });
 
       const updated = await updateProduct(created._id.toString(), {
@@ -294,10 +242,10 @@ describe('Product Service', () => {
     it('should delete product successfully', async () => {
       const created = await ProductModel.create({
         name: 'To Delete',
-        slug: 'to-delete',
+        slug: 'to-delete-slug',
         description: 'Description',
         price: 10,
-        variants: [{ name: 'Default', sku: 'DEL-001', stock: 50 }],
+        stock: 50,
       });
 
       const result = await deleteProduct(created._id.toString());

@@ -14,7 +14,6 @@ export async function getProducts(params?: {
   page?: number
   limit?: number
   search?: string
-  category?: string
   status?: string
   minStock?: number
   maxStock?: number
