@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
@@ -24,6 +24,20 @@ export default function ProductForm({ initialData, isEditing = false }: ProductF
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [uploadError, setUploadError] = useState<string | null>(null);
+    const [availableTags, setAvailableTags] = useState<any[]>([]);
+
+    useEffect(() => {
+        const fetchTags = async () => {
+            try {
+                const res = await fetch('/api/tags');
+                const data = await res.json();
+                if (res.ok) setAvailableTags(data);
+            } catch (err) {
+                console.error('Failed to fetch tags:', err);
+            }
+        };
+        fetchTags();
+    }, []);
 
     // Default values need to be carefully handled for editing vs creating
 
@@ -50,6 +64,15 @@ export default function ProductForm({ initialData, isEditing = false }: ProductF
     });
 
     const images = watch('images') || [];
+    const selectedTags = watch('tags') || [];
+
+    const toggleTag = (tagId: string) => {
+        if (selectedTags.includes(tagId)) {
+            setValue('tags', selectedTags.filter(id => id !== tagId));
+        } else {
+            setValue('tags', [...selectedTags, tagId]);
+        }
+    };
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -211,6 +234,30 @@ export default function ProductForm({ initialData, isEditing = false }: ProductF
                             <option value="archived">Archived</option>
                         </Select>
                         {errors.status && <p className="text-sm text-red-500">{errors.status.message}</p>}
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium">Tags / Categories</label>
+                        <div className="flex flex-wrap gap-2 p-3 border rounded-md min-h-[42px] bg-slate-50">
+                            {availableTags.length === 0 ? (
+                                <p className="text-xs text-slate-400">No tags available. Create them in the Tags menu.</p>
+                            ) : (
+                                availableTags.map((tag) => (
+                                    <button
+                                        key={tag._id}
+                                        type="button"
+                                        onClick={() => toggleTag(tag._id)}
+                                        className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${selectedTags.includes(tag._id)
+                                                ? 'bg-black text-white'
+                                                : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-400'
+                                            }`}
+                                    >
+                                        {tag.name}
+                                    </button>
+                                ))
+                            )}
+                        </div>
+                        {errors.tags && <p className="text-sm text-red-500">{errors.tags.message}</p>}
                     </div>
                 </div>
 

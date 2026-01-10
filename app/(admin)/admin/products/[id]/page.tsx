@@ -23,6 +23,7 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
                 ...img,
                 _id: img._id?.toString(),
             })) || [],
+            tags: product.tags?.map((tag: any) => typeof tag === 'object' ? tag._id.toString() : tag.toString()) || [],
         };
 
         return (

@@ -1,4 +1,5 @@
 import { ProductModel } from '@/lib/models/product.model';
+import { TagModel } from '@/lib/models/tag.model';
 import { AppError } from '@/lib/errors/app-error';
 import { connectDB } from '@/lib/db/mongo-client';
 import type { CreateProductInput, UpdateProductInput, ProductQueryInput } from './product.schema';
@@ -22,7 +23,7 @@ export async function createProduct(data: CreateProductInput) {
 export async function getProducts(query: ProductQueryInput) {
   await connectDB();
 
-  const { page, limit, search, minPrice, maxPrice, status, minStock, maxStock, sortBy, sortOrder } = query;
+  const { page, limit, search, minPrice, maxPrice, status, minStock, maxStock, sortBy, sortOrder, tag } = query;
 
   const filter: any = {};
 
@@ -50,10 +51,24 @@ export async function getProducts(query: ProductQueryInput) {
     if (maxStock !== undefined) filter.stock.$lte = maxStock;
   }
 
+  if (tag && tag !== 'all') {
+    const tagDoc = await TagModel.findOne({ slug: tag });
+    if (tagDoc) {
+      filter.tags = tagDoc._id;
+    } else {
+      // If tag doesn't exist and it's not 'all', return no products
+      return {
+        products: [],
+        pagination: { page, limit, total: 0, pages: 0 }
+      };
+    }
+  }
+
   const skip = (page - 1) * limit;
   const sort: any = { [sortBy]: sortOrder === 'asc' ? 1 : -1 };
 
   const products = await ProductModel.find(filter)
+    .populate('tags')
     .sort(sort)
     .skip(skip)
     .limit(limit)
@@ -75,7 +90,7 @@ export async function getProducts(query: ProductQueryInput) {
 export async function getProductById(id: string) {
   await connectDB();
 
-  const product = await ProductModel.findById(id).lean();
+  const product = await ProductModel.findById(id).populate('tags').lean();
 
   if (!product) {
     throw new AppError('PRODUCT_NOT_FOUND', 404);

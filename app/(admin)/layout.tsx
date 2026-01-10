@@ -3,6 +3,7 @@ import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { SettingsService } from "@/lib/settings/settings.service";
 import { connection } from "next/server";
 import { Suspense } from "react";
+import Link from "next/link";
 
 async function AdminThemeLoader({ children }: { children: React.ReactNode }) {
     await connection();
@@ -21,9 +22,10 @@ async function AdminThemeLoader({ children }: { children: React.ReactNode }) {
                         <h1 className="text-xl font-bold">Nexoura Admin</h1>
                         <nav className="flex items-center gap-6">
                             <ul className="flex gap-4">
-                                <li className="hover:text-slate-300 cursor-pointer">Dashboard</li>
-                                <li className="hover:text-slate-300 cursor-pointer">Products</li>
-                                <li className="hover:text-slate-300 cursor-pointer">Orders</li>
+                                <li><Link href="/admin" className="hover:text-slate-300">Dashboard</Link></li>
+                                <li><Link href="/admin/products" className="hover:text-slate-300">Products</Link></li>
+                                <li><Link href="/admin/tags" className="hover:text-slate-300">Tags</Link></li>
+                                <li className="hover:text-slate-300 cursor-pointer text-slate-500">Orders</li>
                             </ul>
                             <div className="border-l border-slate-700 h-6 mx-2" />
                             <ThemeToggle />

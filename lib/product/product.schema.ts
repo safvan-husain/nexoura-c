@@ -33,6 +33,7 @@ export const ProductQuerySchema = z.object({
   maxStock: z.number().int().optional(),
   sortBy: z.enum(['name', 'price', 'createdAt']).default('createdAt'),
   sortOrder: z.enum(['asc', 'desc']).default('desc'),
+  tag: z.string().optional(),
 });
 
 export type CreateProductInput = z.infer<typeof CreateProductSchema>;

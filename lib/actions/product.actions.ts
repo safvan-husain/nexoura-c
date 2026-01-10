@@ -11,6 +11,7 @@ export async function createProductAction(formData: FormData) {
     images: JSON.parse(formData.get('images') as string || '[]'),
     stock: parseInt(formData.get('stock') as string || '0'),
     status: formData.get('status') || 'draft',
+    tags: JSON.parse(formData.get('tags') as string || '[]'),
   }
 
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/products`, {
@@ -40,6 +41,7 @@ export async function updateProductAction(id: string, formData: FormData) {
     images: JSON.parse(formData.get('images') as string || '[]'),
     stock: parseInt(formData.get('stock') as string || '0'),
     status: formData.get('status'),
+    tags: JSON.parse(formData.get('tags') as string || '[]'),
   }
 
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/products/${id}`, {
