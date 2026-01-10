@@ -43,9 +43,6 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        style={{
-          background: 'linear-gradient(to bottom, #afaeaeff 0%, #ebebebff 50%, #ffffff 60%, #ffffff 100%)'
-        }}
         className={`${poppins.variable} ${metha.variable} ${mavine.variable} ${black.variable} ${cloisterBlack.variable} antialiased min-h-screen overflow-x-hidden font-[family-name:var(--font-poppins)]`}
       >
         <ToastProvider>

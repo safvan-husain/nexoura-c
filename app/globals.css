@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
   --background: #ffffff;
@@ -21,28 +22,31 @@
   --font-sans: var(--font-poppins);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
 
-    --bg-base: #000000;
-    --bg-subtle: #0a0a0a;
-    --bg-elevated: #171717;
-    --border-subtle: #262626;
-    --border-strong: #404040;
-    --text-primary: #ffffff;
-    --text-secondary: #d4d4d4;
-    --text-muted: #737373;
-  }
+  --bg-base: #000000;
+  --bg-subtle: #0a0a0a;
+  --bg-elevated: #171717;
+  --border-subtle: #262626;
+  --border-strong: #404040;
+  --text-primary: #ffffff;
+  --text-secondary: #d4d4d4;
+  --text-muted: #737373;
 }
 
 body {
+  background: linear-gradient(to bottom, #afaeaeff 0%, #ebebebff 50%, #ffffff 60%, #ffffff 100%);
   color: var(--foreground);
   font-family: var(--font-poppins), sans-serif;
   max-width: 100%;
   overflow-x: hidden;
   position: relative;
+}
+
+.dark body {
+  background: var(--background);
 }
 
 html {
@@ -55,6 +59,7 @@ html {
     transform: translateY(-100%);
     opacity: 0;
   }
+
   100% {
     transform: translateY(0);
     opacity: 1;
@@ -69,6 +74,7 @@ html {
   0% {
     transform: translateY(-100%);
   }
+
   100% {
     transform: translateY(0);
   }
@@ -83,6 +89,7 @@ html {
     transform: translateY(0);
     opacity: 1;
   }
+
   100% {
     transform: translateY(100%);
     opacity: 0;
