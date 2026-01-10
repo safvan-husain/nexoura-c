@@ -38,26 +38,26 @@ export function NavbarClient() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     return (
-        <nav className="bg-[#2B2C31]">
+        <nav className="bg-transparent border-b border-gray-400/70">
             <div className="relative flex mx-auto h-16 items-center justify-center backdrop-blur-sm px-4 sm:px-6 lg:px-8">
-
                 {/* ORIGINAL CENTERED LAYOUT (Hidden on Mobile) */}
                 {/* We use the exact structure from the original file for desktop */}
-                <div className="hidden md:flex flex-row items-center justify-center gap-12 font-semibold">
+                {/* Desktop Layout - Using grid for perfect centering of the logo regardless of link lengths */}
+                <div className="hidden md:grid grid-cols-[1fr_auto_1fr] items-center gap-12 font-semibold w-full">
                     {/* Left Links */}
-                    <div className="text-gray-200 hover:text-blue-600 flex gap-6">
+                    <div className="flex justify-end gap-6 text-gray-600 hover:text-black">
                         <Link href="/" className="uppercase transition-colors">Women</Link>
                         <Link href="/men" className="uppercase transition-colors">Men</Link>
                     </div>
 
                     {/* Logo */}
-                    <Link href="/" className="text-3xl font-semibold leading-tight text-white uppercase whitespace-nowrap">
+                    <Link href="/" className="text-3xl font-semibold leading-tight text-gray-900 uppercase whitespace-nowrap">
                         EZRRAH
                     </Link>
 
                     {/* Right Links */}
-                    <div className="flex gap-6 text-gray-200 hover:text-blue-600">
-                        <Link href="/" className="uppercase transition-colors">Whishlist</Link>
+                    <div className="flex gap-6 text-gray-600 hover:text-black">
+                        <Link href="/" className="uppercase transition-colors">Wishlist</Link>
                         <Link href="/products" className="uppercase transition-colors">Products</Link>
                     </div>
                 </div>
@@ -65,7 +65,7 @@ export function NavbarClient() {
                 {/* MOBILE LAYOUT START */}
                 {/* Logo Left-Aligned on Mobile */}
                 <div className="md:hidden absolute left-4 flex items-center">
-                    <Link href="/" className="text-2xl font-bold leading-tight text-white uppercase">
+                    <Link href="/" className="text-2xl font-bold leading-tight text-gray-900 uppercase">
                         EZRRAH
                     </Link>
                 </div>
@@ -76,23 +76,23 @@ export function NavbarClient() {
                 <div className="absolute right-4 md:right-8 flex items-center gap-5">
                     {/* Desktop Only Icons */}
                     <div className="hidden md:flex items-center gap-5">
-                        <button className="text-gray-200 hover:text-white transition-colors" aria-label="Search">
+                        <button className="text-gray-600 hover:text-black transition-colors" aria-label="Search">
                             <SearchIcon />
                         </button>
-                        <button className="text-gray-200 hover:text-white transition-colors" aria-label="Wishlist">
+                        <button className="text-gray-600 hover:text-black transition-colors" aria-label="Wishlist">
                             <HeartIcon />
                         </button>
                     </div>
 
                     {/* Always Visible: Cart */}
-                    <button className="text-gray-200 hover:text-white transition-colors" aria-label="Cart">
+                    <button className="text-gray-600 hover:text-black transition-colors" aria-label="Cart">
                         <CartIcon />
                     </button>
 
                     {/* Mobile Only: Menu Toggle */}
                     <button
                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                        className="md:hidden text-gray-200 hover:text-white transition-colors ml-2"
+                        className="md:hidden text-gray-600 hover:text-black transition-colors ml-2"
                         aria-label="Menu"
                     >
                         {isMobileMenuOpen ? <XIcon /> : <MenuIcon />}
@@ -107,29 +107,29 @@ export function NavbarClient() {
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        className="md:hidden bg-[#2B2C31] border-t border-gray-700 overflow-hidden absolute w-full z-50 shadow-xl top-16 left-0"
+                        className="md:hidden bg-white border-t border-gray-100 overflow-hidden absolute w-full z-50 shadow-xl top-16 left-0"
                     >
                         <div className="flex flex-col p-6 space-y-6">
-                            <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-medium text-gray-200 hover:text-white text-center uppercase">
+                            <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-medium text-gray-600 hover:text-black text-center uppercase">
                                 Women
                             </Link>
-                            <Link href="/men" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-medium text-gray-200 hover:text-white text-center uppercase">
+                            <Link href="/men" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-medium text-gray-600 hover:text-black text-center uppercase">
                                 Men
                             </Link>
-                            <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-medium text-gray-200 hover:text-white text-center uppercase">
-                                Whishlist
+                            <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-medium text-gray-600 hover:text-black text-center uppercase">
+                                Wishlist
                             </Link>
-                            <Link href="/products" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-medium text-gray-200 hover:text-white text-center uppercase">
+                            <Link href="/products" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-medium text-gray-600 hover:text-black text-center uppercase">
                                 Products
                             </Link>
 
                             {/* Mobile Menu Icons Panel */}
-                            <div className="flex justify-center gap-10 pt-6 border-t border-gray-700">
-                                <button className="flex flex-col items-center gap-2 text-gray-300 hover:text-white">
+                            <div className="flex justify-center gap-10 pt-6 border-t border-gray-100">
+                                <button className="flex flex-col items-center gap-2 text-gray-600 hover:text-black">
                                     <SearchIcon />
                                     <span className="text-xs uppercase tracking-wide">Search</span>
                                 </button>
-                                <button className="flex flex-col items-center gap-2 text-gray-300 hover:text-white">
+                                <button className="flex flex-col items-center gap-2 text-gray-600 hover:text-black">
                                     <HeartIcon />
                                     <span className="text-xs uppercase tracking-wide">Wishlist</span>
                                 </button>
@@ -137,7 +137,7 @@ export function NavbarClient() {
                         Including it here too isn't bad for consistency, or we can skip it. 
                         I'll include it. 
                      */}
-                                <button className="flex flex-col items-center gap-2 text-gray-300 hover:text-white">
+                                <button className="flex flex-col items-center gap-2 text-gray-600 hover:text-black">
                                     <CartIcon />
                                     <span className="text-xs uppercase tracking-wide">Cart</span>
                                 </button>
