@@ -5,7 +5,24 @@ import { useRouter } from 'next/navigation'
 import { ProductCrousel } from './ProductCrousel'
 import ProductDetailsCard from './ProductDetailsCard'
 import ProductGridOverlay from './ProductGridOverlay'
-import { Product } from '@/lib/services/product-service'
+
+export interface Product {
+  _id: string
+  name: string
+  price: number
+  compareAtPrice?: number
+  description: string
+  shortDescription?: string
+  status: string
+  images: {
+    url: string
+    alt?: string
+    isPrimary?: boolean
+  }[]
+  stock: number
+  tags?: string[]
+  metadata?: Record<string, any>
+}
 
 interface ProductViewerProps {
   products: Product[]

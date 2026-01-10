@@ -1,7 +1,9 @@
 'use client'
 
+import { Product } from './ProductViewer'
+
 interface ProductDetailsCardProps {
-  product: any
+  product: Product
   detailsTransition: boolean
 }
 
@@ -9,9 +11,9 @@ export default function ProductDetailsCard({
   product,
   detailsTransition,
 }: ProductDetailsCardProps) {
-  const rating = typeof product?.rating === 'number' ? product.rating : 4.8
+  const rating = 4.8
   const price = typeof product?.price === 'number' ? product.price : 0
-  const brand = product?.brand || 'Nexoura'
+  const brand = 'Nexoura'
 
   return (
     <>

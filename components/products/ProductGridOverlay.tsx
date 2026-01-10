@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Product } from '@/lib/services/product-service'
+import { Product } from './ProductViewer'
 
 interface ProductGridOverlayProps {
     products: Product[]
