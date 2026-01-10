@@ -34,7 +34,6 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
   const [currentIndex, setCurrentIndex] = useState(initialIndex)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [imageTransition, setImageTransition] = useState(false)
-  const [detailsTransition, setDetailsTransition] = useState(false)
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right')
   const [prevProduct, setPrevProduct] = useState(products[initialIndex])
   const [isOverlayOpen, setIsOverlayOpen] = useState(false)
@@ -49,12 +48,10 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
     setCurrentImageIndex(0)
     // Trigger transitions when product changes
     setImageTransition(true)
-    setDetailsTransition(true)
 
     // After rotation completes, update prevProduct and disable transition
     const timer = setTimeout(() => {
       setPrevProduct(currentProduct)
-      setDetailsTransition(false)
       // Small delay to let prevProduct update, then disable transition
       setTimeout(() => {
         setImageTransition(false)
@@ -166,7 +163,6 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
         <div className="hidden lg:block absolute left-4 bottom-24 w-[20%] z-60">
           <ProductDetailsCard
             product={currentProduct}
-            detailsTransition={detailsTransition}
           />
         </div>
 
