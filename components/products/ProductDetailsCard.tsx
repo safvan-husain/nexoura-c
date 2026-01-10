@@ -120,7 +120,7 @@ export default function ProductDetailsCard({
           </div>
         </div>
 
-        {/* Stock status - mt-auto keeps this and button at the bottom */}
+        {/* Stock status - mt-auto keeps this and button at the bottom
         <div className="mt-auto pt-4 space-y-4">
           <AnimatePresence mode="wait">
             <motion.div
@@ -144,7 +144,7 @@ export default function ProductDetailsCard({
               </span>
             </motion.div>
           </AnimatePresence>
-        </div>
+        </div> */}
       </div>
     </div>
   )
