@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import localFont from "next/font/local";
-import { Suspense } from "react";
 import "./globals.css";
-import { Navbar } from "@/components/layout/Navbar";
+import { ToastProvider } from "@/components/ui/Toast";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -23,20 +22,18 @@ const mavine = localFont({
 
 const black = localFont({
   src: "../public/fonts/Black Mustang.ttf",
-  variable: "--font-mavine",
+  variable: "--font-black",
 });
 
 const cloisterBlack = localFont({
   src: "../public/fonts/CloisterBlack.ttf",
-  variable: "--font-mavine",
+  variable: "--font-cloister",
 });
 
 export const metadata: Metadata = {
   title: "Nexoura",
   description: "Your product marketplace",
 };
-
-import { ToastProvider } from "@/components/ui/Toast";
 
 export default function RootLayout({
   children,
@@ -49,34 +46,12 @@ export default function RootLayout({
         style={{
           background: 'linear-gradient(to bottom, #afaeaeff 0%, #ebebebff 50%, #ffffff 60%, #ffffff 100%)'
         }}
-        className={`${poppins.variable} ${metha.variable} ${mavine.variable} ${black.variable} antialiased min-h-screen overflow-x-hidden font-[family-name:var(--font-poppins)]`}
+        className={`${poppins.variable} ${metha.variable} ${mavine.variable} ${black.variable} ${cloisterBlack.variable} antialiased min-h-screen overflow-x-hidden font-[family-name:var(--font-poppins)]`}
       >
         <ToastProvider>
-          <Suspense fallback={<NavbarSkeleton />}>
-            <Navbar />
-          </Suspense>
           {children}
         </ToastProvider>
       </body>
     </html>
-  );
-}
-
-function NavbarSkeleton() {
-  return (
-    <nav className="bg-transparent">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center">
-          <div className="flex items-center gap-8">
-            <div className="text-2xl font-bold text-blue-600">Nexoura</div>
-            <div className="flex gap-6">
-              <div className="text-gray-700">Home</div>
-              <div className="text-gray-700">Products</div>
-            </div>
-          </div>
-          <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse" />
-        </div>
-      </div>
-    </nav>
   );
 }
