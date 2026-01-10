@@ -34,7 +34,7 @@ const XIcon = () => (
     </svg>
 );
 
-export function NavbarClient({ user }: { user?: any }) {
+export function NavbarClient() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     return (

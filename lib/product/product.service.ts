@@ -1,5 +1,4 @@
 import { ProductModel } from '@/lib/models/product.model';
-import { CategoryModel } from '@/lib/models/category.model';
 import { AppError } from '@/lib/errors/app-error';
 import { connectDB } from '@/lib/db/mongo-client';
 import type { CreateProductInput, UpdateProductInput, ProductQueryInput } from './product.schema';
@@ -15,30 +14,6 @@ export async function createProduct(data: CreateProductInput) {
     });
   }
 
-  // Validate categories exist
-  if (data.categories && data.categories.length > 0) {
-    const categoriesCount = await CategoryModel.countDocuments({
-      _id: { $in: data.categories }
-    });
-    if (categoriesCount !== data.categories.length) {
-      throw new AppError('INVALID_CATEGORIES', 400, {
-        message: 'One or more category IDs are invalid'
-      });
-    }
-  }
-
-  // Check for duplicate SKUs in variants
-  const variantSkus = data.variants.map(v => v.sku);
-  const duplicateSku = await ProductModel.findOne({
-    'variants.sku': { $in: variantSkus }
-  });
-
-  if (duplicateSku) {
-    throw new AppError('VARIANT_SKU_ALREADY_EXISTS', 409, {
-      field: 'sku'
-    });
-  }
-
   const product = await ProductModel.create(data);
 
   return product;
@@ -47,7 +22,7 @@ export async function createProduct(data: CreateProductInput) {
 export async function getProducts(query: ProductQueryInput) {
   await connectDB();
 
-  const { page, limit, search, category, minPrice, maxPrice, status, minStock, maxStock, sortBy, sortOrder } = query;
+  const { page, limit, search, minPrice, maxPrice, status, minStock, maxStock, sortBy, sortOrder } = query;
 
   const filter: any = {};
 
@@ -57,10 +32,6 @@ export async function getProducts(query: ProductQueryInput) {
       { description: { $regex: search, $options: 'i' } },
       { tags: { $in: [new RegExp(search, 'i')] } },
     ];
-  }
-
-  if (category) {
-    filter.categories = category;
   }
 
   if (minPrice !== undefined || maxPrice !== undefined) {
@@ -73,25 +44,20 @@ export async function getProducts(query: ProductQueryInput) {
     filter.status = status;
   }
 
+  if (minStock !== undefined || maxStock !== undefined) {
+    filter.stock = {};
+    if (minStock !== undefined) filter.stock.$gte = minStock;
+    if (maxStock !== undefined) filter.stock.$lte = maxStock;
+  }
+
   const skip = (page - 1) * limit;
   const sort: any = { [sortBy]: sortOrder === 'asc' ? 1 : -1 };
 
-  let products = await ProductModel.find(filter)
-    .populate('categories', 'name slug')
+  const products = await ProductModel.find(filter)
     .sort(sort)
     .skip(skip)
     .limit(limit)
     .lean();
-
-  // Apply stock filtering after fetching (since totalStock is computed)
-  if (minStock !== undefined || maxStock !== undefined) {
-    products = products.filter((product: any) => {
-      const totalStock = product.variants.reduce((sum: number, v: any) => sum + v.stock, 0);
-      if (minStock !== undefined && totalStock < minStock) return false;
-      if (maxStock !== undefined && totalStock > maxStock) return false;
-      return true;
-    });
-  }
 
   const total = await ProductModel.countDocuments(filter);
 
@@ -109,9 +75,7 @@ export async function getProducts(query: ProductQueryInput) {
 export async function getProductById(id: string) {
   await connectDB();
 
-  const product = await ProductModel.findById(id)
-    .populate('categories', 'name slug')
-    .lean();
+  const product = await ProductModel.findById(id).lean();
 
   if (!product) {
     throw new AppError('PRODUCT_NOT_FOUND', 404);
@@ -123,9 +87,7 @@ export async function getProductById(id: string) {
 export async function getProductBySlug(slug: string) {
   await connectDB();
 
-  const product = await ProductModel.findOne({ slug })
-    .populate('categories', 'name slug')
-    .lean();
+  const product = await ProductModel.findOne({ slug }).lean();
 
   if (!product) {
     throw new AppError('PRODUCT_NOT_FOUND', 404);
@@ -150,38 +112,11 @@ export async function updateProduct(id: string, data: UpdateProductInput) {
     }
   }
 
-  // Validate categories exist if being updated
-  if (data.categories && data.categories.length > 0) {
-    const categoriesCount = await CategoryModel.countDocuments({
-      _id: { $in: data.categories }
-    });
-    if (categoriesCount !== data.categories.length) {
-      throw new AppError('INVALID_CATEGORIES', 400, {
-        message: 'One or more category IDs are invalid'
-      });
-    }
-  }
-
-  // Check for duplicate SKUs in variants if variants are being updated
-  if (data.variants) {
-    const variantSkus = data.variants.map(v => v.sku);
-    const duplicateSku = await ProductModel.findOne({
-      _id: { $ne: id },
-      'variants.sku': { $in: variantSkus }
-    });
-
-    if (duplicateSku) {
-      throw new AppError('VARIANT_SKU_ALREADY_EXISTS', 409, {
-        field: 'sku'
-      });
-    }
-  }
-
   const product = await ProductModel.findByIdAndUpdate(
     id,
     data,
     { new: true, runValidators: true }
-  ).populate('categories', 'name slug');
+  );
 
   if (!product) {
     throw new AppError('PRODUCT_NOT_FOUND', 404);

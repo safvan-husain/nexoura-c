@@ -6,17 +6,6 @@ const ProductImageSchema = z.object({
   isPrimary: z.boolean().default(false),
 });
 
-const ProductVariantSchema = z.object({
-  name: z.string().min(1, 'Variant name is required'),
-  sku: z.string().min(1, 'SKU is required'),
-  color: z.string().min(1, 'Color is required'),
-  size: z.string().min(1, 'Size is required'),
-  price: z.number().min(0, 'Price must be non-negative'),
-  stock: z.number().int().min(0, 'Stock must be non-negative'),
-  images: z.array(ProductImageSchema).default([]),
-  attributes: z.record(z.string(), z.string()).optional(),
-});
-
 export const CreateProductSchema = z.object({
   name: z.string().min(1, 'Product name is required'),
   slug: z.string().min(1, 'Slug is required').regex(/^[a-z0-9-]+$/, 'Invalid slug format'),
@@ -24,9 +13,9 @@ export const CreateProductSchema = z.object({
   shortDescription: z.string().optional(),
   price: z.number().min(0, 'Price must be positive'),
   compareAtPrice: z.number().min(0).optional(),
-  categories: z.array(z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid category ID')).default([]),
+  images: z.array(ProductImageSchema).default([]),
   tags: z.array(z.string()).default([]),
-  variants: z.array(ProductVariantSchema).min(1, 'At least one variant is required'),
+  stock: z.number().int().min(0, 'Stock must be non-negative').default(0),
   status: z.enum(['draft', 'published', 'archived']).default('draft'),
   metadata: z.record(z.string(), z.any()).optional(),
 });
@@ -37,7 +26,6 @@ export const ProductQuerySchema = z.object({
   page: z.number().int().min(1).default(1),
   limit: z.number().int().min(1).max(100).default(20),
   search: z.string().optional(),
-  category: z.string().optional(),
   minPrice: z.number().min(0).optional(),
   maxPrice: z.number().min(0).optional(),
   status: z.enum(['draft', 'published', 'archived']).optional(),

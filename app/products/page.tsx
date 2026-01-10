@@ -11,17 +11,14 @@ export default function ProductsPage({
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
+        <div className="max-w-7xl mx-auto px-4 py-6">
           <h1 className="text-3xl font-bold">Products</h1>
-          <Link href="/login" className="text-blue-600 hover:underline">
-            Login
-          </Link>
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-8">
         <Suspense fallback={<ProductsLoading />}>
-          <ProductsListWrapper 
+          <ProductsListWrapper
             pagePromise={searchParams.then((params) => parseInt(params.page || '1'))}
             searchPromise={searchParams.then((params) => params.search)}
           />
@@ -40,7 +37,7 @@ async function ProductsListWrapper({
 }) {
   const page = await pagePromise
   const search = await searchPromise
-  
+
   return <ProductsList page={page} search={search} />
 }
 

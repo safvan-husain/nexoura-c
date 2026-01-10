@@ -16,7 +16,6 @@ export async function PUT(
 ) {
   const { id } = await params;
   const data = await req.json();
-  // TODO: Extract adminId from JWT token in Authorization header
   const { status, body } = await handleUpdateProduct(id, data);
   return NextResponse.json(body, { status });
 }

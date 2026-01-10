@@ -8,14 +8,11 @@ interface Product {
   description: string
   price: number
   compareAtPrice?: number
-  variants: Array<{
-    name: string
-    images: Array<{ url: string; alt?: string }>
-  }>
+  images: Array<{ url: string; alt?: string }>
 }
 
 export function ProductCard({ product }: { product: Product }) {
-  const primaryImage = product.variants[0]?.images[0]?.url
+  const primaryImage = product.images[0]?.url
   const hasDiscount = product.compareAtPrice && product.compareAtPrice > product.price
 
   return (
@@ -30,13 +27,13 @@ export function ProductCard({ product }: { product: Product }) {
             />
           </div>
         )}
-        
+
         <h3 className="text-lg font-semibold mb-2">{product.name}</h3>
-        
+
         <p className="text-gray-600 text-sm mb-4 line-clamp-2">
           {product.description}
         </p>
-        
+
         <div className="flex items-center gap-2">
           <span className="text-xl font-bold">${product.price.toFixed(2)}</span>
           {hasDiscount && product.compareAtPrice && (

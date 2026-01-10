@@ -1,18 +1,6 @@
 import { promises as fs } from 'fs'
 import path from 'path'
 
-export interface ProductVariant {
-    color: string
-    size: string
-    sku: string
-    price: number
-    stock: number
-    images: {
-        url: string
-        alt: string
-    }[]
-}
-
 export interface Product {
     _id: string
     name: string
@@ -20,9 +8,12 @@ export interface Product {
     compareAtPrice: number
     description: string
     shortDescription: string
-    category: string
     status: string
-    variants: ProductVariant[]
+    images: {
+        url: string
+        alt: string
+    }[]
+    stock: number
 }
 
 export async function getProducts(): Promise<Product[]> {
@@ -54,18 +45,11 @@ export async function getProducts(): Promise<Product[]> {
                 compareAtPrice: price + Math.floor(Math.random() * 30) + 10,
                 description: `This is a placeholder description for ${cleanName}. Product details would normally come from the database.`,
                 shortDescription: `Preview of ${cleanName}`,
-                category: 'Sample Category',
                 status: 'published',
-                variants: [{
-                    color: 'default',
-                    size: 'default',
-                    sku: `SKU-${String(index).padStart(4, '0')}`,
-                    price: price,
-                    stock: Math.floor(Math.random() * 50) + 5,
-                    images: [{
-                        url: `/images/no-bg/${filename}`,
-                        alt: filename
-                    }]
+                stock: Math.floor(Math.random() * 50) + 5,
+                images: [{
+                    url: `/images/no-bg/${filename}`,
+                    alt: filename
                 }]
             }
         })

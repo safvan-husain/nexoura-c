@@ -9,7 +9,6 @@ interface FilterPanelProps {
 
 export interface FilterState {
   search?: string
-  category?: string
   minPrice?: number
   maxPrice?: number
   status?: 'draft' | 'published' | 'archived'
@@ -22,10 +21,9 @@ export interface FilterState {
 export default function FilterPanel({ onFilterChange }: FilterPanelProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  
+
   const [filters, setFilters] = useState<FilterState>({
     search: searchParams.get('search') || '',
-    category: searchParams.get('category') || '',
     minPrice: searchParams.get('minPrice') ? parseFloat(searchParams.get('minPrice')!) : undefined,
     maxPrice: searchParams.get('maxPrice') ? parseFloat(searchParams.get('maxPrice')!) : undefined,
     status: (searchParams.get('status') as any) || 'published',
@@ -41,7 +39,7 @@ export default function FilterPanel({ onFilterChange }: FilterPanelProps) {
     const newFilters = { ...filters, [key]: value || undefined }
     setFilters(newFilters)
     onFilterChange(newFilters)
-    
+
     // Update URL
     const params = new URLSearchParams()
     Object.entries(newFilters).forEach(([k, v]) => {
@@ -55,7 +53,6 @@ export default function FilterPanel({ onFilterChange }: FilterPanelProps) {
   const clearFilters = () => {
     const defaultFilters: FilterState = {
       search: '',
-      category: '',
       status: 'published',
       sortBy: 'createdAt',
       sortOrder: 'desc',
@@ -97,17 +94,6 @@ export default function FilterPanel({ onFilterChange }: FilterPanelProps) {
             />
           </div>
 
-          {/* Category */}
-          <div>
-            <label className="block text-xs font-semibold mb-1 text-gray-700">Category</label>
-            <input
-              type="text"
-              value={filters.category || ''}
-              onChange={(e) => updateFilter('category', e.target.value)}
-              placeholder="Category ID..."
-              className="w-full px-2 py-1.5 text-sm border rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
 
           {/* Status */}
           <div>

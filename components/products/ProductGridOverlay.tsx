@@ -73,7 +73,7 @@ export default function ProductGridOverlay({ products, isOpen, onClose }: Produc
                                 >
                                     <div className="aspect-[4/5] relative bg-[#f5f5f5] rounded-[2rem] overflow-hidden mb-6 transition-all duration-500 group-hover:shadow-2xl group-hover:shadow-black/10">
                                         <Image
-                                            src={product.variants[0].images[0].url}
+                                            src={product.images[0]?.url || ''}
                                             alt={product.name}
                                             fill
                                             className="object-contain p-8 transition-transform duration-700 group-hover:scale-110"
@@ -99,9 +99,6 @@ export default function ProductGridOverlay({ products, isOpen, onClose }: Produc
                                                 ${product.price}
                                             </p>
                                         </div>
-                                        <p className="text-gray-400 text-xs font-semibold uppercase tracking-widest">
-                                            {product.category}
-                                        </p>
                                     </div>
                                 </motion.div>
                             ))}

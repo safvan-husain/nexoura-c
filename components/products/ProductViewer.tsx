@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { FilterState } from './FilterPanel'
 import { ProductCrousel } from './ProductCrousel'
 import ProductDetailsCard from './ProductDetailsCard'
 import ProductGridOverlay from './ProductGridOverlay'
@@ -16,33 +15,21 @@ interface ProductViewerProps {
 export default function ProductViewer({ products, initialIndex }: ProductViewerProps) {
   const router = useRouter()
   const [currentIndex, setCurrentIndex] = useState(initialIndex)
-  const [currentVariantIndex, setCurrentVariantIndex] = useState(0)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [imageTransition, setImageTransition] = useState(false)
   const [detailsTransition, setDetailsTransition] = useState(false)
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right')
   const [prevProduct, setPrevProduct] = useState(products[initialIndex])
-  const [selectedColor, setSelectedColor] = useState<string | null>(null)
-  const [selectedSize, setSelectedSize] = useState<string | null>(null)
   const [isOverlayOpen, setIsOverlayOpen] = useState(false)
 
   const currentProduct = products[currentIndex]
-  const currentVariant = currentProduct?.variants?.[currentVariantIndex]
-  const images = currentVariant?.images || []
+  const images = currentProduct?.images || []
   const currentImage = images[currentImageIndex]
 
-  const prevVariant = prevProduct?.variants?.[0]
-  const prevImage = prevVariant?.images?.[0]
-
-  // Get unique colors and sizes
-  const availableColors = Array.from(new Set(currentProduct?.variants?.map((v: any) => v.color) || [])) as string[]
-  const availableSizes = Array.from(new Set(currentProduct?.variants?.map((v: any) => v.size) || [])) as string[]
+  const prevImage = prevProduct?.images?.[0]
 
   useEffect(() => {
     setCurrentImageIndex(0)
-    setCurrentVariantIndex(0)
-    setSelectedColor(null)
-    setSelectedSize(null)
     // Trigger transitions when product changes
     setImageTransition(true)
     setDetailsTransition(true)
@@ -59,32 +46,6 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
 
     return () => clearTimeout(timer)
   }, [currentIndex])
-
-  // Handle variant selection by color/size
-  const findAndSetVariant = (color: string | null, size: string | null) => {
-    if (!currentProduct?.variants) return
-
-    const matchingVariant = currentProduct.variants.findIndex((v: any) => {
-      const colorMatch = !color || v.color === color
-      const sizeMatch = !size || v.size === size
-      return colorMatch && sizeMatch
-    })
-
-    if (matchingVariant >= 0) {
-      setCurrentVariantIndex(matchingVariant)
-      setCurrentImageIndex(0)
-    }
-  }
-
-  const handleColorSelect = (color: string | null) => {
-    setSelectedColor(color)
-    findAndSetVariant(color, selectedSize)
-  }
-
-  const handleSizeSelect = (size: string | null) => {
-    setSelectedSize(size)
-    findAndSetVariant(selectedColor, size)
-  }
 
   const handlePrevious = () => {
     if (currentImageIndex > 0) {
@@ -131,11 +92,6 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
 
   if (!currentProduct) {
     return <div>Product not found</div>
-  }
-
-  const handleFilterChange = (filters: FilterState) => {
-    // Filters are handled by URL params and page re-render
-    // This is just a callback for the FilterPanel
   }
 
   // Scroll to top when overlay opens to ensure navbar is visible
@@ -191,35 +147,17 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
       <div className="w-full h-[93vh] max-w-full overflow-x-hidden flex flex-col lg:flex-row items-center justify-center z-10 gap-4 lg:gap-22 min-h-[50dvh] lg:h-[850px] px-4 py-4 relative">
         {/* Left Details Card - Absolutely Positioned */}
         <div className="hidden lg:block absolute left-4 bottom-24 w-[20%] z-60">
-          {(() => {
-            const dummyProduct = {
-              name: 'OVERSIZED BLACK HOODIE',
-              price: 99.99,
-              compareAtPrice: 129.99,
-              shortDescription: 'A minimalist premium oversized hoodie crafted from organic cotton.',
-              description: 'Featuring a matte texture and relaxed drop-shoulder design.',
-            }
-
-            const dummyVariant = {
-              sku: 'HOODIE-BLK-XL',
-              stock: 24,
-            }
-
-            return (
-              <ProductDetailsCard
-                product={dummyProduct}
-                currentVariant={dummyVariant}
-                detailsTransition={detailsTransition}
-              />
-            )
-          })()}
+          <ProductDetailsCard
+            product={currentProduct}
+            detailsTransition={detailsTransition}
+          />
         </div>
 
         <div className="shrink-0 w-full lg:w-[70%] overflow-hidden relative h-[600px] md:h-full">
           <div className="ml-4 sm:ml-0 absolute w-[220%] md:w-full left-1/2 -translate-x-1/2 md:left-auto md:translate-x-0 h-full">
             <ProductCrousel
               products={products.map(p => ({
-                img: p.variants?.[0]?.images?.[0]?.url || '',
+                img: p.images?.[0]?.url || '',
                 name: p.name,
                 price: p.price,
                 id: p._id

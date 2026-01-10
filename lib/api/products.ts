@@ -27,7 +27,6 @@ export async function getProducts(params?: {
   if (params?.page) searchParams.set('page', params.page.toString())
   if (params?.limit) searchParams.set('limit', params.limit.toString())
   if (params?.search) searchParams.set('search', params.search)
-  if (params?.category) searchParams.set('category', params.category)
   if (params?.status) searchParams.set('status', params.status)
   if (params?.minStock !== undefined) searchParams.set('minStock', params.minStock.toString())
   if (params?.maxStock !== undefined) searchParams.set('maxStock', params.maxStock.toString())
@@ -36,7 +35,7 @@ export async function getProducts(params?: {
   const url = `${baseUrl}/api/products?${searchParams}`
 
   try {
-    const res = await fetch(url, { 
+    const res = await fetch(url, {
       cache: 'no-store',
       headers: {
         'Content-Type': 'application/json',
@@ -65,7 +64,7 @@ export async function getProductById(id: string) {
   const url = `${baseUrl}/api/products/${id}`
 
   try {
-    const res = await fetch(url, { 
+    const res = await fetch(url, {
       cache: 'no-store',
       headers: {
         'Content-Type': 'application/json',
