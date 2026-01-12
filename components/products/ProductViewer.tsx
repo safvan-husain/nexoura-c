@@ -22,6 +22,7 @@ export interface Product {
   stock: number
   tags?: string[]
   metadata?: Record<string, any>
+  slug: string
 }
 
 interface ProductViewerProps {
@@ -173,7 +174,8 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
                 img: p.images?.[0]?.url || '',
                 name: p.name,
                 price: p.price,
-                id: p._id
+                id: p._id,
+                slug: p.slug
               }))}
               currentIndex={currentIndex}
               setCurrentIndex={handleProductSelect}

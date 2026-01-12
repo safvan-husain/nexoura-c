@@ -3,9 +3,10 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { InfiniteVerticalScroller } from "@/components/ui/InfiniteVerticalScroller";
+import Link from 'next/link';
 
 type ProductCrouselProps = {
-    products: { img: string, name: string, price: number, id: string }[],
+    products: { img: string, name: string, price: number, id: string, slug: string }[],
     currentIndex: number,
     setCurrentIndex: (index: number) => void,
     onViewAll?: () => void,
@@ -207,9 +208,14 @@ export function ProductCrousel({
 
                     {/* Action Buttons */}
                     <div className="flex flex-wrap justify-center gap-3 md:gap-4 w-full px-6 w-screen">
-                        <button className="flex-1 md:flex-none min-w-[140px] md:min-w-[160px] px-6 py-3 md:py-4 rounded-2xl bg-zinc-900 text-white font-bold hover:bg-black transition-all shadow-[0_10px_20px_rgba(0,0,0,0.3)] active:scale-95 text-[10px] md:text-xs tracking-[0.2em] uppercase border border-white/10">
-                            BUY NOW
-                        </button>
+                        {products[currentIndex]?.slug && (
+                            <Link
+                                href={`/products/${products[currentIndex].slug}`}
+                                className="flex-1 md:flex-none min-w-[140px] md:min-w-[160px] px-6 py-3 md:py-4 rounded-2xl bg-zinc-900 text-white font-bold hover:bg-black transition-all shadow-[0_10px_20px_rgba(0,0,0,0.3)] active:scale-95 text-[10px] md:text-xs tracking-[0.2em] uppercase border border-white/10 flex items-center justify-center"
+                            >
+                                VIEW DETAILS
+                            </Link>
+                        )}
                         <button
                             onClick={onViewAll}
                             className="w-full md:w-auto min-w-[200px] px-8 py-3 md:py-4 rounded-2xl bg-white/10 backdrop-blur-md border border-zinc-900/10 text-zinc-900 font-bold hover:bg-zinc-900 hover:text-white transition-all shadow-lg active:scale-95 text-[10px] md:text-xs tracking-[0.2em] uppercase mt-1 md:mt-0"

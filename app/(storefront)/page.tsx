@@ -52,7 +52,8 @@ async function ProductViewerWrapper({
       url: img.url,
       alt: img.alt,
       isPrimary: img.isPrimary
-    })) || []
+    })) || [],
+    slug: p.slug
   }))
 
   if (products.length === 0) {
