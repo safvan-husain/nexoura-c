@@ -32,7 +32,7 @@ export default function ProductGridOverlay({ products, isOpen, onClose }: Produc
                     animate={{ y: 0 }}
                     exit={{ y: '100%' }}
                     transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                    className="fixed inset-0 top-16 z-[100] bg-white overflow-y-auto"
+                    className="fixed inset-0 top-18 z-[100] bg-white overflow-y-auto"
                 >
                     <div className="max-w-7xl mx-auto px-6 py-12">
                         <div className="flex justify-between items-center mb-12">

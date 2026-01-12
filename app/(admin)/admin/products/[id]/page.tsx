@@ -17,11 +17,19 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
 
         // Serialize product for client component
         const serializedProduct = {
-            ...product,
             _id: product._id.toString(),
+            name: product.name,
+            slug: product.slug,
+            description: product.description,
+            shortDescription: product.shortDescription,
+            price: product.price,
+            compareAtPrice: product.compareAtPrice,
+            stock: product.stock,
+            status: product.status,
             images: product.images?.map((img: any) => ({
-                ...img,
-                _id: img._id?.toString(),
+                url: img.url,
+                alt: img.alt,
+                isPrimary: img.isPrimary,
             })) || [],
             tags: product.tags?.map((tag: any) => typeof tag === 'object' ? tag._id.toString() : tag.toString()) || [],
         };

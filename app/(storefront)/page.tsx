@@ -10,7 +10,7 @@ export default function HomePage({
   }>
 }) {
   return (
-    <div className="-mt-12 lg:-mt-22">
+    <div className="-mt-12 lg:-mt-28">
       <Suspense fallback={<ProductViewerLoading />}>
         <ProductViewerWrapper searchParamsPromise={searchParams} />
       </Suspense>
@@ -35,12 +35,19 @@ async function ProductViewerWrapper({
     sortOrder: 'desc'
   })
 
-  // Serialize products for client component (convert _id to string)
+  // Serialize products for client component by explicitly mapping fields
+  // to avoid passing non-plain objects like Mongoose ObjectIDs or Date objects
   const products = rawProducts.map((p: any) => ({
-    ...p,
-    _id: p._id.toString(),
-    // Ensure images have the structure expected by UI if different
-    // The service returns objects, ensuring compat with UI expectations:
+    _id: p._id.toString(), // Convert ObjectId to string
+    name: p.name,
+    price: p.price,
+    compareAtPrice: p.compareAtPrice,
+    description: p.description,
+    shortDescription: p.shortDescription,
+    status: p.status,
+    stock: p.stock,
+    // Map tags to an array of strings (names) as expected by ProductViewer interface
+    tags: p.tags?.map((t: any) => (typeof t === 'object' ? t.name : t)) || [],
     images: p.images?.map((img: any) => ({
       url: img.url,
       alt: img.alt,

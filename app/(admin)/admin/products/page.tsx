@@ -15,13 +15,18 @@ export default async function ProductsPage() {
         sortOrder: 'desc'
     });
 
-    // Serialize products to ensure IDs are strings
+    // Serialize products to ensure IDs and other non-plain objects are converted for RSC
     const serializedProducts = products.map((product: any) => ({
-        ...product,
         _id: product._id.toString(),
+        name: product.name,
+        slug: product.slug,
+        price: product.price,
+        stock: product.stock,
+        status: product.status,
+        updatedAt: product.updatedAt?.toISOString(), // Convert Date to ISO string
         images: product.images?.map((img: any) => ({
-            ...img,
-            _id: img._id?.toString(),
+            url: img.url,
+            isPrimary: img.isPrimary,
         })) || [],
     }));
 

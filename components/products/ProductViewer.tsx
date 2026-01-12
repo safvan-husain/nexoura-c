@@ -158,9 +158,9 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
 
   return (
     <div className="relative">
-      <div className="w-full h-[93vh] max-w-full overflow-x-hidden flex flex-col lg:flex-row items-center justify-center z-10 gap-4 lg:gap-22 min-h-[50dvh] lg:h-[850px] px-4 py-4 relative">
+      <div className="w-full h-[93vh] max-w-full overflow-x-hidden flex flex-col lg:flex-row items-center justify-center z-10 gap-4 lg:gap-22 min-h-[50dvh] lg:h-[100vh] px-4 py-4 relative">
         {/* Left Details Card - Absolutely Positioned */}
-        <div className="hidden lg:block absolute left-4 bottom-24 w-[20%] z-60">
+        <div className="hidden lg:block absolute left-4 bottom-0 w-[20%] z-60">
           <ProductDetailsCard
             product={currentProduct}
           />

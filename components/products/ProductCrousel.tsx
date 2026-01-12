@@ -19,7 +19,7 @@ export function ProductCrousel({
     setCurrentIndex,
     onViewAll,
     spacingStep = 35,
-    centerPosition = 27
+    centerPosition = 29
 }: ProductCrouselProps) {
     const [direction, setDirection] = useState<'next' | 'prev' | 'idle'>('idle');
     const [displayProducts, setDisplayProducts] = useState(products.slice(0, 5));
@@ -140,7 +140,7 @@ export function ProductCrousel({
     return (
         <div className="w-full flex flex-col overflow-hidden">
             {/* Product carousel container */}
-            <div className="relative w-full pb-12 h-[600px] md:h-[700px] lg:h-[800px] overflow-hidden flex items-center">
+            <div className="relative w-full pb-12 h-[600px] md:h-[700px] lg:h-[95vh] overflow-hidden flex items-center">
                 {/* Boxes: render all five so stacking/animation looks natural */}
                 {displayProducts.map((product, i) => {
                     const currentPos = getPosition(i, direction);

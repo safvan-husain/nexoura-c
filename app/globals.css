@@ -37,7 +37,7 @@
 }
 
 body {
-  background: linear-gradient(to bottom, #afaeaeff 0%, #ebebebff 50%, #ffffff 60%, #ffffff 100%);
+  background: var(--background);
   color: var(--foreground);
   font-family: var(--font-poppins), sans-serif;
   max-width: 100%;
@@ -45,9 +45,6 @@ body {
   position: relative;
 }
 
-.dark body {
-  background: var(--background);
-}
 
 html {
   max-width: 100%;
