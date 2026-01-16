@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const SearchIcon = () => (
@@ -36,6 +37,12 @@ const XIcon = () => (
 
 export function NavbarClient() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
+    const isHomePage = pathname === '/';
+    const isOverlayOpen = searchParams.get('view') === 'overlay';
+    const showNavSearch = !isHomePage || isOverlayOpen;
 
     return (
         <nav className="bg-transparent border-b border-gray-400/70">
@@ -76,9 +83,11 @@ export function NavbarClient() {
                 <div className="absolute right-4 md:right-8 flex items-center gap-5">
                     {/* Desktop Only Icons */}
                     <div className="hidden md:flex items-center gap-5">
-                        <button className="text-gray-600 hover:text-black transition-colors" aria-label="Search">
-                            <SearchIcon />
-                        </button>
+                        {showNavSearch && (
+                            <button className="text-gray-600 hover:text-black transition-colors" aria-label="Search">
+                                <SearchIcon />
+                            </button>
+                        )}
                         <button className="text-gray-600 hover:text-black transition-colors" aria-label="Wishlist">
                             <HeartIcon />
                         </button>
@@ -125,10 +134,12 @@ export function NavbarClient() {
 
                             {/* Mobile Menu Icons Panel */}
                             <div className="flex justify-center gap-10 pt-6 border-t border-gray-100">
-                                <button className="flex flex-col items-center gap-2 text-gray-600 hover:text-black">
-                                    <SearchIcon />
-                                    <span className="text-xs uppercase tracking-wide">Search</span>
-                                </button>
+                                {showNavSearch && (
+                                    <button className="flex flex-col items-center gap-2 text-gray-600 hover:text-black">
+                                        <SearchIcon />
+                                        <span className="text-xs uppercase tracking-wide">Search</span>
+                                    </button>
+                                )}
                                 <button className="flex flex-col items-center gap-2 text-gray-600 hover:text-black">
                                     <HeartIcon />
                                     <span className="text-xs uppercase tracking-wide">Wishlist</span>

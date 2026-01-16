@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { ProductCrousel } from './ProductCrousel'
 import ProductDetailsCard from './ProductDetailsCard'
 import ProductGridOverlay from './ProductGridOverlay'
@@ -37,9 +37,22 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
   const [imageTransition, setImageTransition] = useState(false)
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right')
   const [prevProduct, setPrevProduct] = useState(products[initialIndex])
-  const [isOverlayOpen, setIsOverlayOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const pathname = usePathname()
+
+  const isOverlayOpen = searchParams.get('view') === 'overlay'
+
+  const setIsOverlayOpen = (open: boolean) => {
+    const params = new URLSearchParams(searchParams.toString())
+    if (open) {
+      params.set('view', 'overlay')
+    } else {
+      params.delete('view')
+    }
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+  }
 
   const filteredSuggestions = useMemo(() => {
     if (!searchQuery.trim()) {
