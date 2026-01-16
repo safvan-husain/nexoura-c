@@ -41,7 +41,7 @@ export class Product {
   @typegoose.prop({ type: () => [ProductImage], default: [] })
   public images!: ProductImage[];
 
-  @typegoose.prop({ type: () => [typegoose.mongoose.Schema.Types.ObjectId], ref: () => 'Tag', default: [] })
+  @typegoose.prop({ type: () => [typegoose.mongoose.Schema.Types.ObjectId], ref: () => Tag, default: [] })
   public tags!: typegoose.Ref<Tag>[];
 
   @typegoose.prop({ required: true, min: 0, type: Number, default: 0 })
