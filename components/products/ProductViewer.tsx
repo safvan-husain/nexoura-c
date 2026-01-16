@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import { ProductCrousel } from './ProductCrousel'
 import ProductDetailsCard from './ProductDetailsCard'
 import ProductGridOverlay from './ProductGridOverlay'
@@ -37,6 +38,21 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right')
   const [prevProduct, setPrevProduct] = useState(products[initialIndex])
   const [isOverlayOpen, setIsOverlayOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const router = useRouter()
+
+  const filteredSuggestions = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return products.slice(0, 4)
+    }
+    const query = searchQuery.toLowerCase()
+    return products
+      .filter(p =>
+        p.name.toLowerCase().includes(query) ||
+        p.tags?.some(tag => tag.toLowerCase().includes(query))
+      )
+      .slice(0, 5)
+  }, [products, searchQuery])
 
   const currentProduct = products[currentIndex]
   const images = currentProduct?.images || []
@@ -183,7 +199,7 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
         </div>
       </div>
 
-      <div className='hidden lg:block w-[25%] shrink-0 absolute right-10 bottom-10 flex flex-col gap-8 p-6 z-20'>
+      <div className='hidden lg:block w-[25%] shrink-0 absolute right-10 top-[60%] flex flex-col gap-8 p-6 z-20'>
         <div className="flex items-center gap-2  border-b border-black/20">
           <div className="right-0 bottom-4">
             <svg className="w-6 h-6 text-black/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -193,21 +209,29 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
           <input
             type="text"
             placeholder="SEARCH products"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-transparent text-2xl font-black text-transparent [-webkit-text-stroke:1px_rgba(0,0,0,0.4)] placeholder:text-black/20 focus:outline-none focus:border-black focus:[-webkit-text-stroke:1px_black] transition-all uppercase"
           />
         </div>
 
         <div className="flex flex-col gap-4">
-          <span className="text-[10px] tracking-[0.4em] text-black/40 font-bold uppercase transition-colors hover:text-black/60 cursor-default mt-1">Suggested Items</span>
+          <span className="text-[10px] tracking-[0.4em] text-black/40 font-bold uppercase transition-colors hover:text-black/60 cursor-default mt-1">
+            {searchQuery ? 'Search Results' : 'Suggested Items'}
+          </span>
           <div className="flex flex-col items-start gap-3">
-            {['Minimalist Hoodie', 'Reflective Techwear', 'Urban Utility Cargo', 'Essential Basics'].map((item) => (
+            {filteredSuggestions.map((product) => (
               <button
-                key={item}
+                key={product._id}
+                onClick={() => router.push(`/products/${product.slug}`)}
                 className="text-xl font-black uppercase transition-all duration-500 hover:[-webkit-text-stroke:1px_black] hover:translate-x-3 text-transparent [-webkit-text-stroke:1px_rgba(0,0,0,0.3)] text-left"
               >
-                {item}
+                {product.name}
               </button>
             ))}
+            {searchQuery && filteredSuggestions.length === 0 && (
+              <span className="text-sm font-bold text-black/20 uppercase">No items found</span>
+            )}
           </div>
         </div>
       </div>
