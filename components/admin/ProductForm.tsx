@@ -11,7 +11,8 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { Select } from '@/components/ui/Select';
-import { Loader2, X, Upload } from 'lucide-react';
+import { Switch } from '@/components/ui/Switch';
+import { Loader2, X, Upload, Plus, Trash2 } from 'lucide-react';
 import Image from 'next/image';
 
 interface ProductFormProps {
@@ -25,6 +26,8 @@ export default function ProductForm({ initialData, isEditing = false }: ProductF
     const [isUploading, setIsUploading] = useState(false);
     const [uploadError, setUploadError] = useState<string | null>(null);
     const [availableTags, setAvailableTags] = useState<any[]>([]);
+    const [tempColor, setTempColor] = useState('');
+    const [tempSize, setTempSize] = useState('');
 
     useEffect(() => {
         const fetchTags = async () => {
@@ -59,12 +62,20 @@ export default function ProductForm({ initialData, isEditing = false }: ProductF
             status: 'draft',
             images: [],
             tags: [],
+            hasColors: false,
+            colors: [],
+            hasSizes: false,
+            sizes: [],
             ...initialData // Override with initial data if present
         },
     });
 
     const images = watch('images') || [];
     const selectedTags = watch('tags') || [];
+    const hasColors = watch('hasColors');
+    const colors = watch('colors') || [];
+    const hasSizes = watch('hasSizes');
+    const sizes = watch('sizes') || [];
 
     const toggleTag = (tagId: string) => {
         if (selectedTags.includes(tagId)) {
@@ -72,6 +83,28 @@ export default function ProductForm({ initialData, isEditing = false }: ProductF
         } else {
             setValue('tags', [...selectedTags, tagId]);
         }
+    };
+
+    const addColor = () => {
+        if (tempColor.trim() && !colors.includes(tempColor.trim())) {
+            setValue('colors', [...colors, tempColor.trim()]);
+            setTempColor('');
+        }
+    };
+
+    const removeColor = (colorToRemove: string) => {
+        setValue('colors', colors.filter(c => c !== colorToRemove));
+    };
+
+    const addSize = () => {
+        if (tempSize.trim() && !sizes.includes(tempSize.trim())) {
+            setValue('sizes', [...sizes, tempSize.trim()]);
+            setTempSize('');
+        }
+    };
+
+    const removeSize = (sizeToRemove: string) => {
+        setValue('sizes', sizes.filter(s => s !== sizeToRemove));
     };
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -127,6 +160,7 @@ export default function ProductForm({ initialData, isEditing = false }: ProductF
 
     const onSubmit: SubmitHandler<CreateProductInput> = async (data) => {
         setIsSubmitting(true);
+        console.log('[ProductForm] Submitting with data:', JSON.stringify(data, null, 2));
         try {
             const formData = new FormData();
             // Flatten the data into FormData as expected by the server action
@@ -147,11 +181,14 @@ export default function ProductForm({ initialData, isEditing = false }: ProductF
             formData.append('stock', data.stock.toString());
             formData.append('status', data.status);
             formData.append('images', JSON.stringify(data.images));
-            // tags are not explicitly handled in server action currently shown in view_file, 
-            // but schema has it. Ideally server action should be updated or we pass it if it handles it.
-            // Assuming server action needs update or I should align with it.
-            // For now let's pass it, and if server action ignores it, loss of data but no crash.
             formData.append('tags', JSON.stringify(data.tags));
+            formData.append('hasColors', data.hasColors.toString());
+            formData.append('colors', JSON.stringify(data.colors));
+            formData.append('hasSizes', data.hasSizes.toString());
+            formData.append('sizes', JSON.stringify(data.sizes));
+
+            console.log('[ProductForm] FormData overview:');
+            formData.forEach((value, key) => console.log(`  ${key}: ${value}`));
 
 
             if (isEditing && initialData?._id) {
@@ -248,8 +285,8 @@ export default function ProductForm({ initialData, isEditing = false }: ProductF
                                         type="button"
                                         onClick={() => toggleTag(tag._id)}
                                         className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${selectedTags.includes(tag._id)
-                                                ? 'bg-black text-white'
-                                                : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-400'
+                                            ? 'bg-black text-white'
+                                            : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-400'
                                             }`}
                                     >
                                         {tag.name}
@@ -324,6 +361,119 @@ export default function ProductForm({ initialData, isEditing = false }: ProductF
                         ))}
                     </div>
                     {errors.images && <p className="text-sm text-red-500">{errors.images.message}</p>}
+                </div>
+
+                {/* Variants Selection */}
+                <div className="md:col-span-2 space-y-6 pt-4 border-t">
+                    <h3 className="text-lg font-medium">Product Variants</h3>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {/* Colors */}
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <label className="text-sm font-medium">Color Selection</label>
+                                <Switch
+                                    checked={hasColors}
+                                    onChange={(e) => setValue('hasColors', e.target.checked)}
+                                    label={hasColors ? "Enabled" : "Disabled"}
+                                />
+                            </div>
+
+                            {hasColors && (
+                                <div className="space-y-4 p-4 border rounded-lg bg-slate-50">
+                                    <div className="flex gap-2">
+                                        <div className="flex-1">
+                                            <Input
+                                                value={tempColor}
+                                                onChange={(e) => setTempColor(e.target.value)}
+                                                placeholder="Color name or Hex (#000)"
+                                                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addColor())}
+                                            />
+                                        </div>
+                                        <Button type="button" onClick={addColor} variant="secondary" size="sm">
+                                            <Plus className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+
+                                    <div className="flex flex-wrap gap-2 mt-2">
+                                        {colors.map((color) => (
+                                            <div
+                                                key={color}
+                                                className="flex items-center gap-2 bg-white border px-3 py-1.5 rounded-full shadow-sm"
+                                            >
+                                                <div
+                                                    className="w-4 h-4 rounded-full border border-slate-200"
+                                                    style={{ backgroundColor: color }}
+                                                />
+                                                <span className="text-xs font-medium">{color}</span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeColor(color)}
+                                                    className="text-slate-400 hover:text-red-500 transition-colors"
+                                                >
+                                                    <X className="h-3 w-3" />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    {colors.length === 0 && (
+                                        <p className="text-xs text-slate-400 text-center py-2">No colors added yet.</p>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Sizes */}
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <label className="text-sm font-medium">Size Selection</label>
+                                <Switch
+                                    checked={hasSizes}
+                                    onChange={(e) => setValue('hasSizes', e.target.checked)}
+                                    label={hasSizes ? "Enabled" : "Disabled"}
+                                />
+                            </div>
+
+                            {hasSizes && (
+                                <div className="space-y-4 p-4 border rounded-lg bg-slate-50">
+                                    <div className="flex gap-2">
+                                        <div className="flex-1">
+                                            <Input
+                                                value={tempSize}
+                                                onChange={(e) => setTempSize(e.target.value)}
+                                                placeholder="e.g. S, M, L, XL or 42, 44"
+                                                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addSize())}
+                                            />
+                                        </div>
+                                        <Button type="button" onClick={addSize} variant="secondary" size="sm">
+                                            <Plus className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+
+                                    <div className="flex flex-wrap gap-2 mt-2">
+                                        {sizes.map((size) => (
+                                            <div
+                                                key={size}
+                                                className="flex items-center gap-2 bg-white border px-3 py-1.5 rounded-full shadow-sm"
+                                            >
+                                                <span className="text-xs font-medium uppercase">{size}</span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeSize(size)}
+                                                    className="text-slate-400 hover:text-red-500 transition-colors"
+                                                >
+                                                    <X className="h-3 w-3" />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    {sizes.length === 0 && (
+                                        <p className="text-xs text-slate-400 text-center py-2">No sizes added yet.</p>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
 

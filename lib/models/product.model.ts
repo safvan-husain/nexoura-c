@@ -47,6 +47,18 @@ export class Product {
   @typegoose.prop({ required: true, min: 0, type: Number, default: 0 })
   public stock!: number;
 
+  @typegoose.prop({ required: true, type: Boolean, default: false })
+  public hasColors!: boolean;
+
+  @typegoose.prop({ type: () => [String], default: [] })
+  public colors!: string[];
+
+  @typegoose.prop({ required: true, type: Boolean, default: false })
+  public hasSizes!: boolean;
+
+  @typegoose.prop({ type: () => [String], default: [] })
+  public sizes!: string[];
+
   @typegoose.prop({ enum: ['draft', 'published', 'archived'], default: 'draft', type: String })
   public status!: 'draft' | 'published' | 'archived';
 

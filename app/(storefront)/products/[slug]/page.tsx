@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Suspense } from 'react'
+import ProductOptions from '@/components/products/ProductOptions'
 
 async function ProductContent({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params
@@ -47,7 +48,7 @@ async function ProductContent({ params }: { params: Promise<{ slug: string }> })
             </div>
 
             {/* Right Side - Content */}
-            <div className="w-full lg:w-2/3 flex flex-col pt-4 lg:pt-12">
+            <div className="w-full lg:w-2/3 flex flex-col">
                 <div className="mb-8">
                     {product.tags && product.tags.length > 0 && (
                         <span className="inline-block px-3 py-1 bg-black/5 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] mb-4">
@@ -69,9 +70,16 @@ async function ProductContent({ params }: { params: Promise<{ slug: string }> })
                     </div>
                 </div>
 
-                <div className="prose prose-lg text-gray-500 mb-10 leading-relaxed max-w-none">
+                <div className="prose prose-lg text-gray-500 mb-6 leading-relaxed max-w-none">
                     <p>{product.description}</p>
                 </div>
+
+                <ProductOptions
+                    hasColors={product.hasColors}
+                    colors={product.colors}
+                    hasSizes={product.hasSizes}
+                    sizes={product.sizes}
+                />
 
                 <div className="mt-auto space-y-4">
                     {/* Stock Check */}

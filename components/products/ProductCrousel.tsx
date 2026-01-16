@@ -6,7 +6,15 @@ import { InfiniteVerticalScroller } from "@/components/ui/InfiniteVerticalScroll
 import Link from 'next/link';
 
 type ProductCrouselProps = {
-    products: { img: string, name: string, price: number, id: string, slug: string }[],
+    products: {
+        img: string,
+        name: string,
+        price: number,
+        id: string,
+        slug: string,
+        subtitle?: string,
+        description?: string
+    }[],
     currentIndex: number,
     setCurrentIndex: (index: number) => void,
     onViewAll?: () => void,
@@ -192,26 +200,34 @@ export function ProductCrousel({
                         </div>
                     );
                 })}
-                <div className='-ml-4  absolute flex flex-col items-center justify-center bottom-0 left-1/2 z-50 -translate-x-1/2 w-full'>
+                <div className='-ml-4 absolute flex flex-col items-center justify-center bottom-0 left-1/2 z-50 -translate-x-1/2 w-full'>
                     {/* Product name carousel - Infinite Vertical Scroller */}
                     <InfiniteVerticalScroller
                         names={products.map(p => p.name)}
                         currentIndex={currentIndex}
                         speed={3000}
-                        className="mb-2"
+                        className="mb-6"
                     />
 
                     {/* Subtitle */}
-                    <h3 className="text-sm font-semibold text-black font-sans mb-8">
-                        Full face covering hoodi | 7738
-                    </h3>
+                    {/* <InfiniteVerticalScroller
+                        names={products.map(p => {
+                            if (p.subtitle) return p.subtitle;
+                            if (p.description) return p.description.split(/\s+/).slice(0, 5).join(' ');
+                            return '';
+                        })}
+                        currentIndex={currentIndex}
+                        speed={3000}
+                        className="mb-8"
+                        textClassName="text-sm font-semibold text-black font-sans text-center px-4"
+                    /> */}
 
                     {/* Action Buttons */}
                     <div className="flex flex-wrap justify-center gap-3 md:gap-4 w-full px-6 w-screen">
                         {products[currentIndex]?.slug && (
                             <Link
                                 href={`/products/${products[currentIndex].slug}`}
-                                className="flex-1 md:flex-none min-w-[140px] md:min-w-[160px] px-6 py-3 md:py-4 rounded-2xl bg-zinc-900 text-white font-bold hover:bg-black transition-all shadow-[0_10px_20px_rgba(0,0,0,0.3)] active:scale-95 text-[10px] md:text-xs tracking-[0.2em] uppercase border border-white/10 flex items-center justify-center"
+                                className="flex-1 md:flex-none min-w-[140px] md:min-w-[160px] px-6 py-3 md:py-4 rounded-2xl bg-zinc-900 text-white font-bold hover:bg-black transition-all active:scale-95 text-[10px] md:text-xs tracking-[0.2em] uppercase border border-white/10 flex items-center justify-center"
                             >
                                 VIEW DETAILS
                             </Link>

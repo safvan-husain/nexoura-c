@@ -32,6 +32,10 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
                 isPrimary: img.isPrimary,
             })) || [],
             tags: product.tags?.map((tag: any) => typeof tag === 'object' ? tag._id.toString() : tag.toString()) || [],
+            hasColors: product.hasColors || false,
+            colors: product.colors || [],
+            hasSizes: product.hasSizes || false,
+            sizes: product.sizes || [],
         };
 
         return (

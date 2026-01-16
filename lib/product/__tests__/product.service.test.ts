@@ -27,6 +27,28 @@ describe('Product Service', () => {
       expect(product.price).toBe(productData.price);
     });
 
+    it('should create a product with variants successfully', async () => {
+      const productData = {
+        name: 'Variant Product',
+        slug: 'variant-product',
+        description: 'A product with variants',
+        price: 49.99,
+        stock: 50,
+        hasColors: true,
+        colors: ['Red', 'Blue'],
+        hasSizes: true,
+        sizes: ['S', 'M', 'L'],
+      };
+
+      const product = await createProduct(productData as any);
+
+      expect(product.hasColors).toBe(true);
+      expect(product.colors).toContain('Red');
+      expect(product.colors).toContain('Blue');
+      expect(product.hasSizes).toBe(true);
+      expect(product.sizes).toContain('S');
+    });
+
     it('should throw error for duplicate slug', async () => {
       await createProduct({
         name: 'Product 1',
@@ -59,7 +81,6 @@ describe('Product Service', () => {
           slug: 'product-a',
           description: 'Description A',
           price: 10,
-          tags: ['new'],
           status: 'published',
           stock: 50,
         },
@@ -68,7 +89,6 @@ describe('Product Service', () => {
           slug: 'product-b',
           description: 'Description B',
           price: 20,
-          tags: ['sale'],
           status: 'published',
           stock: 30,
         },

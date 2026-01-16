@@ -7,6 +7,7 @@ type InfiniteVerticalScrollerProps = {
     speed?: number;
     className?: string;
     currentIndex?: number; // Add this to sync with carousel
+    textClassName?: string;
 }
 
 // InfiniteVerticalScroller (single-item viewport)
@@ -23,6 +24,7 @@ export function InfiniteVerticalScroller({
     speed = 3000,
     className = "",
     currentIndex,
+    textClassName,
 }: InfiniteVerticalScrollerProps) {
     const viewportRef = useRef<HTMLDivElement>(null);
     const innerRef = useRef<HTMLDivElement>(null);
@@ -206,7 +208,7 @@ export function InfiniteVerticalScroller({
                         margin: 0
                     }}
                 >
-                    <div className="px-4 text-center w-full uppercase font-[family-name:var(--font-mavine)] font-black tracking-[0.05em] text-6xl md:text-8xl text-black">
+                    <div className={textClassName || "px-4 text-center w-full uppercase font-[family-name:var(--font-mavine)] font-black tracking-[0.05em] text-6xl md:text-8xl text-black"}>
                         {n}
                     </div>
                 </li>

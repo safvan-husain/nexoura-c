@@ -53,7 +53,8 @@ async function ProductViewerWrapper({
       alt: img.alt,
       isPrimary: img.isPrimary
     })) || [],
-    slug: p.slug
+    slug: p.slug,
+    subtitle: p.subtitle
   }))
 
   if (products.length === 0) {

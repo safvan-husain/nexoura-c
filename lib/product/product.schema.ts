@@ -17,6 +17,10 @@ export const CreateProductSchema = z.object({
   tags: z.array(z.string()).default([]),
   stock: z.number().int().min(0, 'Stock must be non-negative').default(0),
   status: z.enum(['draft', 'published', 'archived']).default('draft'),
+  hasColors: z.boolean().default(false),
+  colors: z.array(z.string()).default([]),
+  hasSizes: z.boolean().default(false),
+  sizes: z.array(z.string()).default([]),
   metadata: z.record(z.string(), z.any()).optional(),
 });
 

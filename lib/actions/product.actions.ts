@@ -12,7 +12,13 @@ export async function createProductAction(formData: FormData) {
     stock: parseInt(formData.get('stock') as string || '0'),
     status: formData.get('status') || 'draft',
     tags: JSON.parse(formData.get('tags') as string || '[]'),
+    hasColors: formData.get('hasColors') === 'true',
+    colors: JSON.parse(formData.get('colors') as string || '[]'),
+    hasSizes: formData.get('hasSizes') === 'true',
+    sizes: JSON.parse(formData.get('sizes') as string || '[]'),
   }
+
+  console.log('[ProductAction] Creating product with data:', JSON.stringify(productData, null, 2));
 
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/products`, {
     method: 'POST',
@@ -42,7 +48,13 @@ export async function updateProductAction(id: string, formData: FormData) {
     stock: parseInt(formData.get('stock') as string || '0'),
     status: formData.get('status'),
     tags: JSON.parse(formData.get('tags') as string || '[]'),
+    hasColors: formData.get('hasColors') === 'true',
+    colors: JSON.parse(formData.get('colors') as string || '[]'),
+    hasSizes: formData.get('hasSizes') === 'true',
+    sizes: JSON.parse(formData.get('sizes') as string || '[]'),
   }
+
+  console.log('[ProductAction] Updating product with data:', JSON.stringify(productData, null, 2));
 
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/products/${id}`, {
     method: 'PUT',

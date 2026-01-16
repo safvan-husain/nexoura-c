@@ -23,6 +23,7 @@ export interface Product {
   tags?: string[]
   metadata?: Record<string, any>
   slug: string
+  subtitle?: string
 }
 
 interface ProductViewerProps {
@@ -175,7 +176,9 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
                 name: p.name,
                 price: p.price,
                 id: p._id,
-                slug: p.slug
+                slug: p.slug,
+                description: p.description,
+                subtitle: p.subtitle || p.shortDescription
               }))}
               currentIndex={currentIndex}
               setCurrentIndex={handleProductSelect}

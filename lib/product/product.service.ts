@@ -15,6 +15,7 @@ export async function createProduct(data: CreateProductInput) {
     });
   }
 
+  console.log('[ProductService] Creating product in DB:', JSON.stringify(data, null, 2));
   const product = await ProductModel.create(data);
 
   return product;
@@ -31,7 +32,6 @@ export async function getProducts(query: ProductQueryInput) {
     filter.$or = [
       { name: { $regex: search, $options: 'i' } },
       { description: { $regex: search, $options: 'i' } },
-      { tags: { $in: [new RegExp(search, 'i')] } },
     ];
   }
 
@@ -127,11 +127,16 @@ export async function updateProduct(id: string, data: UpdateProductInput) {
     }
   }
 
+  console.log('[ProductService] Updating product', id, 'in DB with data:', JSON.stringify(data, null, 2));
   const product = await ProductModel.findByIdAndUpdate(
     id,
     data,
     { new: true, runValidators: true }
   );
+
+  // Verification step requested by user
+  const verification = await ProductModel.findById(id).lean();
+  console.log('[ProductService] Re-fetched product from DB after update:', JSON.stringify(verification, null, 2));
 
   if (!product) {
     throw new AppError('PRODUCT_NOT_FOUND', 404);
