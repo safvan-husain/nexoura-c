@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useProducts } from '@/lib/hooks/use-products';
 
 const SearchIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
@@ -37,12 +38,48 @@ const XIcon = () => (
 
 export function NavbarClient() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isSearchActive, setIsSearchActive] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const searchRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
     const pathname = usePathname();
     const searchParams = useSearchParams();
+    const router = useRouter();
+    const { products } = useProducts();
 
     const isHomePage = pathname === '/';
     const isOverlayOpen = searchParams.get('view') === 'overlay';
     const showNavSearch = !isHomePage || isOverlayOpen;
+
+    const filteredProducts = useMemo(() => {
+        if (!searchQuery.trim()) return [];
+        const query = searchQuery.toLowerCase();
+        return products.filter(p => p.name.toLowerCase().includes(query)).slice(0, 5);
+    }, [products, searchQuery]);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+                setIsSearchActive(false);
+                setSearchQuery('');
+            }
+        };
+
+        if (isSearchActive) {
+            document.addEventListener('mousedown', handleClickOutside);
+            inputRef.current?.focus();
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isSearchActive]);
+
+    const handleProductClick = (slug: string) => {
+        router.push(`/products/${slug}`);
+        setIsSearchActive(false);
+        setSearchQuery('');
+    };
 
     return (
         <nav className="bg-transparent border-b border-gray-400/70">
@@ -84,9 +121,79 @@ export function NavbarClient() {
                     {/* Desktop Only Icons */}
                     <div className="hidden md:flex items-center gap-5">
                         {showNavSearch && (
-                            <button className="text-gray-600 hover:text-black transition-colors" aria-label="Search">
-                                <SearchIcon />
-                            </button>
+                            <div className="relative" ref={searchRef}>
+                                <AnimatePresence mode="wait">
+                                    {!isSearchActive ? (
+                                        <motion.button
+                                            key="search-icon"
+                                            initial={{ opacity: 0, scale: 0.8 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            exit={{ opacity: 0, scale: 0.8 }}
+                                            onClick={() => setIsSearchActive(true)}
+                                            className="text-gray-600 hover:text-black transition-colors"
+                                            aria-label="Search"
+                                        >
+                                            <SearchIcon />
+                                        </motion.button>
+                                    ) : (
+                                        <motion.div
+                                            key="search-input"
+                                            initial={{ width: 0, opacity: 0 }}
+                                            animate={{ width: 240, opacity: 1 }}
+                                            exit={{ width: 0, opacity: 0 }}
+                                            className="flex items-center bg-gray-100 rounded-full px-4 py-2"
+                                        >
+                                            <div className="text-gray-400 mr-2">
+                                                <SearchIcon />
+                                            </div>
+                                            <input
+                                                ref={inputRef}
+                                                type="text"
+                                                value={searchQuery}
+                                                onChange={(e) => setSearchQuery(e.target.value)}
+                                                placeholder="Search..."
+                                                className="bg-transparent border-none focus:outline-none text-sm w-full text-black placeholder:text-gray-400"
+                                            />
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+
+                                {/* Dropdown Results */}
+                                <AnimatePresence>
+                                    {isSearchActive && filteredProducts.length > 0 && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: 10 }}
+                                            className="absolute top-full mt-2 right-0 w-[300px] bg-white border border-gray-100 shadow-2xl rounded-2xl overflow-hidden z-[100]"
+                                        >
+                                            <div className="py-2">
+                                                {filteredProducts.map((product) => (
+                                                    <button
+                                                        key={product._id}
+                                                        onClick={() => handleProductClick(product.slug)}
+                                                        className="w-full flex items-center gap-4 px-4 py-3 hover:bg-gray-50 transition-colors text-left"
+                                                    >
+                                                        {product.images?.[0]?.url && (
+                                                            <div className="w-10 h-10 bg-gray-50 rounded-lg overflow-hidden shrink-0">
+                                                                <img
+                                                                    src={product.images[0].url}
+                                                                    alt={product.name}
+                                                                    className="w-full h-full object-cover"
+                                                                />
+                                                            </div>
+                                                        )}
+                                                        <div>
+                                                            <p className="text-sm font-semibold text-gray-900 line-clamp-1">{product.name}</p>
+                                                            <p className="text-xs text-gray-500 uppercase tracking-wider">${product.price}</p>
+                                                        </div>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
                         )}
                         <button className="text-gray-600 hover:text-black transition-colors" aria-label="Wishlist">
                             <HeartIcon />
@@ -135,10 +242,34 @@ export function NavbarClient() {
                             {/* Mobile Menu Icons Panel */}
                             <div className="flex justify-center gap-10 pt-6 border-t border-gray-100">
                                 {showNavSearch && (
-                                    <button className="flex flex-col items-center gap-2 text-gray-600 hover:text-black">
-                                        <SearchIcon />
-                                        <span className="text-xs uppercase tracking-wide">Search</span>
-                                    </button>
+                                    <div className="flex flex-col items-center">
+                                        <AnimatePresence mode="wait">
+                                            {!isSearchActive ? (
+                                                <button
+                                                    onClick={() => setIsSearchActive(true)}
+                                                    className="flex flex-col items-center gap-2 text-gray-600 hover:text-black"
+                                                >
+                                                    <SearchIcon />
+                                                    <span className="text-xs uppercase tracking-wide">Search</span>
+                                                </button>
+                                            ) : (
+                                                <motion.div
+                                                    initial={{ width: 0, opacity: 0 }}
+                                                    animate={{ width: 140, opacity: 1 }}
+                                                    className="bg-gray-100 rounded-full px-3 py-1 flex items-center"
+                                                >
+                                                    <input
+                                                        ref={inputRef}
+                                                        type="text"
+                                                        value={searchQuery}
+                                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                                        placeholder="..."
+                                                        className="bg-transparent border-none focus:outline-none text-xs w-full text-black"
+                                                    />
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </div>
                                 )}
                                 <button className="flex flex-col items-center gap-2 text-gray-600 hover:text-black">
                                     <HeartIcon />
