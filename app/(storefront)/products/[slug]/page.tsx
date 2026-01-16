@@ -49,12 +49,22 @@ async function ProductContent({ params }: { params: Promise<{ slug: string }> })
 
             {/* Right Side - Content */}
             <div className="w-full lg:w-2/3 flex flex-col">
-                <div className="mb-8">
-                    {product.tags && product.tags.length > 0 && (
-                        <span className="inline-block px-3 py-1 bg-black/5 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] mb-4">
-                            New Arrival
-                        </span>
-                    )}
+                <div className="mb-6">
+                    <div className="flex items-center justify-between mb-4">
+                        {product.tags && product.tags.length > 0 ? (
+                            <span className="inline-block px-3 py-1 bg-black/5 rounded-full text-[10px] font-bold uppercase tracking-[0.2em]">
+                                New Arrival
+                            </span>
+                        ) : <div />}
+
+                        <div className="flex items-center gap-2">
+                            <div className={`w-1.5 h-1.5 rounded-full ${product.stock > 0 ? 'bg-green-500' : 'bg-red-500'}`} />
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500">
+                                {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
+                            </span>
+                        </div>
+                    </div>
+
                     <h1 className="text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tight text-black leading-[0.9] mb-4">
                         {product.name}
                     </h1>
@@ -81,14 +91,7 @@ async function ProductContent({ params }: { params: Promise<{ slug: string }> })
                     sizes={product.sizes}
                 />
 
-                <div className="mt-auto space-y-4">
-                    {/* Stock Check */}
-                    <div className="flex items-center gap-2 mb-6">
-                        <div className={`w-2 h-2 rounded-full ${product.stock > 0 ? 'bg-green-500' : 'bg-red-500'}`} />
-                        <span className="text-xs font-bold uppercase tracking-widest text-gray-500">
-                            {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
-                        </span>
-                    </div>
+                <div className="mt-auto">
 
                     <div className="flex gap-4">
                         <button className="flex-1 bg-black text-white h-14 rounded-2xl font-bold uppercase tracking-[0.2em] hover:bg-gray-900 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-black/10">

@@ -19,16 +19,14 @@ export default function ProductOptions({
     const [selectedSize, setSelectedSize] = useState(sizes?.[0] || '');
 
     return (
-        <div className="space-y-8 mt-4 mb-10">
+        <div className="flex flex-col sm:flex-row sm:items-start gap-8 sm:gap-16 mt-4 mb-8">
             {/* Color Selection */}
             {hasColors && colors.length > 0 && (
-                <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                        <span className="text-xs font-bold uppercase tracking-widest text-gray-500">
-                            Color: <span className="text-black ml-1">{selectedColor}</span>
-                        </span>
-                    </div>
-                    <div className="flex flex-wrap gap-3">
+                <div className="space-y-3">
+                    <span className="block text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                        Color: <span className="text-black ml-1">{selectedColor}</span>
+                    </span>
+                    <div className="flex flex-wrap gap-2.5">
                         {colors.map((color) => {
                             const isHex = color.startsWith('#');
                             return (
@@ -56,18 +54,16 @@ export default function ProductOptions({
 
             {/* Size Selection */}
             {hasSizes && sizes.length > 0 && (
-                <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                        <span className="text-xs font-bold uppercase tracking-widest text-gray-500">
-                            Size: <span className="text-black ml-1 uppercase">{selectedSize}</span>
-                        </span>
-                    </div>
+                <div className="space-y-3">
+                    <span className="block text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                        Size: <span className="text-black ml-1 uppercase">{selectedSize}</span>
+                    </span>
                     <div className="flex flex-wrap gap-2">
                         {sizes.map((size) => (
                             <button
                                 key={size}
                                 onClick={() => setSelectedSize(size)}
-                                className={`min-w-[4rem] h-12 rounded-xl border-2 font-bold uppercase tracking-widest text-xs transition-all ${selectedSize === size
+                                className={`min-w-[3.5rem] h-10 rounded-xl border-2 font-bold uppercase tracking-widest text-[10px] transition-all ${selectedSize === size
                                     ? 'bg-black border-black text-white'
                                     : 'bg-white border-gray-100 text-gray-400 hover:border-black hover:text-black'
                                     }`}
