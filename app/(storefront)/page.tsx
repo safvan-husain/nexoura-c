@@ -1,30 +1,22 @@
 import { Suspense } from 'react'
+import { cacheLife } from 'next/cache'
 import ProductViewer from '@/components/products/ProductViewer'
 import { getProducts } from '@/lib/product/product.service'
 
-export default function HomePage({
-  searchParams,
-}: {
-  searchParams: Promise<{
-    productId?: string
-  }>
-}) {
+export default function HomePage() {
   return (
     <div className="-mt-12 lg:-mt-28">
       <Suspense fallback={<ProductViewerLoading />}>
-        <ProductViewerWrapper searchParamsPromise={searchParams} />
+        <ProductViewerWrapper />
       </Suspense>
     </div>
   )
 }
 
-async function ProductViewerWrapper({
-  searchParamsPromise,
-}: {
-  searchParamsPromise: Promise<any>
-}) {
-  const params = await searchParamsPromise
-  const productId = params.productId
+async function ProductViewerWrapper() {
+  'use cache'
+  cacheLife('minutes')
+  const productId = undefined
 
   // Fetch published products from the database
   const { products: rawProducts } = await getProducts({

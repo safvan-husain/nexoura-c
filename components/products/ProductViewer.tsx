@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { ProductCrousel } from './ProductCrousel'
 import ProductDetailsCard from './ProductDetailsCard'
 import ProductGridOverlay from './ProductGridOverlay'
@@ -32,7 +31,6 @@ interface ProductViewerProps {
 }
 
 export default function ProductViewer({ products, initialIndex }: ProductViewerProps) {
-  const router = useRouter()
   const [currentIndex, setCurrentIndex] = useState(initialIndex)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [imageTransition, setImageTransition] = useState(false)
@@ -69,7 +67,6 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
     } else if (currentIndex > 0) {
       setSlideDirection('left')
       setCurrentIndex(currentIndex - 1)
-      router.push(`/?productId=${products[currentIndex - 1]._id}`, { scroll: false })
     }
   }
 
@@ -79,7 +76,6 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
     } else if (currentIndex < products.length - 1) {
       setSlideDirection('right')
       setCurrentIndex(currentIndex + 1)
-      router.push(`/?productId=${products[currentIndex + 1]._id}`, { scroll: false })
     }
   }
 
@@ -87,7 +83,6 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
     setSlideDirection(index > currentIndex ? 'right' : 'left')
     setCurrentIndex(index)
     setCurrentImageIndex(0)
-    router.push(`/?productId=${products[index]._id}`, { scroll: false })
   }
 
   // Keyboard navigation
