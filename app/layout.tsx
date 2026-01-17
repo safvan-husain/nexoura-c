@@ -1,3 +1,4 @@
+import React, { Suspense } from "react";
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import localFont from "next/font/local";
@@ -39,27 +40,38 @@ export const metadata: Metadata = {
   description: "Your product marketplace",
 };
 
-export default async function RootLayout({
+async function StorefrontSessionWrapper({ children }: { children: React.ReactNode }) {
+  const session = await getStorefrontSession();
+
+  return (
+    <StorefrontSessionProvider initialSession={session}>
+      <StorefrontWishlistProvider>
+        {children}
+      </StorefrontWishlistProvider>
+    </StorefrontSessionProvider>
+  );
+}
+
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getStorefrontSession();
-
   return (
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${poppins.variable} ${metha.variable} ${mavine.variable} ${black.variable} ${cloisterBlack.variable} antialiased min-h-screen overflow-x-hidden font-[family-name:var(--font-poppins)]`}
       >
         <ToastProvider>
-          <StorefrontSessionProvider initialSession={session}>
-            <StorefrontWishlistProvider>
-              <ErrorToastHandler />
+          <ErrorToastHandler />
+          <Suspense>
+            <StorefrontSessionWrapper>
               {children}
-            </StorefrontWishlistProvider>
-          </StorefrontSessionProvider>
+            </StorefrontSessionWrapper>
+          </Suspense>
         </ToastProvider>
       </body>
     </html>
   );
 }
+

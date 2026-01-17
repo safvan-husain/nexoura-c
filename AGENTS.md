@@ -19,6 +19,10 @@ Depending on what you are working on, please load the corresponding context:
     *   File: `/.agent/FRONTEND_RULES.md`
     *   *Load when: working on Next.js pages, components, CSS, animations, or client-side logic.*
 
+3.  **Data Serialization (RSC)** 📦
+    *   File: `/.agent/SERIALIZATION_RULES.md`
+    *   *Load when: passing data from Server Components to Client Components (fixing "plain object" errors).*
+
 ---
 
 ### 🛠 Common Standards (Always Follow)

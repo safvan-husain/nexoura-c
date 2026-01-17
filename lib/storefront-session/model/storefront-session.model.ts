@@ -48,7 +48,7 @@ export interface StorefrontSession {
 }
 
 export function toStorefrontSession(doc: StorefrontSessionDocument): StorefrontSession {
-    return {
+    const session: StorefrontSession = {
         id: (doc._id as any).toString(),
         sessionId: doc.sessionId,
         status: doc.status,
@@ -57,8 +57,17 @@ export function toStorefrontSession(doc: StorefrontSessionDocument): StorefrontS
         updatedAt: doc.updatedAt.toISOString(),
         expiresAt: doc.expiresAt.toISOString(),
         lastActiveAt: doc.lastActiveAt.toISOString(),
-        metadata: doc.metadata,
     };
+
+    if (doc.metadata) {
+        session.metadata = {
+            userAgent: doc.metadata.userAgent || undefined,
+            ipHash: doc.metadata.ipHash || undefined,
+        };
+    }
+
+    // Use JSON stringify/parse to ensure absolute plainness and removal of undefined/toJSON
+    return JSON.parse(JSON.stringify(session));
 }
 
 export function buildStorefrontSessionDocument(

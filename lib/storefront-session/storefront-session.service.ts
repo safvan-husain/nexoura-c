@@ -1,4 +1,5 @@
 import 'server-only';
+import { connection } from 'next/server';
 
 import { createHash, randomBytes } from 'node:crypto';
 import { connectDB } from '@/lib/db/mongo-client';
@@ -128,6 +129,7 @@ export async function touchStorefrontSession(
 export async function ensureStorefrontSession(
     input?: EnsureStorefrontSessionInput
 ): Promise<StorefrontSession> {
+    await connection();
     const payload = input?.metadata;
     const token = await getCurrentStorefrontSessionToken();
     if (!token) {
@@ -148,6 +150,7 @@ export async function ensureStorefrontSession(
 }
 
 export async function getStorefrontSession(): Promise<StorefrontSession | null> {
+    await connection();
     const token = await getCurrentStorefrontSessionToken();
     if (!token) {
         return null;

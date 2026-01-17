@@ -56,7 +56,7 @@ export interface Wishlist {
 }
 
 export function toWishlist(doc: WishlistDocument): Wishlist {
-    return {
+    const wishlist: Wishlist = {
         id: (doc._id as any).toString(),
         sessionId: doc.sessionId,
         userId: doc.userId?.toString(),
@@ -68,4 +68,6 @@ export function toWishlist(doc: WishlistDocument): Wishlist {
         createdAt: doc.createdAt.toISOString(),
         updatedAt: doc.updatedAt.toISOString(),
     };
+
+    return JSON.parse(JSON.stringify(wishlist));
 }
