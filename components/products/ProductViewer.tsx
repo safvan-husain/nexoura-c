@@ -193,7 +193,7 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
         </div>
 
         <div className="shrink-0 w-full lg:w-[70%] overflow-hidden relative h-[600px] md:h-full">
-          <div className="ml-4 sm:ml-0 absolute w-[220%] md:w-full left-1/2 -translate-x-1/2 md:left-auto md:translate-x-0 h-full">
+          <div className="absolute w-[220%] md:w-full left-1/2 -translate-x-1/2 md:left-auto md:translate-x-0 h-full">
             <ProductCrousel
               products={products.map(p => ({
                 img: p.images?.[0]?.url || '',

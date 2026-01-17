@@ -179,7 +179,7 @@ export function ProductCrousel({
                         </div>
                     );
                 })}
-                <div className='-ml-4 absolute flex flex-col items-center justify-center bottom-0 left-1/2 z-50 -translate-x-1/2 w-full'>
+                <div className='absolute flex flex-col items-center justify-center bottom-0 left-1/2 z-50 -translate-x-1/2 w-full'>
                     {/* Product name carousel - Infinite Vertical Scroller */}
                     <InfiniteVerticalScroller
                         names={products.map(p => p.name)}
