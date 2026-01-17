@@ -19,7 +19,7 @@ async function ProductContent({ params }: { params: Promise<{ slug: string }> })
     return (
         <div className="flex flex-col lg:flex-row lg:justify-center gap-12 lg:gap-20">
             {/* Left Side - Image */}
-            <div className="w-full lg:w-1/3">
+            <div className="w-3/4 mx-auto lg:mx-0 lg:w-1/3">
                 <div className="relative aspect-[4/5] bg-[#f8f8f8] rounded-[2rem] overflow-hidden">
                     <Image
                         src={product.images[0]?.url || ''}
@@ -65,18 +65,20 @@ async function ProductContent({ params }: { params: Promise<{ slug: string }> })
                         </div>
                     </div>
 
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tight text-black leading-[0.9] mb-4">
-                        {product.name}
-                    </h1>
-                    <div className="flex items-baseline gap-4">
-                        <span className="text-3xl font-medium text-black">
-                            ${product.price}
-                        </span>
-                        {hasDiscount && (
-                            <span className="text-xl text-gray-400 line-through decoration-1">
-                                ${product.compareAtPrice}
+                    <div className="flex flex-wrap justify-between md:flex-col">
+                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tight text-black leading-[0.9] mb-4">
+                            {product.name}
+                        </h1>
+                        <div className="flex items-baseline gap-4">
+                            <span className="text-3xl font-medium text-black">
+                                ${product.price}
                             </span>
-                        )}
+                            {hasDiscount && (
+                                <span className="text-xl text-gray-400 line-through decoration-1">
+                                    ${product.compareAtPrice}
+                                </span>
+                            )}
+                        </div>
                     </div>
                 </div>
 
@@ -131,15 +133,18 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
     return (
         <div className="bg-white">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
-                <Link
-                    href="/"
-                    className="inline-flex items-center text-sm font-bold uppercase tracking-widest text-gray-500 hover:text-black mb-8 transition-colors"
-                >
-                    <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                    </svg>
-                    Back to Store
-                </Link>
+                <div className='hidden md:block'>
+                    <Link
+                        href="/"
+                        className="inline-flex items-center text-sm font-bold uppercase tracking-widest text-gray-500 hover:text-black mb-8 transition-colors"
+                    >
+                        <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Back to Store
+                    </Link>
+                </div>
+
 
                 <Suspense fallback={<ProductLoading />}>
                     <ProductContent params={params} />
