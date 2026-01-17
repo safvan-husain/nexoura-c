@@ -1,23 +1,16 @@
-export class AppError {
-  public readonly message: string;
-  public readonly error?: Object;
-  public readonly statusCode: number;
-  public readonly name?: any;
-  public readonly stack?: any;
-
-  constructor(message: string, statusCode: number, error?: Object, stack?: any) {
-    this.name = this.constructor.name;
-    this.message = message;
-    this.statusCode = statusCode;
-    this.error = error;
-    if (stack) {
-      this.stack = stack;
-    } else {
-      // Capture stack trace excluding constructor
-      if (Error.captureStackTrace) {
-        Error.captureStackTrace(this, this.constructor);
-      }
+export class AppError extends Error {
+  constructor(
+    public message: string,
+    public statusCode: number,
+    public error?: any
+  ) {
+    super(message);
+    this.name = 'AppError';
+    // Capture stack trace excluding constructor
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, AppError);
     }
+    console.log('[AppError] Created:', { message: this.message, stack: this.stack });
   }
 
   toJson(): object {
@@ -27,32 +20,45 @@ export class AppError {
       stack: this.stack
     };
   }
-
-  toString(): string {
-    return `${this.name}: ${this.message} (Status: ${this.statusCode})\n${String(this.stack)}`;
-  }
-
-  [Symbol.for('nodejs.util.inspect.custom')](): string {
-    return this.toString();
-  }
 }
 
 import { z } from "zod";
 
 export const catchError = (error: any): { status: number, body: object } => {
-  //TODO: use logger here.
   if (error instanceof z.ZodError) {
-    return {
-      status: 400, body: { error: "VALIDATION_ERROR", details: error.issues }
-    }
+    const result = {
+      status: 400,
+      body: {
+        error: "VALIDATION_ERROR",
+        message: "Validation failed",
+        details: error.issues
+      }
+    };
+    console.log('[catchError] ZodError:', result);
+    return result;
   }
+
   if (error instanceof AppError) {
-    return {
-      status: error.statusCode, body: { error: error.message, details: error.error }
-    }
+    const result = {
+      status: error.statusCode,
+      body: {
+        error: error.message,
+        message: error.message,
+        details: error.error
+      }
+    };
+    console.log('[catchError] AppError:', result);
+    return result;
   }
+
   console.error('Unhandled error in catchError:', error);
-  return {
-    status: 500, body: { error: "INTERNAL_SERVER_ERROR", message: error instanceof Error ? error.message : 'Unknown error' }
-  }
-}
+  const result = {
+    status: 500,
+    body: {
+      error: "INTERNAL_SERVER_ERROR",
+      message: error instanceof Error ? error.message : 'Unknown error'
+    }
+  };
+  console.log('[catchError] UNHANDLED:', result);
+  return result;
+};

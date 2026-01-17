@@ -1,5 +1,12 @@
 // lib/utils/api-error-handler.ts
 
+export class HandledApiError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'HandledApiError';
+    }
+}
+
 export interface ApiErrorDetails {
     status: number;
     body: any;
@@ -31,7 +38,9 @@ export async function handleApiError(
 
     const message = body.message || body.error || `Request failed with status ${response.status}`;
 
+    console.log('[handleApiError] Details:', details);
+
     showToast(message, 'error', details);
 
-    throw new Error(message);
+    throw new HandledApiError(message);
 }

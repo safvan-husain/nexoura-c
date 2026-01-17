@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStorefrontSession } from '@/components/providers/StorefrontSessionProvider';
 import { useToast } from '@/components/ui/Toast';
+import { HandledApiError, handleApiError } from '@/lib/utils/api-error-handler';
 
 export default function LoginForm() {
     const [email, setEmail] = useState('');
@@ -24,16 +25,17 @@ export default function LoginForm() {
                 body: JSON.stringify({ email, password }),
             });
 
-            const data = await res.json();
-
             if (!res.ok) {
-                showToast(data.error || 'Login failed', 'error');
-            } else {
-                showToast('Welcome back!', 'success');
-                await refreshSession(); // This will also cause wishlist to refresh because of session dependency
-                router.push('/');
+                await handleApiError(res, showToast);
             }
+
+            const data = await res.json();
+            showToast('Welcome back!', 'success');
+            await refreshSession();
+            router.push('/');
         } catch (error) {
+            if (error instanceof HandledApiError) return;
+            console.error('Login error:', error);
             showToast('Something went wrong', 'error');
         } finally {
             setIsLoading(false);

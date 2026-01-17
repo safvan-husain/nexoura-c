@@ -11,6 +11,7 @@ export async function POST(req: NextRequest) {
         const { email, password } = LoginSchema.parse(body);
 
         const sessionId = await getStorefrontSessionId();
+        
         if (!sessionId) {
             throw new AppError('SESSION_REQUIRED', 400);
         }
@@ -26,6 +27,9 @@ export async function POST(req: NextRequest) {
         return NextResponse.json(user, { status: 200 });
     } catch (err) {
         const result = catchError(err);
-        return NextResponse.json(result.body, { status: result.status });
+        return NextResponse.json(result.body, {
+            status: result.status,
+            headers: { 'x-request-method': 'POST' }
+        });
     }
 }

@@ -26,6 +26,9 @@ export async function POST(req: NextRequest) {
         return NextResponse.json(user, { status: 201 });
     } catch (err) {
         const result = catchError(err);
-        return NextResponse.json(result.body, { status: result.status });
+        return NextResponse.json(result.body, {
+            status: result.status,
+            headers: { 'x-request-method': 'POST' }
+        });
     }
 }

@@ -41,6 +41,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             pinned: false,
         };
 
+        console.log('[showToast] New Toast:', newToast);
+
         setToasts((prev) => [...prev, newToast]);
 
         // Auto-remove after 5 seconds (unless pinned)

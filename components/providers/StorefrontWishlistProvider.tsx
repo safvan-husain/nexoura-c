@@ -4,6 +4,7 @@ import React, { createContext, useContext, useEffect, useState, useMemo } from '
 import { useStorefrontSession } from './StorefrontSessionProvider';
 import { Wishlist, WishlistItem } from '@/lib/wishlist/model/wishlist.model';
 import { useToast } from '@/components/ui/Toast';
+import { HandledApiError, handleApiError } from '@/lib/utils/api-error-handler';
 
 interface StorefrontWishlistContextType {
     items: WishlistItem[];
@@ -79,12 +80,8 @@ export function StorefrontWishlistProvider({ children }: { children: React.React
             });
 
             if (!res.ok) {
-                const errorData = await res.json();
-                showToast(
-                    `Failed to ${exists ? 'remove from' : 'add to'} wishlist`,
-                    'error'
-                );
                 setItems(previousItems);
+                await handleApiError(res, showToast);
             } else {
                 const data = await res.json();
                 setItems(data.items || []);
@@ -94,8 +91,10 @@ export function StorefrontWishlistProvider({ children }: { children: React.React
                 );
             }
         } catch (error) {
-            showToast('Something went wrong', 'error');
             setItems(previousItems);
+            if (error instanceof HandledApiError) return;
+            console.error('Wishlist error:', error);
+            showToast('Something went wrong', 'error');
         }
     };
 
