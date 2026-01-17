@@ -3,6 +3,9 @@ import { Poppins } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/Toast";
+import { StorefrontSessionProvider } from "@/components/providers/StorefrontSessionProvider";
+import { StorefrontWishlistProvider } from "@/components/providers/StorefrontWishlistProvider";
+import { ErrorToastHandler } from "@/components/ErrorToastHandler";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -46,7 +49,12 @@ export default function RootLayout({
         className={`${poppins.variable} ${metha.variable} ${mavine.variable} ${black.variable} ${cloisterBlack.variable} antialiased min-h-screen overflow-x-hidden font-[family-name:var(--font-poppins)]`}
       >
         <ToastProvider>
-          {children}
+          <StorefrontSessionProvider initialSession={null}>
+            <StorefrontWishlistProvider>
+              <ErrorToastHandler />
+              {children}
+            </StorefrontWishlistProvider>
+          </StorefrontSessionProvider>
         </ToastProvider>
       </body>
     </html>

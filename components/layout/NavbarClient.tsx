@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useProducts } from '@/lib/hooks/use-products';
+import { useStorefrontWishlist } from '@/components/providers/StorefrontWishlistProvider';
+import { useStorefrontSession } from '@/components/providers/StorefrontSessionProvider';
 
 const SearchIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
@@ -36,6 +38,12 @@ const XIcon = () => (
     </svg>
 );
 
+const UserIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+    </svg>
+);
+
 export function NavbarClient() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isSearchActive, setIsSearchActive] = useState(false);
@@ -46,6 +54,8 @@ export function NavbarClient() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const { products } = useProducts();
+    const { wishlistCount } = useStorefrontWishlist();
+    const { session, refreshSession } = useStorefrontSession();
     console.log("is serach active", isSearchActive);
 
     const isHomePage = pathname === '/';
@@ -82,6 +92,16 @@ export function NavbarClient() {
         setSearchQuery('');
     };
 
+    const handleLogout = async () => {
+        try {
+            await fetch('/api/auth/logout', { method: 'POST' });
+            await refreshSession();
+            router.push('/');
+        } catch (error) {
+            console.error('Logout failed:', error);
+        }
+    };
+
     return (
         <nav className="relative z-[110] bg-transparent border-b border-gray-400/70">
             <div className="relative flex mx-auto h-16 items-center justify-center backdrop-blur-sm px-4 sm:px-6 lg:px-8">
@@ -102,7 +122,14 @@ export function NavbarClient() {
 
                     {/* Right Links */}
                     <div className="flex gap-6 text-gray-600 hover:text-black">
-                        <Link href="/" className="uppercase transition-colors">Wishlist</Link>
+                        <Link href="/wishlist" className="uppercase transition-colors relative">
+                            Wishlist
+                            {wishlistCount > 0 && (
+                                <span className="absolute -top-2 -right-4 bg-black text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">
+                                    {wishlistCount}
+                                </span>
+                            )}
+                        </Link>
                         <Link href="/products" className="uppercase transition-colors">Products</Link>
                     </div>
                 </div>
@@ -196,9 +223,26 @@ export function NavbarClient() {
                                 </AnimatePresence>
                             </div>
                         )}
-                        <button className="text-gray-600 hover:text-black transition-colors" aria-label="Wishlist">
+                        <Link href="/wishlist" className="text-gray-600 hover:text-black transition-colors relative" aria-label="Wishlist">
                             <HeartIcon />
-                        </button>
+                            {wishlistCount > 0 && (
+                                <span className="absolute -top-1 -right-1 bg-black text-white text-[10px] w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                                    {wishlistCount}
+                                </span>
+                            )}
+                        </Link>
+                        {session?.userId ? (
+                            <div className="flex items-center gap-4">
+                                <Link href="/account" className="text-gray-600 hover:text-black transition-colors" aria-label="Account">
+                                    <UserIcon />
+                                </Link>
+                                <button onClick={handleLogout} className="text-xs uppercase text-gray-500 hover:text-black">Logout</button>
+                            </div>
+                        ) : (
+                            <Link href="/account/login" className="text-gray-600 hover:text-black transition-colors" aria-label="Login">
+                                <UserIcon />
+                            </Link>
+                        )}
                     </div>
 
                     {/* Always Visible: Cart */}
