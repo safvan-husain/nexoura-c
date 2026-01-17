@@ -6,6 +6,7 @@ import { ToastProvider } from "@/components/ui/Toast";
 import { StorefrontSessionProvider } from "@/components/providers/StorefrontSessionProvider";
 import { StorefrontWishlistProvider } from "@/components/providers/StorefrontWishlistProvider";
 import { ErrorToastHandler } from "@/components/ErrorToastHandler";
+import { getStorefrontSession } from "@/lib/storefront-session";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -38,18 +39,20 @@ export const metadata: Metadata = {
   description: "Your product marketplace",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getStorefrontSession();
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${poppins.variable} ${metha.variable} ${mavine.variable} ${black.variable} ${cloisterBlack.variable} antialiased min-h-screen overflow-x-hidden font-[family-name:var(--font-poppins)]`}
       >
         <ToastProvider>
-          <StorefrontSessionProvider initialSession={null}>
+          <StorefrontSessionProvider initialSession={session}>
             <StorefrontWishlistProvider>
               <ErrorToastHandler />
               {children}

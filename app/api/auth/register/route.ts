@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { RegisterSchema } from '@/lib/auth/auth.schema';
 import { registerUser } from '@/lib/auth/auth.service';
-import { bindSessionToUser, getStorefrontSessionId } from '@/lib/storefront-session';
+import { bindSessionToUser, ensureStorefrontSession } from '@/lib/storefront-session';
 import { mergeWishlists } from '@/lib/wishlist/wishlist.service';
 import { catchError, AppError } from '@/lib/errors/app-error';
 
@@ -10,10 +10,8 @@ export async function POST(req: NextRequest) {
         const body = await req.json();
         const { email, password } = RegisterSchema.parse(body);
 
-        const sessionId = await getStorefrontSessionId();
-        if (!sessionId) {
-            throw new AppError('SESSION_REQUIRED', 400);
-        }
+        const session = await ensureStorefrontSession();
+        const sessionId = session.sessionId;
 
         const user = await registerUser(email, password);
 
