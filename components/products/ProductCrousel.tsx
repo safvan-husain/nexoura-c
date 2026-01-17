@@ -58,12 +58,6 @@ export function ProductCrousel({
 
         const interval = setInterval(() => {
             const nextIndex = (currentIndex + 1) % products.length;
-            console.log('🔄 AUTO-ROTATE:', {
-                from: currentIndex,
-                to: nextIndex,
-                productName: products[nextIndex]?.name,
-                timestamp: new Date().toISOString()
-            });
             setCurrentIndex(nextIndex);
         }, 1000);
 
@@ -96,27 +90,12 @@ export function ProductCrousel({
         // Update everything simultaneously - no delay
         const newDisplay = calculateDisplayProducts(currentIndex);
 
-        console.log('📊 INDEX CHANGE:', {
-            prevIndex,
-            currentIndex,
-            direction: animDirection,
-            currentProduct: products[currentIndex]?.name,
-            centerDisplayProduct: newDisplay[2]?.name,
-            allDisplayProducts: newDisplay.map(p => p.name),
-            timestamp: new Date().toISOString()
-        });
-
         setDisplayProducts(newDisplay);
         setDirection(animDirection);
 
         // After animation completes, reset to idle
         const timer = setTimeout(() => {
             setDirection('idle');
-            console.log('✅ ANIMATION COMPLETE:', {
-                currentIndex,
-                currentProduct: products[currentIndex]?.name,
-                centerDisplayProduct: newDisplay[2]?.name // Use newDisplay instead of stale displayProducts
-            });
         }, 500);
 
         prevIndexRef.current = currentIndex;

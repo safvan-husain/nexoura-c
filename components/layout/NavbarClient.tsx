@@ -46,6 +46,7 @@ export function NavbarClient() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const { products } = useProducts();
+    console.log("is serach active", isSearchActive);
 
     const isHomePage = pathname === '/';
     const isOverlayOpen = searchParams.get('view') === 'overlay';
@@ -82,7 +83,7 @@ export function NavbarClient() {
     };
 
     return (
-        <nav className="bg-transparent border-b border-gray-400/70">
+        <nav className="relative z-[110] bg-transparent border-b border-gray-400/70">
             <div className="relative flex mx-auto h-16 items-center justify-center backdrop-blur-sm px-4 sm:px-6 lg:px-8">
                 {/* ORIGINAL CENTERED LAYOUT (Hidden on Mobile) */}
                 {/* We use the exact structure from the original file for desktop */}
@@ -129,7 +130,7 @@ export function NavbarClient() {
                                             initial={{ opacity: 0, scale: 0.8 }}
                                             animate={{ opacity: 1, scale: 1 }}
                                             exit={{ opacity: 0, scale: 0.8 }}
-                                            onClick={() => setIsSearchActive(true)}
+                                            onClick={() => { setIsSearchActive(true); console.log("search icon clicked") }}
                                             className="text-gray-600 hover:text-black transition-colors"
                                             aria-label="Search"
                                         >
@@ -165,7 +166,7 @@ export function NavbarClient() {
                                             initial={{ opacity: 0, y: 10 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             exit={{ opacity: 0, y: 10 }}
-                                            className="absolute top-full mt-2 right-0 w-[300px] bg-white border border-gray-100 shadow-2xl rounded-2xl overflow-hidden z-[100]"
+                                            className="absolute top-full mt-2 right-0 w-[300px] bg-white border border-gray-100 shadow-2xl rounded-2xl overflow-hidden z-[120]"
                                         >
                                             <div className="py-2">
                                                 {filteredProducts.map((product) => (
@@ -223,7 +224,7 @@ export function NavbarClient() {
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        className="md:hidden bg-white border-t border-gray-100 overflow-hidden absolute w-full z-50 shadow-xl top-16 left-0"
+                        className="md:hidden bg-white border-t border-gray-100 overflow-hidden absolute w-full z-[120] shadow-xl top-16 left-0"
                     >
                         <div className="flex flex-col p-6 space-y-6">
                             <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-medium text-gray-600 hover:text-black text-center uppercase">
