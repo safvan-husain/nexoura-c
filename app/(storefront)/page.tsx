@@ -1,7 +1,7 @@
 import { Suspense } from 'react'
 import { cacheLife } from 'next/cache'
 import ProductViewer from '@/components/products/ProductViewer'
-import { getProducts } from '@/lib/product/product.service'
+import { getProducts } from '@/lib/api/products'
 
 export default function HomePage() {
   return (

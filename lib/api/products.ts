@@ -1,5 +1,9 @@
 import { cacheLife, cacheTag } from 'next/cache'
-import { getProducts as getProductsFromService, getProductById as getProductByIdFromService } from '@/lib/product/product.service'
+import {
+  getProducts as getProductsFromService,
+  getProductById as getProductByIdFromService,
+  getProductBySlug as getProductBySlugFromService
+} from '@/lib/product/product.service'
 
 export async function getProducts(params?: {
   page?: number
@@ -8,6 +12,9 @@ export async function getProducts(params?: {
   status?: string
   minStock?: number
   maxStock?: number
+  tag?: string
+  sortBy?: 'name' | 'price' | 'createdAt'
+  sortOrder?: 'asc' | 'desc'
 }) {
   'use cache'
   cacheTag('products')
@@ -23,13 +30,14 @@ export async function getProducts(params?: {
       status: params?.status as any,
       minStock: params?.minStock,
       maxStock: params?.maxStock,
-      sortBy: 'createdAt',
-      sortOrder: 'desc'
+      tag: params?.tag,
+      sortBy: params?.sortBy || 'createdAt',
+      sortOrder: params?.sortOrder || 'desc'
     })
 
-    // Transform to match the expected API response format if necessary
-    // Our service already returns { products, pagination }
-    return result
+    // Serialize the results to ensure they are plain objects
+    // This converts MongoDB ObjectIds to strings and Dates to ISO strings
+    return JSON.parse(JSON.stringify(result))
   } catch (error) {
     console.error('Error fetching products:', error)
     throw error
@@ -43,10 +51,23 @@ export async function getProductById(id: string) {
 
   try {
     const product = await getProductByIdFromService(id)
-    return product
+    return JSON.parse(JSON.stringify(product))
   } catch (error) {
     console.error('Error fetching product:', error)
     throw error
   }
 }
 
+export async function getProductBySlug(slug: string) {
+  'use cache'
+  cacheTag(`product-${slug}`)
+  cacheLife('minutes')
+
+  try {
+    const product = await getProductBySlugFromService(slug)
+    return JSON.parse(JSON.stringify(product))
+  } catch (error) {
+    console.error('Error fetching product by slug:', error)
+    throw error
+  }
+}

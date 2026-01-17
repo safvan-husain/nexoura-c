@@ -49,7 +49,7 @@ export interface StorefrontSession {
 
 export function toStorefrontSession(doc: StorefrontSessionDocument): StorefrontSession {
     return {
-        id: doc._id.toString(),
+        id: (doc._id as any).toString(),
         sessionId: doc.sessionId,
         status: doc.status,
         userId: doc.userId?.toString(),

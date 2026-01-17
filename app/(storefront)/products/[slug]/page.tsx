@@ -1,4 +1,4 @@
-import { getProductBySlug } from '@/lib/product/product.service'
+import { getProductBySlug } from '@/lib/api/products'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'

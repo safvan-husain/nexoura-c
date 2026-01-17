@@ -20,7 +20,7 @@ export async function handleGetSession() {
     try {
         const session = await getStorefrontSession();
         if (!session) {
-            throw new AppError(404, 'SESSION_NOT_FOUND');
+            throw new AppError('SESSION_NOT_FOUND', 404);
         }
         return { status: 200, body: session };
     } catch (err) {

@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { getProducts } from '@/lib/product/product.service';
+import { getProducts } from '@/lib/api/products';
 import { getTagBySlug } from '@/lib/tag/tag.service';
 import Image from 'next/image';
 import Link from 'next/link';

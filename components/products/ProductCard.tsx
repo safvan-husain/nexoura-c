@@ -73,11 +73,11 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
             </div>
 
             <div className="flex flex-col gap-1 px-2">
-                <div className="flex justify-between items-start gap-4">
+                <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
                     <h3 className="text-xl font-bold uppercase leading-tight group-hover:text-gray-600 transition-colors">
                         {product.name}
                     </h3>
-                    <p className="text-xl font-black text-black">
+                    <p className="text-md font-black text-black">
                         ${product.price}
                     </p>
                 </div>

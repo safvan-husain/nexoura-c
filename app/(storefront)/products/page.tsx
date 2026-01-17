@@ -51,7 +51,7 @@ async function ProductsList({ page, search }: { page: number; search?: string })
     <>
       <div className="flex justify-between items-center mb-12">
         <div>
-          <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-black">
+          <h1 className="text-2xl md:text-4xl font-black uppercase tracking-tighter text-black">
             Our Collection
           </h1>
           <p className="text-gray-500 mt-2 font-medium uppercase tracking-widest text-sm">
