@@ -1,90 +1,75 @@
 'use server'
 
 import { revalidateTag } from 'next/cache'
+import { createProduct, updateProduct, deleteProduct } from '@/lib/product/product.service'
 
 export async function createProductAction(formData: FormData) {
-  const productData = {
-    name: formData.get('name'),
-    slug: formData.get('slug'),
-    description: formData.get('description'),
-    price: parseFloat(formData.get('price') as string),
-    images: JSON.parse(formData.get('images') as string || '[]'),
-    stock: parseInt(formData.get('stock') as string || '0'),
-    status: formData.get('status') || 'draft',
-    tags: JSON.parse(formData.get('tags') as string || '[]'),
-    hasColors: formData.get('hasColors') === 'true',
-    colors: JSON.parse(formData.get('colors') as string || '[]'),
-    hasSizes: formData.get('hasSizes') === 'true',
-    sizes: JSON.parse(formData.get('sizes') as string || '[]'),
+  try {
+    const productData = {
+      name: formData.get('name') as string,
+      slug: formData.get('slug') as string,
+      description: formData.get('description') as string,
+      price: parseFloat(formData.get('price') as string),
+      images: JSON.parse(formData.get('images') as string || '[]'),
+      stock: parseInt(formData.get('stock') as string || '0'),
+      status: (formData.get('status') as any) || 'draft',
+      tags: JSON.parse(formData.get('tags') as string || '[]'),
+      hasColors: formData.get('hasColors') === 'true',
+      colors: JSON.parse(formData.get('colors') as string || '[]'),
+      hasSizes: formData.get('hasSizes') === 'true',
+      sizes: JSON.parse(formData.get('sizes') as string || '[]'),
+    }
+
+    console.log('[ProductAction] createProductAction calling service with images:', productData.images);
+
+    const product = await createProduct(productData);
+
+    revalidateTag('products', 'max')
+    return { success: true, data: product }
+  } catch (error: any) {
+    console.error('[ProductAction] createProductAction error:', error);
+    return { error: error.message || 'Failed to create product' }
   }
-
-  console.log('[ProductAction] Creating product with data:', JSON.stringify(productData, null, 2));
-
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/products`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(productData),
-  })
-
-  const data = await res.json()
-
-  if (!res.ok) {
-    return { error: data.error || 'Failed to create product' }
-  }
-
-  revalidateTag('products', 'max')
-  return { success: true, data }
 }
 
 export async function updateProductAction(id: string, formData: FormData) {
-  const productData = {
-    name: formData.get('name'),
-    slug: formData.get('slug'),
-    description: formData.get('description'),
-    price: parseFloat(formData.get('price') as string),
-    images: JSON.parse(formData.get('images') as string || '[]'),
-    stock: parseInt(formData.get('stock') as string || '0'),
-    status: formData.get('status'),
-    tags: JSON.parse(formData.get('tags') as string || '[]'),
-    hasColors: formData.get('hasColors') === 'true',
-    colors: JSON.parse(formData.get('colors') as string || '[]'),
-    hasSizes: formData.get('hasSizes') === 'true',
-    sizes: JSON.parse(formData.get('sizes') as string || '[]'),
+  try {
+    const productData = {
+      name: formData.get('name') as string,
+      slug: formData.get('slug') as string,
+      description: formData.get('description') as string,
+      price: parseFloat(formData.get('price') as string),
+      images: JSON.parse(formData.get('images') as string || '[]'),
+      stock: parseInt(formData.get('stock') as string || '0'),
+      status: formData.get('status') as any,
+      tags: JSON.parse(formData.get('tags') as string || '[]'),
+      hasColors: formData.get('hasColors') === 'true',
+      colors: JSON.parse(formData.get('colors') as string || '[]'),
+      hasSizes: formData.get('hasSizes') === 'true',
+      sizes: JSON.parse(formData.get('sizes') as string || '[]'),
+    }
+
+    console.log('[ProductAction] updateProductAction calling service for ID', id);
+
+    const product = await updateProduct(id, productData);
+
+    revalidateTag('products', 'max')
+    revalidateTag(`product-${id}`, 'max')
+    return { success: true, data: product }
+  } catch (error: any) {
+    console.error('[ProductAction] updateProductAction error:', error);
+    return { error: error.message || 'Failed to update product' }
   }
-
-  console.log('[ProductAction] Updating product with data:', JSON.stringify(productData, null, 2));
-
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/products/${id}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(productData),
-  })
-
-  const data = await res.json()
-
-  if (!res.ok) {
-    return { error: data.error || 'Failed to update product' }
-  }
-
-  revalidateTag('products', 'max')
-  revalidateTag(`product-${id}`, 'max')
-  return { success: true, data }
 }
 
 export async function deleteProductAction(id: string) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/products/${id}`, {
-    method: 'DELETE',
-  })
-
-  if (!res.ok) {
-    const data = await res.json()
-    return { error: data.error || 'Failed to delete product' }
+  try {
+    await deleteProduct(id);
+    revalidateTag('products', 'max')
+    return { success: true }
+  } catch (error: any) {
+    console.error('[ProductAction] deleteProductAction error:', error);
+    return { error: error.message || 'Failed to delete product' }
   }
-
-  revalidateTag('products', 'max')
-  return { success: true }
 }
+

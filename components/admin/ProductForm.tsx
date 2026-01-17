@@ -14,6 +14,8 @@ import { Select } from '@/components/ui/Select';
 import { Switch } from '@/components/ui/Switch';
 import { Loader2, X, Upload, Plus, Trash2 } from 'lucide-react';
 import Image from 'next/image';
+import { Modal } from '@/components/ui/Modal';
+import { ImageCropper } from '@/components/admin/ImageCropper';
 
 interface ProductFormProps {
     initialData?: any; // Replace with proper type from database
@@ -28,6 +30,9 @@ export default function ProductForm({ initialData, isEditing = false }: ProductF
     const [availableTags, setAvailableTags] = useState<any[]>([]);
     const [tempColor, setTempColor] = useState('');
     const [tempSize, setTempSize] = useState('');
+    const [isCropperOpen, setIsCropperOpen] = useState(false);
+    const [selectedImageForCrop, setSelectedImageForCrop] = useState<string | null>(null);
+    const [originalFile, setOriginalFile] = useState<File | null>(null);
 
     useEffect(() => {
         const fetchTags = async () => {
@@ -50,6 +55,7 @@ export default function ProductForm({ initialData, isEditing = false }: ProductF
         handleSubmit,
         setValue,
         watch,
+        getValues,
         formState: { errors },
     } = useForm<CreateProductInput>({
         resolver: zodResolver(CreateProductSchema) as any,
@@ -71,6 +77,8 @@ export default function ProductForm({ initialData, isEditing = false }: ProductF
     });
 
     const images = watch('images') || [];
+    console.log('[ProductForm] Component Render. images count:', images.length, images);
+
     const selectedTags = watch('tags') || [];
     const hasColors = watch('hasColors');
     const colors = watch('colors') || [];
@@ -111,12 +119,29 @@ export default function ProductForm({ initialData, isEditing = false }: ProductF
         const file = e.target.files?.[0];
         if (!file) return;
 
-        setIsUploading(true);
+        setOriginalFile(file);
+        const reader = new FileReader();
+        reader.onload = () => {
+            setSelectedImageForCrop(reader.result as string);
+            setIsCropperOpen(true);
+        };
+        reader.readAsDataURL(file);
+
+        // Reset input value to allow uploading same file again if needed
+        e.target.value = '';
+    };
+
+    const handleCropComplete = async (croppedBlob: Blob) => {
+        console.log('[ProductForm] handleCropComplete triggered', { size: croppedBlob.size, type: croppedBlob.type });
+        setIsUploading(true); // This will show loader inside the modal or form
         setUploadError(null);
 
         try {
             const formData = new FormData();
-            formData.append('file', file);
+            const fileName = (originalFile?.name || 'image').split('.')[0] + '-cropped.jpg';
+            const croppedFile = new File([croppedBlob], fileName, { type: 'image/jpeg' });
+            formData.append('file', croppedFile);
+            console.log('[ProductForm] Uploading cropped file:', fileName, croppedFile.size);
 
             const res = await fetch('/api/upload/image', {
                 method: 'POST',
@@ -124,25 +149,54 @@ export default function ProductForm({ initialData, isEditing = false }: ProductF
             });
 
             const data = await res.json();
+            console.log('[ProductForm] upload response status:', res.status, 'data:', data);
 
             if (!res.ok) {
                 throw new Error(data.error || 'Failed to upload image');
             }
 
+            if (!data.url) {
+                console.error('[ProductForm] No URL in upload response data:', data);
+                throw new Error('Server returned no image URL');
+            }
+
+            // Get the current images from state to avoid closure issues
+            const currentImages = getValues('images') || [];
+            console.log('[ProductForm] Images before update:', currentImages.length);
+
             // Add new image to the list
             const newImage = {
                 url: data.url,
-                isPrimary: images.length === 0, // First image is primary by default
+                isPrimary: currentImages.length === 0, // First image is primary by default
             };
 
-            setValue('images', [...images, newImage]);
+            const updatedImages = [...currentImages, newImage];
+            console.log('[ProductForm] Updating images state to:', updatedImages);
+
+            setValue('images', updatedImages, {
+                shouldValidate: true,
+                shouldDirty: true
+            });
+
+            // Verify the update
+            setTimeout(() => {
+                const verifiedImages = getValues('images');
+                console.log('[ProductForm] Verified images after setValue:', verifiedImages);
+            }, 100);
+
+            // Only close modal on success
+            setIsCropperOpen(false);
+            setSelectedImageForCrop(null);
+            setOriginalFile(null);
         } catch (err: any) {
-            console.error("Upload error:", err);
-            setUploadError(err.message);
+            console.error("[ProductForm] Upload error:", err);
+            setUploadError(err.message || 'An error occurred during upload');
+            // Don't close modal so user can try again or see the error? 
+            // Actually, showing error in modal might be better. 
+            // For now, let's at least close so they aren't stuck if they want to cancel.
+            // But user might want to try again.
         } finally {
             setIsUploading(false);
-            // Reset input value to allow uploading same file again if needed
-            e.target.value = '';
         }
     };
 
@@ -159,19 +213,17 @@ export default function ProductForm({ initialData, isEditing = false }: ProductF
     };
 
     const onSubmit: SubmitHandler<CreateProductInput> = async (data) => {
+        if (isUploading) {
+            alert('Please wait for the image upload to complete before saving.');
+            return;
+        }
         setIsSubmitting(true);
-        console.log('[ProductForm] Submitting with data:', JSON.stringify(data, null, 2));
+        console.log('[ProductForm] Starting onSubmit.');
+        console.log('[ProductForm] Data to submit:', data);
+        console.table(data.images);
+
         try {
             const formData = new FormData();
-            // Flatten the data into FormData as expected by the server action
-            // Note: usage of formData in server action seems to expect individual fields
-            // or a way to construct the object.
-            // Looking at product.actions.ts:
-            // const productData = {
-            //   name: formData.get('name'),
-            //   ...
-            //   images: JSON.parse(formData.get('images') as string || '[]'),
-            // }
 
             formData.append('name', data.name);
             formData.append('slug', data.slug);
@@ -180,45 +232,50 @@ export default function ProductForm({ initialData, isEditing = false }: ProductF
             if (data.shortDescription) formData.append('shortDescription', data.shortDescription);
             formData.append('stock', data.stock.toString());
             formData.append('status', data.status);
-            formData.append('images', JSON.stringify(data.images));
+
+            const imagesJson = JSON.stringify(data.images);
+            console.log('[ProductForm] Images JSON for FormData:', imagesJson);
+            formData.append('images', imagesJson);
+
             formData.append('tags', JSON.stringify(data.tags));
             formData.append('hasColors', data.hasColors.toString());
             formData.append('colors', JSON.stringify(data.colors));
             formData.append('hasSizes', data.hasSizes.toString());
             formData.append('sizes', JSON.stringify(data.sizes));
 
-            console.log('[ProductForm] FormData overview:');
-            formData.forEach((value, key) => console.log(`  ${key}: ${value}`));
-
-
             if (isEditing && initialData?._id) {
+                console.log('[ProductForm] Form is in EDIT mode for ID:', initialData._id);
                 const res = await updateProductAction(initialData._id, formData);
                 if (res.error) {
-                    alert(res.error); // Simple alert for now, toast would be better
+                    console.error('[ProductForm] Update Action Error:', res.error);
+                    alert(res.error);
                 } else {
+                    console.log('[ProductAction] Update Action Success');
                     router.push('/admin/products');
                 }
             } else {
+                console.log('[ProductForm] Form is in CREATE mode');
                 const res = await createProductAction(formData);
                 if (res.error) {
+                    console.error('[ProductForm] Create Action Error:', res.error);
                     alert(res.error);
                 } else {
+                    console.log('[ProductAction] Create Action Success');
                     router.push('/admin/products');
                 }
             }
         } catch (error) {
-            console.error('Submit error:', error);
-            alert('An unexpected error occurred');
+            console.error('[ProductForm] UNEXPECTED Error in onSubmit:', error);
+            alert('An unexpected error occurred: ' + (error as any).message);
         } finally {
             setIsSubmitting(false);
         }
     };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit as any)} className="space-y-8 max-w-4xl">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Basic Info */}
-                <div className="space-y-4 md:col-span-2">
+        <>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 bg-slate-50 p-6 rounded-lg">
+                <div className="space-y-4">
                     <h3 className="text-lg font-medium">Basic Information</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
@@ -475,24 +532,61 @@ export default function ProductForm({ initialData, isEditing = false }: ProductF
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div className="flex justify-end gap-4 pt-4 border-t">
-                <Button
-                    type="button"
-                    variant="ghost"
-                    onClick={() => router.back()}
-                >
-                    Cancel
-                </Button>
-                <Button
-                    type="submit"
-                    disabled={isSubmitting}
-                >
-                    {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {isEditing ? 'Update Product' : 'Create Product'}
-                </Button>
-            </div>
-        </form>
+                <div className="flex justify-end gap-4 pt-4 border-t">
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={() => router.back()}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        type="submit"
+                        disabled={isSubmitting || isUploading}
+                    >
+                        {(isSubmitting || isUploading) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        {isEditing ? 'Update Product' : 'Create Product'}
+                    </Button>
+                </div>
+
+            </form >
+
+            <Modal
+                isOpen={isCropperOpen}
+                onClose={() => {
+                    setIsCropperOpen(false);
+                    setSelectedImageForCrop(null);
+                    setOriginalFile(null);
+                }}
+                title="Edit Product Image"
+            >
+                {selectedImageForCrop && (
+                    <div className="space-y-4">
+                        <ImageCropper
+                            image={selectedImageForCrop!}
+                            onCropComplete={handleCropComplete}
+                            onCancel={() => {
+                                setIsCropperOpen(false);
+                                setSelectedImageForCrop(null);
+                                setOriginalFile(null);
+                                setUploadError(null);
+                            }}
+                        />
+                        {isUploading && (
+                            <div className="absolute inset-0 bg-white/60 flex flex-col items-center justify-center z-10 rounded-lg">
+                                <Loader2 className="h-10 w-10 animate-spin text-blue-600 mb-2" />
+                                <p className="text-sm font-medium text-slate-700">Processing & Uploading...</p>
+                            </div>
+                        )}
+                        {uploadError && (
+                            <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+                                <p className="text-sm text-red-600">{uploadError}</p>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </Modal>
+        </>
     );
 }

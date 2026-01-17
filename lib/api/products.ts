@@ -1,14 +1,5 @@
 import { cacheLife, cacheTag } from 'next/cache'
-
-// Helper to get the base URL for server-side fetching
-function getBaseUrl() {
-  // In server components, use localhost directly
-  if (typeof window === 'undefined') {
-    return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
-  }
-  // In client components, use relative URLs
-  return ''
-}
+import { getProducts as getProductsFromService, getProductById as getProductByIdFromService } from '@/lib/product/product.service'
 
 export async function getProducts(params?: {
   page?: number
@@ -22,32 +13,23 @@ export async function getProducts(params?: {
   cacheTag('products')
   cacheLife('minutes')
 
-  const searchParams = new URLSearchParams()
-  if (params?.page) searchParams.set('page', params.page.toString())
-  if (params?.limit) searchParams.set('limit', params.limit.toString())
-  if (params?.search) searchParams.set('search', params.search)
-  if (params?.status) searchParams.set('status', params.status)
-  if (params?.minStock !== undefined) searchParams.set('minStock', params.minStock.toString())
-  if (params?.maxStock !== undefined) searchParams.set('maxStock', params.maxStock.toString())
-
-  const baseUrl = getBaseUrl()
-  const url = `${baseUrl}/api/products?${searchParams}`
-
   try {
-    const res = await fetch(url, {
-      cache: 'no-store',
-      headers: {
-        'Content-Type': 'application/json',
-      }
+    // Call the service directly instead of fetching from our own API
+    // This is more efficient and avoids localhost connection issues
+    const result = await getProductsFromService({
+      page: params?.page || 1,
+      limit: params?.limit || 20,
+      search: params?.search,
+      status: params?.status as any,
+      minStock: params?.minStock,
+      maxStock: params?.maxStock,
+      sortBy: 'createdAt',
+      sortOrder: 'desc'
     })
 
-    if (!res.ok) {
-      const errorText = await res.text()
-      console.error('Failed to fetch products:', res.status, errorText)
-      throw new Error(`Failed to fetch products: ${res.status}`)
-    }
-
-    return res.json()
+    // Transform to match the expected API response format if necessary
+    // Our service already returns { products, pagination }
+    return result
   } catch (error) {
     console.error('Error fetching products:', error)
     throw error
@@ -59,26 +41,12 @@ export async function getProductById(id: string) {
   cacheTag(`product-${id}`)
   cacheLife('minutes')
 
-  const baseUrl = getBaseUrl()
-  const url = `${baseUrl}/api/products/${id}`
-
   try {
-    const res = await fetch(url, {
-      cache: 'no-store',
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    })
-
-    if (!res.ok) {
-      const errorText = await res.text()
-      console.error('Failed to fetch product:', res.status, errorText)
-      throw new Error(`Failed to fetch product: ${res.status}`)
-    }
-
-    return res.json()
+    const product = await getProductByIdFromService(id)
+    return product
   } catch (error) {
     console.error('Error fetching product:', error)
     throw error
   }
 }
+
