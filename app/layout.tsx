@@ -11,22 +11,22 @@ const poppins = Poppins({
 });
 
 const metha = localFont({
-  src: "../public/fonts/Metha-Regular.ttf",
+  src: "./fonts/Metha-Regular.ttf",
   variable: "--font-metha",
 });
 
 const mavine = localFont({
-  src: "../public/fonts/Mavine-bold.ttf",
+  src: "./fonts/Mavine-Bold.ttf",
   variable: "--font-mavine",
 });
 
 const black = localFont({
-  src: "../public/fonts/Black Mustang.ttf",
+  src: "./fonts/Black Mustang.ttf",
   variable: "--font-black",
 });
 
 const cloisterBlack = localFont({
-  src: "../public/fonts/CloisterBlack.ttf",
+  src: "./fonts/CloisterBlack.ttf",
   variable: "--font-cloister",
 });
 
