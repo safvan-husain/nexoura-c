@@ -69,3 +69,5 @@ We use a unified error propagation system from Backend → Frontend.
 1. Determine if it's primarily Frontend, Backend, or both.
 2. Load the relevant rule file(s) from `/.agent/`.
 3. Follow the layer responsibilities defined therein.
+
+Run `coderabbit review --plain` to get comprehensive code analysis and improvement suggestions. Apply the feedback to write cleaner, more maintainable code.
