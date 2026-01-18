@@ -7,9 +7,10 @@ import { AppError } from '@/lib/errors/app-error';
 import {
     StorefrontSession,
     StorefrontSessionModel,
-    StorefrontSessionMetadata,
+    StorefrontSessionMetadataPlain,
     buildStorefrontSessionDocument,
     toStorefrontSession,
+    StorefrontSessionPlain,
 } from './model/storefront-session.model';
 import {
     EnsureStorefrontSessionInput,
@@ -27,12 +28,12 @@ function computeExpiry() {
     return new Date(Date.now() + SESSION_DURATION_MS);
 }
 
-function normalizeMetadata(metadata?: StorefrontSessionMetadataInput): StorefrontSessionMetadata | undefined {
+function normalizeMetadata(metadata?: StorefrontSessionMetadataInput): StorefrontSessionMetadataPlain | undefined {
     if (!metadata) {
         return undefined;
     }
 
-    const normalized: StorefrontSessionMetadata = {};
+    const normalized: StorefrontSessionMetadataPlain = {};
     if (metadata.userAgent) {
         normalized.userAgent = metadata.userAgent;
     }
@@ -97,7 +98,7 @@ export async function createStorefrontSession(
     sessionId: string,
     metadata?: StorefrontSessionMetadataInput,
     setCookie: boolean = false
-): Promise<StorefrontSession> {
+): Promise<StorefrontSessionPlain> {
     await connectDB();
     const expiresAt = computeExpiry();
     const docData = buildStorefrontSessionDocument(sessionId, expiresAt, normalizeMetadata(metadata));
@@ -115,7 +116,7 @@ export async function touchStorefrontSession(
     sessionId: string,
     metadata?: StorefrontSessionMetadataInput,
     setCookie: boolean = false
-): Promise<StorefrontSession> {
+): Promise<StorefrontSessionPlain> {
     const doc = await findActiveSession(sessionId);
     const updated = await updateActivity(sessionId, doc, metadata);
     const storefrontSession = toStorefrontSession(updated);
@@ -128,7 +129,7 @@ export async function touchStorefrontSession(
 
 export async function ensureStorefrontSession(
     input?: EnsureStorefrontSessionInput
-): Promise<StorefrontSession> {
+): Promise<StorefrontSessionPlain> {
     await connection();
     const payload = input?.metadata;
     const token = await getCurrentStorefrontSessionToken();
@@ -149,7 +150,7 @@ export async function ensureStorefrontSession(
     }
 }
 
-export async function getStorefrontSession(): Promise<StorefrontSession | null> {
+export async function getStorefrontSession(): Promise<StorefrontSessionPlain | null> {
     await connection();
     const token = await getCurrentStorefrontSessionToken();
     if (!token) {
@@ -192,7 +193,7 @@ export async function getStorefrontSessionId(): Promise<string | null> {
     return token?.sessionId ?? null;
 }
 
-export async function getStorefrontSessionBySessionId(sessionId: string): Promise<StorefrontSession | null> {
+export async function getStorefrontSessionBySessionId(sessionId: string): Promise<StorefrontSessionPlain | null> {
     await connectDB();
     const doc = await StorefrontSessionModel.findOne({ sessionId });
     return doc ? toStorefrontSession(doc) : null;
@@ -225,7 +226,7 @@ export async function unbindSession(sessionId: string): Promise<void> {
     }
 }
 
-export async function updateSessionBillingDetails(sessionId: string, billingDetails: any): Promise<StorefrontSession> {
+export async function updateSessionBillingDetails(sessionId: string, billingDetails: any): Promise<StorefrontSessionPlain> {
     await connectDB();
     const doc = await StorefrontSessionModel.findOneAndUpdate(
         { sessionId },

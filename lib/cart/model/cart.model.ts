@@ -1,47 +1,50 @@
-import { Schema, model, models, Document, Types } from 'mongoose';
+import 'reflect-metadata';
+import * as typegoose from '@typegoose/typegoose';
+import * as UserModel from '../../auth/user.model';
 
-export interface CartItemDocument {
-    productId: string;
-    selectedVariantItemIds: string[];
-    quantity: number;
-    createdAt: Date;
+// Subdocument for cart items
+export class CartItem {
+    @typegoose.prop({ required: true, type: String })
+    public productId!: string;
+
+    @typegoose.prop({ type: () => [String], default: [] })
+    public selectedVariantItemIds!: string[];
+
+    @typegoose.prop({ required: true, min: 1, default: 1, type: Number })
+    public quantity!: number;
+
+    @typegoose.prop({ default: () => new Date(), type: Date })
+    public createdAt!: Date;
 }
 
-export interface CartDocument extends Document {
-    sessionId?: string;
-    userId?: Types.ObjectId;
-    items: CartItemDocument[];
-    createdAt: Date;
-    updatedAt: Date;
-}
-
-const CartItemSchema = new Schema<CartItemDocument>(
-    {
-        productId: { type: String, required: true },
-        selectedVariantItemIds: { type: [String], default: [] },
-        quantity: { type: Number, required: true, min: 1, default: 1 },
-        createdAt: { type: Date, default: Date.now },
-    },
-    { _id: false }
-);
-
-const CartSchema = new Schema<CartDocument>(
-    {
-        sessionId: { type: String },
-        userId: { type: Schema.Types.ObjectId, ref: 'User' },
-        items: [CartItemSchema],
-    },
-    {
+@typegoose.modelOptions({
+    schemaOptions: {
         timestamps: true,
+        collection: 'carts'
     }
-);
+})
+@typegoose.index({ sessionId: 1 }, { unique: true, sparse: true })
+@typegoose.index({ userId: 1 }, { unique: true, sparse: true })
+export class Cart {
+    @typegoose.prop({ type: String })
+    public sessionId?: string;
 
-// Unique sparse indexes to ensure one cart per session and one cart per user
-CartSchema.index({ sessionId: 1 }, { unique: true, sparse: true });
-CartSchema.index({ userId: 1 }, { unique: true, sparse: true });
+    @typegoose.prop({ ref: () => UserModel.User, type: typegoose.mongoose.Schema.Types.ObjectId })
+    public userId?: typegoose.Ref<UserModel.User>;
 
-export const CartModel = models.Cart || model<CartDocument>('Cart', CartSchema);
+    @typegoose.prop({ type: () => [CartItem], default: [] })
+    public items!: CartItem[];
 
+    public createdAt!: Date;
+    public updatedAt!: Date;
+}
+
+if (!(global as any).CartModel) {
+    (global as any).CartModel = typegoose.getModelForClass(Cart);
+}
+export const CartModel = (global as any).CartModel;
+
+// Plain object interfaces for serialization
 export interface CartProduct {
     _id: string;
     name: string;
@@ -50,7 +53,7 @@ export interface CartProduct {
     images: { url: string; alt?: string }[];
 }
 
-export interface CartItem {
+export interface CartItemPlain {
     productId: string;
     product?: CartProduct;
     selectedVariantItemIds: string[];
@@ -58,17 +61,17 @@ export interface CartItem {
     createdAt: string;
 }
 
-export interface Cart {
+export interface CartPlain {
     id: string;
     sessionId?: string;
     userId?: string;
-    items: CartItem[];
+    items: CartItemPlain[];
     createdAt: string;
     updatedAt: string;
 }
 
-export function toCart(doc: CartDocument): Cart {
-    const cart: Cart = {
+export function toCart(doc: typegoose.DocumentType<Cart>): CartPlain {
+    const cart: CartPlain = {
         id: (doc._id as any).toString(),
         sessionId: doc.sessionId,
         userId: doc.userId?.toString(),

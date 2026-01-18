@@ -3,19 +3,20 @@ import 'server-only';
 import { connectDB } from '@/lib/db/mongo-client';
 import { AppError } from '@/lib/errors/app-error';
 import { getStorefrontSession } from '@/lib/storefront-session';
-import { StorefrontSession } from '@/lib/storefront-session/model/storefront-session.model';
+import { StorefrontSessionPlain } from '@/lib/storefront-session/model/storefront-session.model';
 import {
     Cart,
     CartModel,
-    CartDocument,
-    CartItemDocument,
+    CartPlain,
+    CartItem,
     toCart,
 } from './model/cart.model';
 import { AddToCartInput, RemoveFromCartInput, UpdateCartItemQuantityInput } from './cart.schema';
 import { Types } from 'mongoose';
 import { ProductModel } from '@/lib/models/product.model';
+import { DocumentType } from '@typegoose/typegoose';
 
-async function populateCart(cart: Cart): Promise<Cart> {
+async function populateCart(cart: CartPlain): Promise<CartPlain> {
     const productIds = cart.items.map(item => item.productId);
     if (productIds.length === 0) return cart;
 
@@ -57,9 +58,9 @@ function normalizeVariantItemIds(ids: string[]): string[] {
     return unique;
 }
 
-export async function getCart(session: StorefrontSession): Promise<Cart | null> {
+export async function getCart(session: StorefrontSessionPlain): Promise<CartPlain | null> {
     await connectDB();
-    let cart: Cart | null = null;
+    let cart: CartPlain | null = null;
     if (session.userId) {
         const userCart = await CartModel.findOne({ userId: session.userId });
         if (userCart) {
@@ -75,7 +76,7 @@ export async function getCart(session: StorefrontSession): Promise<Cart | null> 
     return cart ? populateCart(cart) : null;
 }
 
-async function getOrCreateCartDocument(session: StorefrontSession): Promise<CartDocument> {
+async function getOrCreateCartDocument(session: StorefrontSessionPlain): Promise<DocumentType<Cart>> {
     await connectDB();
     if (session.userId) {
         const userCart = await CartModel.findOne({ userId: session.userId });
@@ -95,13 +96,13 @@ async function getOrCreateCartDocument(session: StorefrontSession): Promise<Cart
     return doc;
 }
 
-export async function addItemToCart(params: AddToCartInput & { session: StorefrontSession }): Promise<Cart> {
+export async function addItemToCart(params: AddToCartInput & { session: StorefrontSessionPlain }): Promise<CartPlain> {
     const { session, productId, selectedVariantItemIds: inputVariantIds, quantity = 1 } = params;
     const selectedVariantItemIds = normalizeVariantItemIds(inputVariantIds || []);
 
     const doc = await getOrCreateCartDocument(session);
 
-    const existingIndex = doc.items.findIndex(item => {
+    const existingIndex = doc.items.findIndex((item: CartItem) => {
         if (item.productId !== productId) return false;
         const normalizedExisting = normalizeVariantItemIds(item.selectedVariantItemIds || []);
         if (normalizedExisting.length !== selectedVariantItemIds.length) return false;
@@ -124,13 +125,13 @@ export async function addItemToCart(params: AddToCartInput & { session: Storefro
 }
 
 
-export async function updateCartItemQuantity(params: UpdateCartItemQuantityInput & { session: StorefrontSession }): Promise<Cart> {
+export async function updateCartItemQuantity(params: UpdateCartItemQuantityInput & { session: StorefrontSessionPlain }): Promise<CartPlain> {
     const { session, productId, selectedVariantItemIds: inputVariantIds, quantity } = params;
     const selectedVariantItemIds = normalizeVariantItemIds(inputVariantIds || []);
 
     const doc = await getOrCreateCartDocument(session);
 
-    const existingIndex = doc.items.findIndex(item => {
+    const existingIndex = doc.items.findIndex((item: CartItem) => {
         if (item.productId !== productId) return false;
         const normalizedExisting = normalizeVariantItemIds(item.selectedVariantItemIds || []);
         if (normalizedExisting.length !== selectedVariantItemIds.length) return false;
@@ -146,13 +147,13 @@ export async function updateCartItemQuantity(params: UpdateCartItemQuantityInput
 }
 
 
-export async function removeItemFromCart(params: RemoveFromCartInput & { session: StorefrontSession }): Promise<Cart> {
+export async function removeItemFromCart(params: RemoveFromCartInput & { session: StorefrontSessionPlain }): Promise<CartPlain> {
     const { session, productId, selectedVariantItemIds: inputVariantIds } = params;
     const selectedVariantItemIds = normalizeVariantItemIds(inputVariantIds || []);
 
     const doc = await getOrCreateCartDocument(session);
 
-    doc.items = (doc.items as any).filter((item: CartItemDocument) => {
+    doc.items = (doc.items as any).filter((item: CartItem) => {
         if (item.productId !== productId) return true;
         const normalizedExisting = normalizeVariantItemIds(item.selectedVariantItemIds || []);
         const isSame =
@@ -165,7 +166,7 @@ export async function removeItemFromCart(params: RemoveFromCartInput & { session
     return populateCart(toCart(doc));
 }
 
-export async function clearCart(session: StorefrontSession): Promise<Cart> {
+export async function clearCart(session: StorefrontSessionPlain): Promise<CartPlain> {
     const doc = await getOrCreateCartDocument(session);
     doc.items = [];
     await doc.save();
@@ -173,12 +174,12 @@ export async function clearCart(session: StorefrontSession): Promise<Cart> {
 }
 
 
-export async function mergeCarts(sessionId: string, userId: string): Promise<Cart> {
+export async function mergeCarts(sessionId: string, userId: string): Promise<CartPlain> {
     await connectDB();
 
     const session = await CartModel.db.startSession();
     try {
-        let result: Cart | null = null;
+        let result: CartPlain | null = null;
         await session.withTransaction(async () => {
             // 1. Find the guest cart
             const guestCart = await CartModel.findOne({ sessionId }).session(session);
@@ -216,7 +217,7 @@ export async function mergeCarts(sessionId: string, userId: string): Promise<Car
             }
 
             // Case C: Both exist, merge them
-            const mergedItems = userCart.items.map((item: CartItemDocument) => ({
+            const mergedItems = userCart.items.map((item: CartItem) => ({
                 productId: item.productId,
                 selectedVariantItemIds: [...item.selectedVariantItemIds],
                 quantity: item.quantity,
@@ -268,7 +269,7 @@ export async function mergeCarts(sessionId: string, userId: string): Promise<Car
     }
 }
 
-export async function getCartForCurrentSession(): Promise<Cart | null> {
+export async function getCartForCurrentSession(): Promise<CartPlain | null> {
     const session = await getStorefrontSession();
     if (!session) {
         return null;

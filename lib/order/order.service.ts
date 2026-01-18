@@ -1,11 +1,12 @@
 import 'server-only';
-import { OrderModel, OrderDocument, Order, toOrder, OrderStatus, OrderItemDocument } from '@/lib/models/order.model';
+import { OrderModel, Order, toOrder, OrderStatus, OrderItem, OrderPlain } from '@/lib/models/order.model';
 import { CreateOrderInput } from './order.schema';
 import { AppError } from '@/lib/errors/app-error';
 import { connectDB } from '@/lib/db/mongo-client';
 import { decrementStock } from '@/lib/product/product.service';
+import { DocumentType } from '@typegoose/typegoose';
 
-export async function createOrder(data: CreateOrderInput): Promise<Order> {
+export async function createOrder(data: CreateOrderInput): Promise<OrderPlain> {
     await connectDB();
 
     const doc = new OrderModel(data);
@@ -14,7 +15,7 @@ export async function createOrder(data: CreateOrderInput): Promise<Order> {
     return toOrder(doc);
 }
 
-export async function getOrderById(id: string): Promise<Order | null> {
+export async function getOrderById(id: string): Promise<OrderPlain | null> {
     await connectDB();
     const doc = await OrderModel.findById(id).populate({
         path: 'items.productId',
@@ -23,13 +24,13 @@ export async function getOrderById(id: string): Promise<Order | null> {
     return doc ? toOrder(doc) : null;
 }
 
-export async function getOrderByStripeSessionId(stripeSessionId: string): Promise<Order | null> {
+export async function getOrderByStripeSessionId(stripeSessionId: string): Promise<OrderPlain | null> {
     await connectDB();
     const doc = await OrderModel.findOne({ stripeSessionId });
     return doc ? toOrder(doc) : null;
 }
 
-export async function updateOrderStatus(id: string, status: OrderStatus, stripeSessionId?: string): Promise<Order> {
+export async function updateOrderStatus(id: string, status: OrderStatus, stripeSessionId?: string): Promise<OrderPlain> {
     await connectDB();
 
     const order = await OrderModel.findById(id);
@@ -41,7 +42,7 @@ export async function updateOrderStatus(id: string, status: OrderStatus, stripeS
     // Check if we are transitioning to PAID for the first time
     if (status === 'paid' && order.status !== 'paid') {
         console.log(`[OrderService] Order ${id} paid. Decrementing stock.`);
-        await decrementStock(order.items.map((item: OrderItemDocument) => ({
+        await decrementStock(order.items.map((item: OrderItem) => ({
             productId: item.productId.toString(),
             quantity: item.quantity
         })));
@@ -63,7 +64,7 @@ export async function listOrders(params: {
     status?: OrderStatus;
     page?: number;
     limit?: number;
-}): Promise<{ orders: Order[]; total: number }> {
+}): Promise<{ orders: OrderPlain[]; total: number }> {
     await connectDB();
 
     const query: any = {};

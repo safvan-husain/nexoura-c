@@ -1,62 +1,64 @@
-import { Schema, model, models, Document, Types } from 'mongoose';
+import 'reflect-metadata';
+import * as typegoose from '@typegoose/typegoose';
+import * as UserModel from '../../auth/user.model';
 
-export interface WishlistItemDocument {
-    productId: string;
-    selectedVariantItemIds: string[];
-    createdAt: Date;
+// Subdocument for wishlist items
+export class WishlistItem {
+    @typegoose.prop({ required: true, type: String })
+    public productId!: string;
+
+    @typegoose.prop({ type: () => [String], default: [] })
+    public selectedVariantItemIds!: string[];
+
+    @typegoose.prop({ default: () => new Date(), type: Date })
+    public createdAt!: Date;
 }
 
-export interface WishlistDocument extends Document {
-    sessionId?: string;
-    userId?: Types.ObjectId;
-    items: WishlistItemDocument[];
-    createdAt: Date;
-    updatedAt: Date;
-}
-
-const WishlistItemSchema = new Schema<WishlistItemDocument>(
-    {
-        productId: { type: String, required: true },
-        selectedVariantItemIds: { type: [String], default: [] },
-        createdAt: { type: Date, default: Date.now },
-    },
-    { _id: false }
-);
-
-const WishlistSchema = new Schema<WishlistDocument>(
-    {
-        sessionId: { type: String, index: true },
-        userId: { type: Schema.Types.ObjectId, ref: 'User', index: true },
-        items: [WishlistItemSchema],
-    },
-    {
+@typegoose.modelOptions({
+    schemaOptions: {
         timestamps: true,
+        collection: 'wishlists'
     }
-);
+})
+@typegoose.index({ sessionId: 1 }, { unique: true, sparse: true })
+@typegoose.index({ userId: 1 }, { unique: true, sparse: true })
+export class Wishlist {
+    @typegoose.prop({ index: true, type: String })
+    public sessionId?: string;
 
-// Compound index to ensure one wishlist per session/user
-WishlistSchema.index({ sessionId: 1 }, { unique: true, sparse: true });
-WishlistSchema.index({ userId: 1 }, { unique: true, sparse: true });
+    @typegoose.prop({ ref: () => UserModel.User, index: true, type: typegoose.mongoose.Schema.Types.ObjectId })
+    public userId?: typegoose.Ref<UserModel.User>;
 
-export const WishlistModel = models.Wishlist || model<WishlistDocument>('Wishlist', WishlistSchema);
+    @typegoose.prop({ type: () => [WishlistItem], default: [] })
+    public items!: WishlistItem[];
 
-export interface WishlistItem {
+    public createdAt!: Date;
+    public updatedAt!: Date;
+}
+
+if (!(global as any).WishlistModel) {
+    (global as any).WishlistModel = typegoose.getModelForClass(Wishlist);
+}
+export const WishlistModel = (global as any).WishlistModel;
+
+// Plain object interfaces for serialization
+export interface WishlistItemPlain {
     productId: string;
     selectedVariantItemIds: string[];
     createdAt: string;
 }
 
-export interface Wishlist {
+export interface WishlistPlain {
     id: string;
     sessionId?: string;
     userId?: string;
-    items: WishlistItem[];
+    items: WishlistItemPlain[];
     createdAt: string;
     updatedAt: string;
 }
 
-export function toWishlist(doc: WishlistDocument): Wishlist {
-    const wishlist: Wishlist = {
+export function toWishlist(doc: typegoose.DocumentType<Wishlist>): WishlistPlain {
+    const wishlist: WishlistPlain = {
         id: (doc._id as any).toString(),
         sessionId: doc.sessionId,
         userId: doc.userId?.toString(),

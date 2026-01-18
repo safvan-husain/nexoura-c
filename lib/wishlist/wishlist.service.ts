@@ -3,16 +3,17 @@ import 'server-only';
 import { connectDB } from '@/lib/db/mongo-client';
 import { AppError } from '@/lib/errors/app-error';
 import { getStorefrontSession } from '@/lib/storefront-session';
-import { StorefrontSession } from '@/lib/storefront-session/model/storefront-session.model';
+import { StorefrontSessionPlain } from '@/lib/storefront-session/model/storefront-session.model';
 import {
     Wishlist,
     WishlistModel,
-    WishlistDocument,
-    WishlistItemDocument,
+    WishlistPlain,
+    WishlistItem,
     toWishlist,
 } from './model/wishlist.model';
 import { AddToWishlistInput, RemoveFromWishlistInput } from './wishlist.schema';
 import { Types } from 'mongoose';
+import { DocumentType } from '@typegoose/typegoose';
 
 function normalizeVariantItemIds(ids: string[]): string[] {
     const unique = Array.from(new Set(ids.filter(Boolean)));
@@ -20,7 +21,7 @@ function normalizeVariantItemIds(ids: string[]): string[] {
     return unique;
 }
 
-export async function getWishlist(session: StorefrontSession): Promise<Wishlist | null> {
+export async function getWishlist(session: StorefrontSessionPlain): Promise<WishlistPlain | null> {
     await connectDB();
     if (session.userId) {
         const userList = await WishlistModel.findOne({ userId: session.userId });
@@ -30,7 +31,7 @@ export async function getWishlist(session: StorefrontSession): Promise<Wishlist 
     return doc ? toWishlist(doc) : null;
 }
 
-async function getOrCreateWishlistDocument(session: StorefrontSession): Promise<WishlistDocument> {
+async function getOrCreateWishlistDocument(session: StorefrontSessionPlain): Promise<DocumentType<Wishlist>> {
     await connectDB();
     if (session.userId) {
         const userList = await WishlistModel.findOne({ userId: session.userId });
@@ -50,7 +51,7 @@ async function getOrCreateWishlistDocument(session: StorefrontSession): Promise<
     return doc;
 }
 
-export async function addItemToWishlist(params: AddToWishlistInput & { session: StorefrontSession }): Promise<Wishlist> {
+export async function addItemToWishlist(params: AddToWishlistInput & { session: StorefrontSessionPlain }): Promise<WishlistPlain> {
     const { session, productId, selectedVariantItemIds: inputVariantIds } = params;
     const selectedVariantItemIds = normalizeVariantItemIds(inputVariantIds || []);
 
@@ -75,13 +76,13 @@ export async function addItemToWishlist(params: AddToWishlistInput & { session: 
     return toWishlist(doc);
 }
 
-export async function removeItemFromWishlist(params: RemoveFromWishlistInput & { session: StorefrontSession }): Promise<Wishlist> {
+export async function removeItemFromWishlist(params: RemoveFromWishlistInput & { session: StorefrontSessionPlain }): Promise<WishlistPlain> {
     const { session, productId, selectedVariantItemIds: inputVariantIds } = params;
     const selectedVariantItemIds = normalizeVariantItemIds(inputVariantIds || []);
 
     const doc = await getOrCreateWishlistDocument(session);
 
-    doc.items = (doc.items as any).filter((item: WishlistItemDocument) => {
+    doc.items = (doc.items as any).filter((item: WishlistItem) => {
         if (item.productId !== productId) return true;
         const normalizedExisting = normalizeVariantItemIds(item.selectedVariantItemIds || []);
         const isSame =
@@ -94,14 +95,14 @@ export async function removeItemFromWishlist(params: RemoveFromWishlistInput & {
     return toWishlist(doc);
 }
 
-export async function clearWishlist(session: StorefrontSession): Promise<Wishlist> {
+export async function clearWishlist(session: StorefrontSessionPlain): Promise<WishlistPlain> {
     const doc = await getOrCreateWishlistDocument(session);
     doc.items = [];
     await doc.save();
     return toWishlist(doc);
 }
 
-export async function mergeWishlists(sessionId: string, userId: string): Promise<Wishlist> {
+export async function mergeWishlists(sessionId: string, userId: string): Promise<WishlistPlain> {
     await connectDB();
     const guestWishlist = await WishlistModel.findOne({ sessionId });
     const userWishlist = await WishlistModel.findOne({ userId });
@@ -144,7 +145,7 @@ export async function mergeWishlists(sessionId: string, userId: string): Promise
     return toWishlist(userWishlist);
 }
 
-export async function getWishlistForCurrentSession(): Promise<Wishlist | null> {
+export async function getWishlistForCurrentSession(): Promise<WishlistPlain | null> {
     const session = await getStorefrontSession();
     if (!session) {
         return null;

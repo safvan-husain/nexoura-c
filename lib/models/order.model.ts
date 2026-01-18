@@ -1,74 +1,79 @@
-import { Schema, model, models, Document, Types } from 'mongoose';
-import { BillingDetails } from '@/lib/order/billing-details.schema';
+import 'reflect-metadata';
+import * as typegoose from '@typegoose/typegoose';
+import type { BillingDetails } from '@/lib/order/billing-details.schema';
+import { Product } from './product.model';
+import * as UserModel from '../auth/user.model';
 
 export type OrderStatus = 'pending' | 'paid' | 'cancelled' | 'failed' | 'completed';
 
-export interface OrderItemDocument {
-    productId: Types.ObjectId;
-    productName: string;
-    productImage?: string;
-    quantity: number;
-    unitPrice: number;
-    selectedOptions?: Record<string, string>;
+// Subdocument for order items
+export class OrderItem {
+    @typegoose.prop({ ref: () => Product, required: true, type: typegoose.mongoose.Schema.Types.ObjectId })
+    public productId!: typegoose.Ref<Product>;
+
+    @typegoose.prop({ required: true, type: String })
+    public productName!: string;
+
+    @typegoose.prop({ type: String })
+    public productImage?: string;
+
+    @typegoose.prop({ required: true, min: 1, type: Number })
+    public quantity!: number;
+
+    @typegoose.prop({ required: true, type: Number })
+    public unitPrice!: number;
+
+    @typegoose.prop({ type: typegoose.mongoose.Schema.Types.Mixed })
+    public selectedOptions?: Record<string, string>;
 }
 
-export interface OrderDocument extends Document {
-    sessionId: string;
-    userId?: Types.ObjectId;
-    items: OrderItemDocument[];
-    totalAmount: number;
-    currency: string;
-    status: OrderStatus;
-    stripeSessionId?: string;
-    billingDetails?: BillingDetails;
-    createdAt: Date;
-    updatedAt: Date;
-}
-
-const OrderItemSchema = new Schema<OrderItemDocument>({
-    productId: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
-    productName: { type: String, required: true },
-    productImage: String,
-    quantity: { type: Number, required: true, min: 1 },
-    unitPrice: { type: Number, required: true },
-    selectedOptions: Schema.Types.Mixed,
-}, { _id: false });
-
-const OrderSchema = new Schema<OrderDocument>(
-    {
-        sessionId: { type: String, required: true, index: true },
-        userId: { type: Schema.Types.ObjectId, ref: 'User', index: true },
-        items: [OrderItemSchema],
-        totalAmount: { type: Number, required: true },
-        currency: { type: String, required: true, default: 'usd' },
-        status: {
-            type: String,
-            enum: ['pending', 'paid', 'cancelled', 'failed', 'completed'],
-            default: 'pending',
-            index: true
-        },
-        stripeSessionId: { type: String, unique: true, sparse: true, index: true },
-        billingDetails: {
-            email: String,
-            firstName: String,
-            lastName: String,
-            country: String,
-            streetAddress: String,
-            city: String,
-            state: String,
-            phone: String,
-            zip: String,
-            orderNotes: String,
-        },
-    },
-    {
+@typegoose.modelOptions({
+    schemaOptions: {
         timestamps: true,
+        collection: 'orders'
     }
-);
+})
+export class Order {
+    @typegoose.prop({ required: true, index: true, type: String })
+    public sessionId!: string;
 
-export const OrderModel = models.Order || model<OrderDocument>('Order', OrderSchema);
+    @typegoose.prop({ ref: () => UserModel.User, index: true, type: typegoose.mongoose.Schema.Types.ObjectId })
+    public userId?: typegoose.Ref<UserModel.User>;
 
-export interface OrderItem {
+    @typegoose.prop({ type: () => [OrderItem], default: [] })
+    public items!: OrderItem[];
+
+    @typegoose.prop({ required: true, type: Number })
+    public totalAmount!: number;
+
+    @typegoose.prop({ required: true, default: 'usd', type: String })
+    public currency!: string;
+
+    @typegoose.prop({
+        enum: ['pending', 'paid', 'cancelled', 'failed', 'completed'],
+        default: 'pending',
+        index: true,
+        type: String
+    })
+    public status!: OrderStatus;
+
+    @typegoose.prop({ unique: true, sparse: true, index: true, type: String })
+    public stripeSessionId?: string;
+
+    @typegoose.prop({ type: () => Object })
+    public billingDetails?: BillingDetails;
+
+    public createdAt!: Date;
+    public updatedAt!: Date;
+}
+
+if (!(global as any).OrderModel) {
+    (global as any).OrderModel = typegoose.getModelForClass(Order);
+}
+export const OrderModel = (global as any).OrderModel;
+
+// Plain object interfaces for serialization
+export interface OrderItemPlain {
     productId: string;
     productName: string;
     productImage?: string;
@@ -79,11 +84,11 @@ export interface OrderItem {
     currentPrice?: number;
 }
 
-export interface Order {
+export interface OrderPlain {
     id: string;
     sessionId: string;
     userId?: string;
-    items: OrderItem[];
+    items: OrderItemPlain[];
     totalAmount: number;
     currency: string;
     status: OrderStatus;
@@ -93,21 +98,26 @@ export interface Order {
     updatedAt: string;
 }
 
-export function toOrder(doc: OrderDocument): Order {
-    const order: Order = {
+export function toOrder(doc: typegoose.DocumentType<Order>): OrderPlain {
+    const order: OrderPlain = {
         id: (doc._id as any).toString(),
         sessionId: doc.sessionId,
         userId: doc.userId?.toString(),
-        items: doc.items.map(item => ({
-            productId: item.productId.toString(),
-            productName: item.productName,
-            productImage: item.productImage,
-            quantity: item.quantity,
-            unitPrice: item.unitPrice,
-            selectedOptions: item.selectedOptions,
-            productSlug: (item.productId as any).slug,
-            currentPrice: (item.productId as any).price,
-        })),
+        items: doc.items.map(item => {
+            // Check if productId is populated (object) or just an ObjectId
+            const isPopulated = typeof item.productId === 'object' && item.productId !== null;
+
+            return {
+                productId: item.productId.toString(),
+                productName: item.productName,
+                productImage: item.productImage,
+                quantity: item.quantity,
+                unitPrice: item.unitPrice,
+                selectedOptions: item.selectedOptions,
+                productSlug: isPopulated ? (item.productId as any).slug : undefined,
+                currentPrice: isPopulated ? (item.productId as any).price : undefined,
+            };
+        }),
         totalAmount: doc.totalAmount,
         currency: doc.currency,
         status: doc.status,
