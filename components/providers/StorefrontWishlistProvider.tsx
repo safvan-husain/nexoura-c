@@ -34,7 +34,7 @@ export function StorefrontWishlistProvider({ children }: { children: React.React
                 const res = await fetch('/api/storefront/wishlist');
                 if (res.ok) {
                     const data = await res.json();
-                    setItems(data.items || []);
+                    setItems(data?.items || []);
                 }
             } catch (error) {
                 console.error('Failed to fetch wishlist:', error);
@@ -84,7 +84,7 @@ export function StorefrontWishlistProvider({ children }: { children: React.React
                 await handleApiError(res, showToast);
             } else {
                 const data = await res.json();
-                setItems(data.items || []);
+                setItems(data?.items || []);
                 showToast(
                     exists ? 'Removed from wishlist' : 'Added to wishlist',
                     'success'

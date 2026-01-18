@@ -3,6 +3,7 @@ import { RegisterSchema } from '@/lib/auth/auth.schema';
 import { registerUser } from '@/lib/auth/auth.service';
 import { bindSessionToUser, ensureStorefrontSession } from '@/lib/storefront-session';
 import { mergeWishlists } from '@/lib/wishlist/wishlist.service';
+import { mergeCarts } from '@/lib/cart/cart.service';
 import { catchError, AppError } from '@/lib/errors/app-error';
 
 export async function POST(req: NextRequest) {
@@ -20,6 +21,9 @@ export async function POST(req: NextRequest) {
 
         // Merge guest wishlist into user account
         await mergeWishlists(sessionId, user.id);
+
+        // Merge guest cart into user account
+        await mergeCarts(sessionId, user.id);
 
         return NextResponse.json(user, { status: 201 });
     } catch (err) {

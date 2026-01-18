@@ -6,6 +6,7 @@ import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useProducts } from '@/lib/hooks/use-products';
 import { useStorefrontWishlist } from '@/components/providers/StorefrontWishlistProvider';
+import { useStorefrontCart } from '@/components/providers/StorefrontCartProvider';
 import { useStorefrontSession } from '@/components/providers/StorefrontSessionProvider';
 
 const SearchIcon = () => (
@@ -61,8 +62,8 @@ export function NavbarClient() {
     const router = useRouter();
     const { products } = useProducts();
     const { wishlistCount } = useStorefrontWishlist();
+    const { cartCount } = useStorefrontCart();
     const { session, refreshSession } = useStorefrontSession();
-    console.log("is serach active", isSearchActive);
 
     const isHomePage = pathname === '/';
     const isOverlayOpen = searchParams.get('view') === 'overlay';
@@ -255,9 +256,14 @@ export function NavbarClient() {
                     </div>
 
                     {/* Always Visible: Cart */}
-                    <button className="text-gray-600 hover:text-black transition-colors" aria-label="Cart">
+                    <Link href="/cart" className="text-gray-600 hover:text-black transition-colors relative" aria-label="Cart">
                         <CartIcon />
-                    </button>
+                        {cartCount > 0 && (
+                            <span className="absolute -top-1 -right-1 bg-black text-white text-[10px] w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                                {cartCount}
+                            </span>
+                        )}
+                    </Link>
 
                     {/* Mobile Only: Menu Toggle */}
                     <button

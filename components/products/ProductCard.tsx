@@ -6,6 +6,8 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Product } from './ProductViewer'
 import { useStorefrontWishlist } from '@/components/providers/StorefrontWishlistProvider'
+import { useStorefrontCart } from '@/components/providers/StorefrontCartProvider'
+import { ShoppingBag } from 'lucide-react'
 
 interface ProductCardProps {
     product: Product
@@ -20,6 +22,7 @@ const HeartIcon = ({ filled }: { filled: boolean }) => (
         strokeWidth={1.5}
         stroke="currentColor"
         className="w-5 h-5"
+        aria-hidden="true"
     >
         <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
     </svg>
@@ -27,12 +30,19 @@ const HeartIcon = ({ filled }: { filled: boolean }) => (
 
 export default function ProductCard({ product, index = 0 }: ProductCardProps) {
     const { isInWishlist, toggleWishlistItem } = useStorefrontWishlist()
+    const { addToCart } = useStorefrontCart()
     const inWishlist = isInWishlist(product._id)
 
     const handleWishlistClick = (e: React.MouseEvent) => {
         e.preventDefault()
         e.stopPropagation()
         toggleWishlistItem(product._id)
+    }
+
+    const handleAddToCart = (e: React.MouseEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+        addToCart(product._id)
     }
 
     return (
@@ -53,12 +63,22 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
                 {/* Wishlist Button */}
                 <button
                     onClick={handleWishlistClick}
+                    aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
                     className={`absolute top-6 right-6 p-3 rounded-full backdrop-blur-md transition-all duration-300 z-10 ${inWishlist
-                            ? 'bg-black text-white'
-                            : 'bg-white/80 text-black hover:bg-black hover:text-white'
+                        ? 'bg-black text-white'
+                        : 'bg-white/80 text-black hover:bg-black hover:text-white'
                         }`}
                 >
                     <HeartIcon filled={inWishlist} />
+                </button>
+
+                {/* Add to Cart Button */}
+                <button
+                    onClick={handleAddToCart}
+                    aria-label="Add to cart"
+                    className="absolute top-20 right-6 p-3 rounded-full bg-white/80 backdrop-blur-md text-black hover:bg-black hover:text-white transition-all duration-300 z-10 opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0"
+                >
+                    <ShoppingBag className="w-5 h-5" aria-hidden="true" />
                 </button>
 
                 {/* Hover Overlay */}

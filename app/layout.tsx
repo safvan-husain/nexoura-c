@@ -6,6 +6,7 @@ import "./globals.css";
 import { ToastProvider } from "@/components/ui/Toast";
 import { StorefrontSessionProvider } from "@/components/providers/StorefrontSessionProvider";
 import { StorefrontWishlistProvider } from "@/components/providers/StorefrontWishlistProvider";
+import { StorefrontCartProvider } from "@/components/providers/StorefrontCartProvider";
 import { ErrorToastHandler } from "@/components/ErrorToastHandler";
 import { getStorefrontSession } from "@/lib/storefront-session";
 
@@ -46,7 +47,9 @@ async function StorefrontSessionWrapper({ children }: { children: React.ReactNod
   return (
     <StorefrontSessionProvider initialSession={session}>
       <StorefrontWishlistProvider>
-        {children}
+        <StorefrontCartProvider>
+          {children}
+        </StorefrontCartProvider>
       </StorefrontWishlistProvider>
     </StorefrontSessionProvider>
   );
