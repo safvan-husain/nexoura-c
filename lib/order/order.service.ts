@@ -1,10 +1,10 @@
 import 'server-only';
-import { OrderModel, Order, toOrder, OrderStatus, OrderItem, OrderPlain } from '@/lib/models/order.model';
+import { OrderModel, IOrder, toOrder, OrderStatus, IOrderItem, OrderPlain } from '@/lib/models/order.model';
 import { CreateOrderInput } from './order.schema';
 import { AppError } from '@/lib/errors/app-error';
 import { connectDB } from '@/lib/db/mongo-client';
 import { decrementStock } from '@/lib/product/product.service';
-import { DocumentType } from '@typegoose/typegoose';
+
 
 export async function createOrder(data: CreateOrderInput): Promise<OrderPlain> {
     await connectDB();
@@ -42,7 +42,7 @@ export async function updateOrderStatus(id: string, status: OrderStatus, stripeS
     // Check if we are transitioning to PAID for the first time
     if (status === 'paid' && order.status !== 'paid') {
         console.log(`[OrderService] Order ${id} paid. Decrementing stock.`);
-        await decrementStock(order.items.map((item: OrderItem) => ({
+        await decrementStock(order.items.map((item: IOrderItem) => ({
             productId: item.productId.toString(),
             quantity: item.quantity
         })));

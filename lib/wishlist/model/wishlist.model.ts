@@ -1,45 +1,54 @@
-import 'reflect-metadata';
-import * as typegoose from '@typegoose/typegoose';
-import * as UserModel from '../../auth/user.model';
+import mongoose, { Schema, Document, Model, Types } from 'mongoose';
 
-// Subdocument for wishlist items
-export class WishlistItem {
-    @typegoose.prop({ required: true, type: String })
-    public productId!: string;
-
-    @typegoose.prop({ type: () => [String], default: [] })
-    public selectedVariantItemIds!: string[];
-
-    @typegoose.prop({ default: () => new Date(), type: Date })
-    public createdAt!: Date;
+// Subdocument interface for wishlist items
+export interface IWishlistItem {
+    productId: string;
+    selectedVariantItemIds: string[];
+    createdAt: Date;
 }
 
-@typegoose.modelOptions({
-    schemaOptions: {
-        timestamps: true,
-        collection: 'wishlists'
-    }
-})
-@typegoose.index({ sessionId: 1 }, { unique: true, sparse: true })
-@typegoose.index({ userId: 1 }, { unique: true, sparse: true })
-export class Wishlist {
-    @typegoose.prop({ type: String })
-    public sessionId?: string;
-
-    @typegoose.prop({ ref: () => UserModel.User, type: typegoose.mongoose.Schema.Types.ObjectId })
-    public userId?: typegoose.Ref<UserModel.User>;
-
-    @typegoose.prop({ type: () => [WishlistItem], default: [] })
-    public items!: WishlistItem[];
-
-    public createdAt!: Date;
-    public updatedAt!: Date;
+// Wishlist document interface
+export interface IWishlist extends Document {
+    _id: Types.ObjectId;
+    sessionId?: string;
+    userId?: Types.ObjectId;
+    items: IWishlistItem[];
+    createdAt: Date;
+    updatedAt: Date;
 }
+
+// Subdocument schema for wishlist items
+const WishlistItemSchema = new Schema<IWishlistItem>({
+    productId: { type: String, required: true },
+    selectedVariantItemIds: { type: [String], default: [] },
+    createdAt: { type: Date, default: () => new Date() }
+}, { _id: false });
+
+// Wishlist schema
+const WishlistSchema = new Schema<IWishlist>({
+    sessionId: { type: String },
+    userId: { type: Schema.Types.ObjectId, ref: 'User' },
+    items: { type: [WishlistItemSchema], default: [] }
+}, {
+    timestamps: true,
+    collection: 'wishlists'
+});
+
+// Indexes
+WishlistSchema.index({ sessionId: 1 }, { unique: true, sparse: true });
+WishlistSchema.index({ userId: 1 }, { unique: true, sparse: true });
+
+// Model
+let WishlistModel: Model<IWishlist>;
 
 if (!(global as any).WishlistModel) {
-    (global as any).WishlistModel = typegoose.getModelForClass(Wishlist);
+    WishlistModel = mongoose.model<IWishlist>('Wishlist', WishlistSchema);
+    (global as any).WishlistModel = WishlistModel;
+} else {
+    WishlistModel = (global as any).WishlistModel;
 }
-export const WishlistModel = (global as any).WishlistModel;
+
+export { WishlistModel };
 
 // Plain object interfaces for serialization
 export interface WishlistItemPlain {
@@ -57,15 +66,15 @@ export interface WishlistPlain {
     updatedAt: string;
 }
 
-export function toWishlist(doc: typegoose.DocumentType<Wishlist>): WishlistPlain {
+export function toWishlist(doc: IWishlist): WishlistPlain {
     // Defensive check: ensure items is an array (can be undefined in production)
     const items = Array.isArray(doc.items) ? doc.items : [];
 
     const wishlist: WishlistPlain = {
-        id: (doc._id as any).toString(),
+        id: doc._id.toString(),
         sessionId: doc.sessionId,
         userId: doc.userId?.toString(),
-        items: items.map(item => ({
+        items: items.map((item: IWishlistItem) => ({
             productId: item.productId,
             selectedVariantItemIds: item.selectedVariantItemIds || [],
             createdAt: item.createdAt.toISOString(),

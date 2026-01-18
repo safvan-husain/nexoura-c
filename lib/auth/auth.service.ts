@@ -3,7 +3,7 @@ import 'server-only';
 import { connectDB } from '@/lib/db/mongo-client';
 import { AppError } from '@/lib/errors/app-error';
 import { hashPassword, verifyPassword } from './password';
-import { User, UserModel, toUser, UserPlain } from './user.model';
+import { IUser, UserModel, toUser, UserPlain } from './user.model';
 
 export async function registerUser(email: string, password: string): Promise<UserPlain> {
     await connectDB();

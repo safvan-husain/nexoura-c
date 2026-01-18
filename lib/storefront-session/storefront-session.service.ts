@@ -5,7 +5,7 @@ import { createHash, randomBytes } from 'node:crypto';
 import { connectDB } from '@/lib/db/mongo-client';
 import { AppError } from '@/lib/errors/app-error';
 import {
-    StorefrontSession,
+    IStorefrontSession,
     StorefrontSessionModel,
     StorefrontSessionMetadataPlain,
     buildStorefrontSessionDocument,

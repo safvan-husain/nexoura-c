@@ -1,76 +1,74 @@
-import 'reflect-metadata';
-import * as typegoose from '@typegoose/typegoose';
+import mongoose, { Schema, Document, Model, Types } from 'mongoose';
 import type { BillingDetails } from '@/lib/order/billing-details.schema';
-import { Product } from './product.model';
-import * as UserModel from '../auth/user.model';
 
 export type OrderStatus = 'pending' | 'paid' | 'cancelled' | 'failed' | 'completed';
 
-// Subdocument for order items
-export class OrderItem {
-    @typegoose.prop({ ref: () => Product, required: true, type: typegoose.mongoose.Schema.Types.ObjectId })
-    public productId!: typegoose.Ref<Product>;
-
-    @typegoose.prop({ required: true, type: String })
-    public productName!: string;
-
-    @typegoose.prop({ type: String })
-    public productImage?: string;
-
-    @typegoose.prop({ required: true, min: 1, type: Number })
-    public quantity!: number;
-
-    @typegoose.prop({ required: true, type: Number })
-    public unitPrice!: number;
-
-    @typegoose.prop({ type: typegoose.mongoose.Schema.Types.Mixed })
-    public selectedOptions?: Record<string, string>;
+// Subdocument interface for order items
+export interface IOrderItem {
+    productId: Types.ObjectId;
+    productName: string;
+    productImage?: string;
+    quantity: number;
+    unitPrice: number;
+    selectedOptions?: Record<string, string>;
 }
 
-@typegoose.modelOptions({
-    schemaOptions: {
-        timestamps: true,
-        collection: 'orders'
-    }
-})
-export class Order {
-    @typegoose.prop({ required: true, index: true, type: String })
-    public sessionId!: string;
+// Order document interface
+export interface IOrder extends Document {
+    _id: Types.ObjectId;
+    sessionId: string;
+    userId?: Types.ObjectId;
+    items: IOrderItem[];
+    totalAmount: number;
+    currency: string;
+    status: OrderStatus;
+    stripeSessionId?: string;
+    billingDetails?: BillingDetails;
+    createdAt: Date;
+    updatedAt: Date;
+}
 
-    @typegoose.prop({ ref: () => UserModel.User, index: true, type: typegoose.mongoose.Schema.Types.ObjectId })
-    public userId?: typegoose.Ref<UserModel.User>;
+// Subdocument schema for order items
+const OrderItemSchema = new Schema<IOrderItem>({
+    productId: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
+    productName: { type: String, required: true },
+    productImage: { type: String },
+    quantity: { type: Number, required: true, min: 1 },
+    unitPrice: { type: Number, required: true },
+    selectedOptions: { type: Schema.Types.Mixed }
+}, { _id: false });
 
-    @typegoose.prop({ type: () => [OrderItem], default: [] })
-    public items!: OrderItem[];
-
-    @typegoose.prop({ required: true, type: Number })
-    public totalAmount!: number;
-
-    @typegoose.prop({ required: true, default: 'usd', type: String })
-    public currency!: string;
-
-    @typegoose.prop({
+// Order schema
+const OrderSchema = new Schema<IOrder>({
+    sessionId: { type: String, required: true, index: true },
+    userId: { type: Schema.Types.ObjectId, ref: 'User', index: true },
+    items: { type: [OrderItemSchema], default: [] },
+    totalAmount: { type: Number, required: true },
+    currency: { type: String, required: true, default: 'usd' },
+    status: {
+        type: String,
         enum: ['pending', 'paid', 'cancelled', 'failed', 'completed'],
         default: 'pending',
-        index: true,
-        type: String
-    })
-    public status!: OrderStatus;
+        index: true
+    },
+    stripeSessionId: { type: String, unique: true, sparse: true, index: true },
+    billingDetails: { type: Schema.Types.Mixed }
+}, {
+    timestamps: true,
+    collection: 'orders'
+});
 
-    @typegoose.prop({ unique: true, sparse: true, index: true, type: String })
-    public stripeSessionId?: string;
-
-    @typegoose.prop({ type: () => Object })
-    public billingDetails?: BillingDetails;
-
-    public createdAt!: Date;
-    public updatedAt!: Date;
-}
+// Model
+let OrderModel: Model<IOrder>;
 
 if (!(global as any).OrderModel) {
-    (global as any).OrderModel = typegoose.getModelForClass(Order);
+    OrderModel = mongoose.model<IOrder>('Order', OrderSchema);
+    (global as any).OrderModel = OrderModel;
+} else {
+    OrderModel = (global as any).OrderModel;
 }
-export const OrderModel = (global as any).OrderModel;
+
+export { OrderModel };
 
 // Plain object interfaces for serialization
 export interface OrderItemPlain {
@@ -98,12 +96,12 @@ export interface OrderPlain {
     updatedAt: string;
 }
 
-export function toOrder(doc: typegoose.DocumentType<Order>): OrderPlain {
+export function toOrder(doc: IOrder): OrderPlain {
     const order: OrderPlain = {
-        id: (doc._id as any).toString(),
+        id: doc._id.toString(),
         sessionId: doc.sessionId,
         userId: doc.userId?.toString(),
-        items: doc.items.map(item => {
+        items: doc.items.map((item: IOrderItem) => {
             // Check if productId is populated (object) or just an ObjectId
             const isPopulated = typeof item.productId === 'object' && item.productId !== null;
 

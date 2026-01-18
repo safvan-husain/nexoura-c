@@ -5,15 +5,15 @@ import { AppError } from '@/lib/errors/app-error';
 import { getStorefrontSession } from '@/lib/storefront-session';
 import { StorefrontSessionPlain } from '@/lib/storefront-session/model/storefront-session.model';
 import {
-    Wishlist,
+    IWishlist,
     WishlistModel,
     WishlistPlain,
-    WishlistItem,
+    IWishlistItem,
     toWishlist,
 } from './model/wishlist.model';
 import { AddToWishlistInput, RemoveFromWishlistInput } from './wishlist.schema';
 import { Types } from 'mongoose';
-import { DocumentType } from '@typegoose/typegoose';
+
 
 function normalizeVariantItemIds(ids: string[]): string[] {
     const unique = Array.from(new Set(ids.filter(Boolean)));
@@ -31,7 +31,7 @@ export async function getWishlist(session: StorefrontSessionPlain): Promise<Wish
     return doc ? toWishlist(doc) : null;
 }
 
-async function getOrCreateWishlistDocument(session: StorefrontSessionPlain): Promise<DocumentType<Wishlist>> {
+async function getOrCreateWishlistDocument(session: StorefrontSessionPlain): Promise<IWishlist> {
     await connectDB();
     if (session.userId) {
         const userList = await WishlistModel.findOne({ userId: session.userId });
@@ -82,7 +82,7 @@ export async function removeItemFromWishlist(params: RemoveFromWishlistInput & {
 
     const doc = await getOrCreateWishlistDocument(session);
 
-    doc.items = (doc.items as any).filter((item: WishlistItem) => {
+    doc.items = (doc.items as any).filter((item: IWishlistItem) => {
         if (item.productId !== productId) return true;
         const normalizedExisting = normalizeVariantItemIds(item.selectedVariantItemIds || []);
         const isSame =

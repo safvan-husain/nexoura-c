@@ -1,53 +1,61 @@
-import 'reflect-metadata';
-import * as typegoose from '@typegoose/typegoose';
+import mongoose, { Schema, Document, Model, Types } from 'mongoose';
 import type { BillingDetails } from '@/lib/order/billing-details.schema';
-import * as UserModel from '../../auth/user.model';
 
-// Subdocument for session metadata
-export class StorefrontSessionMetadata {
-    @typegoose.prop({ type: String })
-    public userAgent?: string;
-
-    @typegoose.prop({ type: String })
-    public ipHash?: string;
+// Subdocument interface for session metadata
+export interface IStorefrontSessionMetadata {
+    userAgent?: string;
+    ipHash?: string;
 }
 
-@typegoose.modelOptions({
-    schemaOptions: {
-        timestamps: true,
-        collection: 'storefrontsessions'
-    }
-})
-export class StorefrontSession {
-    @typegoose.prop({ required: true, unique: true, type: String })
-    public sessionId!: string;
-
-    @typegoose.prop({ enum: ['active', 'revoked'], default: 'active', type: String })
-    public status!: 'active' | 'revoked';
-
-    @typegoose.prop({ ref: () => UserModel.User, type: typegoose.mongoose.Schema.Types.ObjectId })
-    public userId?: typegoose.Ref<UserModel.User>;
-
-    @typegoose.prop({ required: true, index: { expires: 0 }, type: Date })
-    public expiresAt!: Date;
-
-    @typegoose.prop({ required: true, type: Date })
-    public lastActiveAt!: Date;
-
-    @typegoose.prop({ type: () => StorefrontSessionMetadata })
-    public metadata?: StorefrontSessionMetadata;
-
-    @typegoose.prop({ type: () => Object })
-    public billingDetails?: BillingDetails;
-
-    public createdAt!: Date;
-    public updatedAt!: Date;
+// StorefrontSession document interface
+export interface IStorefrontSession extends Document {
+    _id: Types.ObjectId;
+    sessionId: string;
+    status: 'active' | 'revoked';
+    userId?: Types.ObjectId;
+    expiresAt: Date;
+    lastActiveAt: Date;
+    metadata?: IStorefrontSessionMetadata;
+    billingDetails?: BillingDetails;
+    createdAt: Date;
+    updatedAt: Date;
 }
+
+// Subdocument schema for session metadata
+const StorefrontSessionMetadataSchema = new Schema<IStorefrontSessionMetadata>({
+    userAgent: { type: String },
+    ipHash: { type: String }
+}, { _id: false });
+
+// StorefrontSession schema
+const StorefrontSessionSchema = new Schema<IStorefrontSession>({
+    sessionId: { type: String, required: true, unique: true },
+    status: {
+        type: String,
+        enum: ['active', 'revoked'],
+        default: 'active'
+    },
+    userId: { type: Schema.Types.ObjectId, ref: 'User' },
+    expiresAt: { type: Date, required: true, index: { expires: 0 } },
+    lastActiveAt: { type: Date, required: true },
+    metadata: { type: StorefrontSessionMetadataSchema },
+    billingDetails: { type: Schema.Types.Mixed }
+}, {
+    timestamps: true,
+    collection: 'storefrontsessions'
+});
+
+// Model
+let StorefrontSessionModel: Model<IStorefrontSession>;
 
 if (!(global as any).StorefrontSessionModel) {
-    (global as any).StorefrontSessionModel = typegoose.getModelForClass(StorefrontSession);
+    StorefrontSessionModel = mongoose.model<IStorefrontSession>('StorefrontSession', StorefrontSessionSchema);
+    (global as any).StorefrontSessionModel = StorefrontSessionModel;
+} else {
+    StorefrontSessionModel = (global as any).StorefrontSessionModel;
 }
-export const StorefrontSessionModel = (global as any).StorefrontSessionModel;
+
+export { StorefrontSessionModel };
 
 // Plain object interfaces for serialization
 export interface StorefrontSessionMetadataPlain {
@@ -68,9 +76,9 @@ export interface StorefrontSessionPlain {
     billingDetails?: BillingDetails;
 }
 
-export function toStorefrontSession(doc: typegoose.DocumentType<StorefrontSession>): StorefrontSessionPlain {
+export function toStorefrontSession(doc: IStorefrontSession): StorefrontSessionPlain {
     const session: StorefrontSessionPlain = {
-        id: (doc._id as any).toString(),
+        id: doc._id.toString(),
         sessionId: doc.sessionId,
         status: doc.status,
         userId: doc.userId?.toString(),
@@ -96,7 +104,7 @@ export function buildStorefrontSessionDocument(
     sessionId: string,
     expiresAt: Date,
     metadata?: StorefrontSessionMetadataPlain
-): Partial<typegoose.DocumentType<StorefrontSession>> {
+): Partial<IStorefrontSession> {
     const now = new Date();
     return {
         sessionId,

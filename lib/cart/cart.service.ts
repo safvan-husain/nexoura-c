@@ -5,16 +5,16 @@ import { AppError } from '@/lib/errors/app-error';
 import { getStorefrontSession } from '@/lib/storefront-session';
 import { StorefrontSessionPlain } from '@/lib/storefront-session/model/storefront-session.model';
 import {
-    Cart,
+    ICart,
     CartModel,
     CartPlain,
-    CartItem,
+    ICartItem,
     toCart,
 } from './model/cart.model';
 import { AddToCartInput, RemoveFromCartInput, UpdateCartItemQuantityInput } from './cart.schema';
 import { Types } from 'mongoose';
 import { ProductModel } from '@/lib/models/product.model';
-import { DocumentType } from '@typegoose/typegoose';
+
 
 async function populateCart(cart: CartPlain): Promise<CartPlain> {
     // Defensive check: ensure items is an array
@@ -81,7 +81,7 @@ export async function getCart(session: StorefrontSessionPlain): Promise<CartPlai
     return cart ? populateCart(cart) : null;
 }
 
-async function getOrCreateCartDocument(session: StorefrontSessionPlain): Promise<DocumentType<Cart>> {
+async function getOrCreateCartDocument(session: StorefrontSessionPlain): Promise<ICart> {
     await connectDB();
     if (session.userId) {
         const userCart = await CartModel.findOne({ userId: session.userId });
@@ -107,7 +107,7 @@ export async function addItemToCart(params: AddToCartInput & { session: Storefro
 
     const doc = await getOrCreateCartDocument(session);
 
-    const existingIndex = doc.items.findIndex((item: CartItem) => {
+    const existingIndex = doc.items.findIndex((item: ICartItem) => {
         if (item.productId !== productId) return false;
         const normalizedExisting = normalizeVariantItemIds(item.selectedVariantItemIds || []);
         if (normalizedExisting.length !== selectedVariantItemIds.length) return false;
@@ -136,7 +136,7 @@ export async function updateCartItemQuantity(params: UpdateCartItemQuantityInput
 
     const doc = await getOrCreateCartDocument(session);
 
-    const existingIndex = doc.items.findIndex((item: CartItem) => {
+    const existingIndex = doc.items.findIndex((item: ICartItem) => {
         if (item.productId !== productId) return false;
         const normalizedExisting = normalizeVariantItemIds(item.selectedVariantItemIds || []);
         if (normalizedExisting.length !== selectedVariantItemIds.length) return false;
@@ -158,7 +158,7 @@ export async function removeItemFromCart(params: RemoveFromCartInput & { session
 
     const doc = await getOrCreateCartDocument(session);
 
-    doc.items = (doc.items as any).filter((item: CartItem) => {
+    doc.items = (doc.items as any).filter((item: ICartItem) => {
         if (item.productId !== productId) return true;
         const normalizedExisting = normalizeVariantItemIds(item.selectedVariantItemIds || []);
         const isSame =
@@ -226,7 +226,7 @@ export async function mergeCarts(sessionId: string, userId: string): Promise<Car
             const userItems = Array.isArray(userCart.items) ? userCart.items : [];
             const guestItems = Array.isArray(guestCart.items) ? guestCart.items : [];
 
-            const mergedItems = userItems.map((item: CartItem) => ({
+            const mergedItems = userItems.map((item: ICartItem) => ({
                 productId: item.productId,
                 selectedVariantItemIds: [...(item.selectedVariantItemIds || [])],
                 quantity: item.quantity,
