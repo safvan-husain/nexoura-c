@@ -13,6 +13,43 @@ import {
 } from './model/cart.model';
 import { AddToCartInput, RemoveFromCartInput, UpdateCartItemQuantityInput } from './cart.schema';
 import { Types } from 'mongoose';
+import { ProductModel } from '@/lib/models/product.model';
+
+async function populateCart(cart: Cart): Promise<Cart> {
+    const productIds = cart.items.map(item => item.productId);
+    if (productIds.length === 0) return cart;
+
+    try {
+        const products = await ProductModel.find({ _id: { $in: productIds } })
+            .select('name slug price images')
+            .lean();
+
+        const productMap = new Map(products.map((p: any) => [p._id.toString(), p]));
+
+        cart.items = cart.items.map(item => {
+            const product: any = productMap.get(item.productId);
+            if (product) {
+                return {
+                    ...item,
+                    product: {
+                        _id: product._id.toString(),
+                        name: product.name,
+                        slug: product.slug,
+                        price: product.price,
+                        images: product.images?.map((img: any) => ({ url: img.url, alt: img.alt })) || []
+                    }
+                };
+            }
+            return item;
+        });
+    } catch (error) {
+        console.error('Failed to populate cart products:', error);
+        const message = error instanceof Error ? error.message : 'Failed to populate cart products';
+        throw new AppError(message, 500, error);
+    }
+
+    return cart;
+}
 
 function normalizeVariantItemIds(ids: string[]): string[] {
     const unique = Array.from(new Set(ids.filter(Boolean)));
@@ -22,12 +59,20 @@ function normalizeVariantItemIds(ids: string[]): string[] {
 
 export async function getCart(session: StorefrontSession): Promise<Cart | null> {
     await connectDB();
+    let cart: Cart | null = null;
     if (session.userId) {
         const userCart = await CartModel.findOne({ userId: session.userId });
-        if (userCart) return toCart(userCart);
+        if (userCart) {
+            cart = toCart(userCart);
+        }
     }
-    const doc = await CartModel.findOne({ sessionId: session.sessionId });
-    return doc ? toCart(doc) : null;
+
+    if (!cart) {
+        const doc = await CartModel.findOne({ sessionId: session.sessionId });
+        cart = doc ? toCart(doc) : null;
+    }
+
+    return cart ? populateCart(cart) : null;
 }
 
 async function getOrCreateCartDocument(session: StorefrontSession): Promise<CartDocument> {
@@ -75,8 +120,9 @@ export async function addItemToCart(params: AddToCartInput & { session: Storefro
     }
 
     await doc.save();
-    return toCart(doc);
+    return populateCart(toCart(doc));
 }
+
 
 export async function updateCartItemQuantity(params: UpdateCartItemQuantityInput & { session: StorefrontSession }): Promise<Cart> {
     const { session, productId, selectedVariantItemIds: inputVariantIds, quantity } = params;
@@ -96,8 +142,9 @@ export async function updateCartItemQuantity(params: UpdateCartItemQuantityInput
         await doc.save();
     }
 
-    return toCart(doc);
+    return populateCart(toCart(doc));
 }
+
 
 export async function removeItemFromCart(params: RemoveFromCartInput & { session: StorefrontSession }): Promise<Cart> {
     const { session, productId, selectedVariantItemIds: inputVariantIds } = params;
@@ -115,15 +162,16 @@ export async function removeItemFromCart(params: RemoveFromCartInput & { session
     });
 
     await doc.save();
-    return toCart(doc);
+    return populateCart(toCart(doc));
 }
 
 export async function clearCart(session: StorefrontSession): Promise<Cart> {
     const doc = await getOrCreateCartDocument(session);
     doc.items = [];
     await doc.save();
-    return toCart(doc);
+    return populateCart(toCart(doc));
 }
+
 
 export async function mergeCarts(sessionId: string, userId: string): Promise<Cart> {
     await connectDB();
@@ -211,7 +259,7 @@ export async function mergeCarts(sessionId: string, userId: string): Promise<Car
         if (!result) {
             throw new AppError('Merge operation failed', 500);
         }
-        return result;
+        return populateCart(result);
     } catch (error) {
         console.error('Merge cart error:', error);
         throw error;

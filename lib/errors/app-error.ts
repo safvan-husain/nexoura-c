@@ -39,12 +39,20 @@ export const catchError = (error: any): { status: number, body: object } => {
   }
 
   if (error instanceof AppError) {
+    const details = error.error instanceof Error ? {
+      ...error.error,
+      name: error.error.name,
+      message: error.error.message,
+      stack: error.error.stack
+    } : error.error;
+
     const result = {
       status: error.statusCode,
       body: {
         error: error.message,
         message: error.message,
-        details: error.error
+        details,
+        stack: error.stack // Include AppError stack as well
       }
     };
     console.log('[catchError] AppError:', result);
@@ -56,7 +64,8 @@ export const catchError = (error: any): { status: number, body: object } => {
     status: 500,
     body: {
       error: "INTERNAL_SERVER_ERROR",
-      message: error instanceof Error ? error.message : 'Unknown error'
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
     }
   };
   console.log('[catchError] UNHANDLED:', result);

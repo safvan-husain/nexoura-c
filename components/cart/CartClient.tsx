@@ -3,7 +3,6 @@
 import React, { useMemo } from 'react';
 import Link from 'next/link';
 import { useStorefrontCart } from '@/components/providers/StorefrontCartProvider';
-import { useProducts } from '@/lib/hooks/use-products';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trash2, Plus, Minus, ShoppingBag } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -16,12 +15,11 @@ const PLACEHOLDER_IMAGE = "https://placehold.co/600x600/f3f4f6/111827?text=Nexou
 
 export default function CartClient() {
     const { items, updateQuantity, removeFromCart, clearCart, isLoading: cartLoading, cartCount } = useStorefrontCart();
-    const { products, loading: productsLoading } = useProducts();
     const [isCheckoutOpen, setIsCheckoutOpen] = React.useState(false);
     const { session } = useStorefrontSession();
     const router = useRouter();
 
-    const isLoading = cartLoading || productsLoading;
+    const isLoading = cartLoading;
 
     const handleCheckout = () => {
         setIsCheckoutOpen(true);
@@ -29,14 +27,13 @@ export default function CartClient() {
 
     const cartDetails = useMemo(() => {
         return items.map(item => {
-            const product = products.find(p => p._id === item.productId);
             return {
                 ...item,
-                product,
-                isUnavailable: !product
+                product: item.product,
+                isUnavailable: !item.product
             };
         });
-    }, [items, products]);
+    }, [items]);
 
     const subtotal = useMemo(() => {
         return cartDetails.reduce((total, item) => {

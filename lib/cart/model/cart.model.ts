@@ -42,8 +42,17 @@ CartSchema.index({ userId: 1 }, { unique: true, sparse: true });
 
 export const CartModel = models.Cart || model<CartDocument>('Cart', CartSchema);
 
+export interface CartProduct {
+    _id: string;
+    name: string;
+    slug: string;
+    price: number;
+    images: { url: string; alt?: string }[];
+}
+
 export interface CartItem {
     productId: string;
+    product?: CartProduct;
     selectedVariantItemIds: string[];
     quantity: number;
     createdAt: string;
