@@ -2,12 +2,12 @@
 
 import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
 import { useStorefrontSession } from './StorefrontSessionProvider';
-import { Cart, CartItem } from '@/lib/cart/model/cart.model';
+import { CartPlain, CartItemPlain } from '@/lib/cart/model/cart.model';
 import { useToast } from '@/components/ui/Toast';
 import { HandledApiError, handleApiError } from '@/lib/utils/api-error-handler';
 
 interface StorefrontCartContextType {
-    items: CartItem[];
+    items: CartItemPlain[];
     isLoading: boolean;
     addToCart: (productId: string, selectedVariantItemIds?: string[], quantity?: number) => Promise<void>;
     updateQuantity: (productId: string, selectedVariantItemIds: string[], quantity: number) => Promise<void>;
@@ -26,7 +26,7 @@ function normalizeVariantItemIds(ids: string[] = []): string {
 export function StorefrontCartProvider({ children }: { children: React.ReactNode }) {
     const { session, isLoading: sessionLoading } = useStorefrontSession();
     const { showToast } = useToast();
-    const [items, setItems] = useState<CartItem[]>([]);
+    const [items, setItems] = useState<CartItemPlain[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     const cartCount = useMemo(() => items.reduce((total, item) => total + item.quantity, 0), [items]);

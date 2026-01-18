@@ -3,9 +3,9 @@ import 'server-only';
 import { connectDB } from '@/lib/db/mongo-client';
 import { AppError } from '@/lib/errors/app-error';
 import { hashPassword, verifyPassword } from './password';
-import { User, UserModel, toUser } from './user.model';
+import { User, UserModel, toUser, UserPlain } from './user.model';
 
-export async function registerUser(email: string, password: string): Promise<User> {
+export async function registerUser(email: string, password: string): Promise<UserPlain> {
     await connectDB();
     const existing = await UserModel.findOne({ email });
     if (existing) {
@@ -25,7 +25,7 @@ export async function registerUser(email: string, password: string): Promise<Use
     return toUser(userDoc);
 }
 
-export async function loginUser(email: string, password: string): Promise<User> {
+export async function loginUser(email: string, password: string): Promise<UserPlain> {
     await connectDB();
     const user = await UserModel.findOne({ email });
 
@@ -41,7 +41,7 @@ export async function loginUser(email: string, password: string): Promise<User> 
     return toUser(user);
 }
 
-export async function getUserById(userId: string): Promise<User | null> {
+export async function getUserById(userId: string): Promise<UserPlain | null> {
     await connectDB();
     const user = await UserModel.findById(userId);
     return user ? toUser(user) : null;

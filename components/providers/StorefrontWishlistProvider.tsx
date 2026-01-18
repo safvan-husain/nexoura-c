@@ -2,12 +2,12 @@
 
 import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
 import { useStorefrontSession } from './StorefrontSessionProvider';
-import { Wishlist, WishlistItem } from '@/lib/wishlist/model/wishlist.model';
+import { WishlistPlain, WishlistItemPlain } from '@/lib/wishlist/model/wishlist.model';
 import { useToast } from '@/components/ui/Toast';
 import { HandledApiError, handleApiError } from '@/lib/utils/api-error-handler';
 
 interface StorefrontWishlistContextType {
-    items: WishlistItem[];
+    items: WishlistItemPlain[];
     isLoading: boolean;
     isInWishlist: (productId: string, selectedVariantItemIds?: string[]) => boolean;
     toggleWishlistItem: (productId: string, selectedVariantItemIds?: string[]) => Promise<void>;
@@ -23,7 +23,7 @@ function normalizeVariantItemIds(ids: string[] = []): string {
 export function StorefrontWishlistProvider({ children }: { children: React.ReactNode }) {
     const { session, isLoading: sessionLoading } = useStorefrontSession();
     const { showToast } = useToast();
-    const [items, setItems] = useState<WishlistItem[]>([]);
+    const [items, setItems] = useState<WishlistItemPlain[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     const wishlistCount = useMemo(() => items.length, [items]);
