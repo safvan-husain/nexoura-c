@@ -1,8 +1,9 @@
 import 'server-only';
-import { OrderModel, OrderDocument, Order, toOrder, OrderStatus } from '@/lib/models/order.model';
+import { OrderModel, OrderDocument, Order, toOrder, OrderStatus, OrderItemDocument } from '@/lib/models/order.model';
 import { CreateOrderInput } from './order.schema';
 import { AppError } from '@/lib/errors/app-error';
 import { connectDB } from '@/lib/db/mongo-client';
+import { decrementStock } from '@/lib/product/product.service';
 
 export async function createOrder(data: CreateOrderInput): Promise<Order> {
     await connectDB();
@@ -28,22 +29,29 @@ export async function getOrderByStripeSessionId(stripeSessionId: string): Promis
 export async function updateOrderStatus(id: string, status: OrderStatus, stripeSessionId?: string): Promise<Order> {
     await connectDB();
 
-    const update: any = { status };
-    if (stripeSessionId) {
-        update.stripeSessionId = stripeSessionId;
-    }
+    const order = await OrderModel.findById(id);
 
-    const doc = await OrderModel.findByIdAndUpdate(
-        id,
-        { $set: update },
-        { new: true }
-    );
-
-    if (!doc) {
+    if (!order) {
         throw new AppError('ORDER_NOT_FOUND', 404, { id });
     }
 
-    return toOrder(doc);
+    // Check if we are transitioning to PAID for the first time
+    if (status === 'paid' && order.status !== 'paid') {
+        console.log(`[OrderService] Order ${id} paid. Decrementing stock.`);
+        await decrementStock(order.items.map((item: OrderItemDocument) => ({
+            productId: item.productId.toString(),
+            quantity: item.quantity
+        })));
+    }
+
+    order.status = status;
+    if (stripeSessionId) {
+        order.stripeSessionId = stripeSessionId;
+    }
+
+    await order.save();
+
+    return toOrder(order);
 }
 
 export async function listOrders(params: {

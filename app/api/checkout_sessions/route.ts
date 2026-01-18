@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { getStorefrontSession } from '@/lib/storefront-session/storefront-session.service';
+import { validateStock } from '@/lib/product/product.service';
 import { createOrder } from '@/lib/order/order.service';
 import { catchError, AppError } from '@/lib/errors/app-error';
 
@@ -29,6 +30,12 @@ export async function POST(req: NextRequest) {
         if (!items || !items.length) {
             throw new AppError('ITEMS_REQUIRED', 400);
         }
+
+        // Validate stock before proceeding
+        await validateStock(items.map((item: any) => ({
+            productId: item.productId,
+            quantity: item.quantity
+        })));
 
         // 1. Create PENDING order
         const orderData = {

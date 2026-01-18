@@ -145,6 +145,7 @@ export async function updateProduct(id: string, data: UpdateProductInput) {
   return product;
 }
 
+
 export async function deleteProduct(id: string) {
   await connectDB();
 
@@ -156,3 +157,40 @@ export async function deleteProduct(id: string) {
 
   return { message: 'Product deleted successfully' };
 }
+
+export async function validateStock(items: { productId: string; quantity: number }[]) {
+  await connectDB();
+
+  for (const item of items) {
+    const product = await ProductModel.findById(item.productId);
+    if (!product) {
+      throw new AppError('PRODUCT_NOT_FOUND', 404, { productId: item.productId });
+    }
+    if (product.stock < item.quantity) {
+      throw new AppError('INSUFFICIENT_STOCK', 409, {
+        message: `Product "${product.name}" has only ${product.stock} items left in stock (requested: ${item.quantity})`,
+        productId: item.productId,
+        available: product.stock,
+        requested: item.quantity
+      });
+    }
+  }
+}
+
+export async function decrementStock(items: { productId: string; quantity: number }[]) {
+  await connectDB();
+
+  console.log('[ProductService] Decrementing stock for items:', JSON.stringify(items));
+
+  const operations = items.map(item => ({
+    updateOne: {
+      filter: { _id: item.productId },
+      update: { $inc: { stock: -item.quantity } }
+    }
+  }));
+
+  if (operations.length > 0) {
+    await ProductModel.bulkWrite(operations);
+  }
+}
+
