@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { BillingDetailsSchema } from '../order/billing-details.schema';
 
 export const StorefrontSessionMetadataSchema = z.object({
     userAgent: z.string().optional(),
@@ -26,6 +27,7 @@ export const StorefrontSessionSchema = z.object({
         userAgent: z.string().optional(),
         ipHash: z.string().optional(),
     }).optional(),
+    billingDetails: BillingDetailsSchema.optional(),
 });
 
 export type StorefrontSessionResponse = z.infer<typeof StorefrontSessionSchema>;

@@ -2,6 +2,9 @@
 
 import { Product } from './ProductViewer'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useState } from 'react'
+import CheckoutModal from '@/components/checkout/CheckoutModal'
+import { useStorefrontSession } from '@/components/providers/StorefrontSessionProvider'
 
 interface ProductDetailsCardProps {
   product: Product
@@ -10,6 +13,8 @@ interface ProductDetailsCardProps {
 export default function ProductDetailsCard({
   product,
 }: ProductDetailsCardProps) {
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false)
+  const { session } = useStorefrontSession()
   const rating = 4.8
   const price = typeof product?.price === 'number' ? product.price : 0
 
@@ -120,32 +125,34 @@ export default function ProductDetailsCard({
           </div>
         </div>
 
-        {/* Stock status - mt-auto keeps this and button at the bottom
-        <div className="mt-auto pt-4 space-y-4">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`stock-${product?._id}`}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              variants={slideVariants}
-              transition={{ ...springTransition, delay: 0.25 }}
-              className="flex flex-wrap gap-3 text-xs"
+        {/* Buy Now Button */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={`actions-${product?._id}`}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            variants={slideVariants}
+            transition={{ ...springTransition, delay: 0.25 }}
+            className="mt-auto pt-4"
+          >
+            <button
+              onClick={() => setIsCheckoutOpen(true)}
+              disabled={product.stock <= 0}
+              className={`w-full bg-black text-white text-[10px] font-bold uppercase tracking-[0.4em] py-4 rounded-xl transition-all hover:bg-gray-900 active:scale-[0.98] disabled:bg-gray-200 disabled:text-gray-400`}
             >
-              <span
-                className={`rounded-full px-4 py-1.5 font-bold uppercase tracking-widest text-[10px] ${(product.stock ?? 0) > 0
-                  ? 'bg-black text-white'
-                  : 'bg-red-100 text-red-800'
-                  }`}
-              >
-                {(product.stock ?? 0) > 0
-                  ? `${product.stock} pieces in stock`
-                  : 'Out of stock'}
-              </span>
-            </motion.div>
-          </AnimatePresence>
-        </div> */}
+              {product.stock > 0 ? 'Buy Now' : 'Out of Stock'}
+            </button>
+          </motion.div>
+        </AnimatePresence>
       </div>
+
+      <CheckoutModal
+        isOpen={isCheckoutOpen}
+        onClose={() => setIsCheckoutOpen(false)}
+        product={product}
+        initialBillingDetails={session?.billingDetails}
+      />
     </div>
   )
 }

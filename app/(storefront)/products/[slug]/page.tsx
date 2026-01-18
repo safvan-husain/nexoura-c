@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Suspense } from 'react'
 import ProductOptions from '@/components/products/ProductOptions'
+import ProductPurchaseAction from '@/components/products/ProductPurchaseAction'
 
 async function ProductContent({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params
@@ -94,17 +95,7 @@ async function ProductContent({ params }: { params: Promise<{ slug: string }> })
                 />
 
                 <div className="mt-auto">
-
-                    <div className="flex gap-4">
-                        <button className="flex-1 bg-black text-white h-14 rounded-2xl font-bold uppercase tracking-[0.2em] hover:bg-gray-900 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-black/10">
-                            Add to Cart
-                        </button>
-                        <button className="w-14 h-14 flex items-center justify-center border-2 border-gray-100 rounded-2xl hover:border-black transition-colors">
-                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                            </svg>
-                        </button>
-                    </div>
+                    <ProductPurchaseAction product={product} />
                 </div>
             </div>
         </div>

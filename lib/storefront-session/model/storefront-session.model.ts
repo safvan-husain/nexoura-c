@@ -1,4 +1,5 @@
 import { Schema, model, models, Document, Types } from 'mongoose';
+import { BillingDetails } from '@/lib/order/billing-details.schema';
 
 export interface StorefrontSessionMetadata {
     userAgent?: string;
@@ -14,6 +15,7 @@ export interface StorefrontSessionDocument extends Document {
     expiresAt: Date;
     lastActiveAt: Date;
     metadata?: StorefrontSessionMetadata;
+    billingDetails?: BillingDetails;
 }
 
 const StorefrontSessionSchema = new Schema<StorefrontSessionDocument>(
@@ -26,6 +28,18 @@ const StorefrontSessionSchema = new Schema<StorefrontSessionDocument>(
         metadata: {
             userAgent: String,
             ipHash: String,
+        },
+        billingDetails: {
+            email: String,
+            firstName: String,
+            lastName: String,
+            country: String,
+            streetAddress: String,
+            city: String,
+            state: String,
+            phone: String,
+            zip: String,
+            orderNotes: String,
         },
     },
     {
@@ -45,6 +59,7 @@ export interface StorefrontSession {
     expiresAt: string;
     lastActiveAt: string;
     metadata?: StorefrontSessionMetadata;
+    billingDetails?: BillingDetails;
 }
 
 export function toStorefrontSession(doc: StorefrontSessionDocument): StorefrontSession {
@@ -57,6 +72,7 @@ export function toStorefrontSession(doc: StorefrontSessionDocument): StorefrontS
         updatedAt: doc.updatedAt.toISOString(),
         expiresAt: doc.expiresAt.toISOString(),
         lastActiveAt: doc.lastActiveAt.toISOString(),
+        billingDetails: doc.billingDetails || undefined,
     };
 
     if (doc.metadata) {

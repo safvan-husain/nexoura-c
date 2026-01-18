@@ -15,6 +15,15 @@ services:
     environment:
       - NODE_ENV=development
       - NEXT_PUBLIC_API_URL=http://localhost:3000
+    # Automatically install dependencies on start to keep volumes in sync
+    command: sh -c "npm install && npm run dev"
+    develop:
+      watch:
+        - path: ./package.json
+          action: rebuild
+        - path: .
+          target: /app
+          action: sync
     restart: always
 
 # Optional: Add a volume for node_modules to persist them and avoid re-installing

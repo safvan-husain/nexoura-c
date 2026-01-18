@@ -1,5 +1,6 @@
 ---
-trigger: glob
+trigger: model_decision
+description: read this before working on the front-end
 globs: app
 ---
 
@@ -44,4 +45,15 @@ This document defines the frontend conventions using Next.js 16 and Cache Compon
 Use only white mode for the storefront, and for the admin panel, we have a manual switching between white and dark mode.
 
 ### Learnings:
-export const dynamic is incompatible with the cacheComponents flag enabled in Next.js 16. With cacheComponents, data fetching defaults to runtime execution (dynamic) unless explicitly cached, so the force-dynamic configuration is redundant and effectively disallowed.
+- **Next.js 16/15 Async APIs**: `params` and `searchParams` in Pages and Layouts are **Promises**. Accessing their properties synchronously (e.g., `params.id`) will cause runtime errors. Always `await` them first or use `React.use()`.
+  ```tsx
+  export default async function Page({ params, searchParams }: { 
+    params: Promise<{ id: string }>, 
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }> 
+  }) {
+    const { id } = await params;
+    const { query } = await searchParams;
+    // ...
+  }
+  ```
+- export const dynamic is incompatible with the cacheComponents flag enabled in Next.js 16. With cacheComponents, data fetching defaults to runtime execution (dynamic) unless explicitly cached, so the force-dynamic configuration is redundant and effectively disallowed.

@@ -224,3 +224,18 @@ export async function unbindSession(sessionId: string): Promise<void> {
         throw new AppError('SESSION_NOT_FOUND', 404);
     }
 }
+
+export async function updateSessionBillingDetails(sessionId: string, billingDetails: any): Promise<StorefrontSession> {
+    await connectDB();
+    const doc = await StorefrontSessionModel.findOneAndUpdate(
+        { sessionId },
+        { $set: { billingDetails, updatedAt: new Date() } },
+        { new: true }
+    );
+
+    if (!doc) {
+        throw new AppError('SESSION_NOT_FOUND', 404);
+    }
+
+    return toStorefrontSession(doc);
+}

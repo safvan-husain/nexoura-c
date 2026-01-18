@@ -25,7 +25,7 @@ async function AdminThemeLoader({ children }: { children: React.ReactNode }) {
                                 <li><Link href="/admin" className="hover:text-slate-300">Dashboard</Link></li>
                                 <li><Link href="/admin/products" className="hover:text-slate-300">Products</Link></li>
                                 <li><Link href="/admin/tags" className="hover:text-slate-300">Tags</Link></li>
-                                <li className="hover:text-slate-300 cursor-pointer text-slate-500">Orders</li>
+                                <li><Link href="/admin/orders" className="hover:text-slate-300">Orders</Link></li>
                             </ul>
                             <div className="border-l border-slate-700 h-6 mx-2" />
                             <ThemeToggle />

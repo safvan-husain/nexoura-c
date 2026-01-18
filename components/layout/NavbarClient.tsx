@@ -44,6 +44,12 @@ const UserIcon = () => (
     </svg>
 );
 
+const PackageIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
+    </svg>
+);
+
 export function NavbarClient() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isSearchActive, setIsSearchActive] = useState(false);
@@ -231,6 +237,9 @@ export function NavbarClient() {
                                 </span>
                             )}
                         </Link>
+                        <Link href="/account/orders" className="text-gray-600 hover:text-black transition-colors" aria-label="Orders">
+                            <PackageIcon />
+                        </Link>
                         {session?.userId ? (
                             <div className="flex items-center gap-4">
                                 <Link href="/account" className="text-gray-600 hover:text-black transition-colors" aria-label="Account">
@@ -320,6 +329,10 @@ export function NavbarClient() {
                                     <HeartIcon />
                                     <span className="text-xs uppercase tracking-wide">Wishlist</span>
                                 </button>
+                                <Link href="/account/orders" onClick={() => setIsMobileMenuOpen(false)} className="flex flex-col items-center gap-2 text-gray-600 hover:text-black">
+                                    <PackageIcon />
+                                    <span className="text-xs uppercase tracking-wide">Orders</span>
+                                </Link>
                                 {/* Cart is already visible in header, but user said 'show all these options' on expand. 
                         Including it here too isn't bad for consistency, or we can skip it. 
                         I'll include it. 
