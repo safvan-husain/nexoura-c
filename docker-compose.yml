@@ -1,0 +1,22 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: nexoura-dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:3000
+    restart: always
+
+# Optional: Add a volume for node_modules to persist them and avoid re-installing
+# however we are mounting the whole directory so we need to be careful with host vs container arch.
+# The /app/node_modules volume in 'app' service handles this by making it an anonymous volume.
