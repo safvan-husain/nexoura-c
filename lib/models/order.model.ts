@@ -75,6 +75,8 @@ export interface OrderItem {
     quantity: number;
     unitPrice: number;
     selectedOptions?: Record<string, string>;
+    productSlug?: string;
+    currentPrice?: number;
 }
 
 export interface Order {
@@ -103,6 +105,8 @@ export function toOrder(doc: OrderDocument): Order {
             quantity: item.quantity,
             unitPrice: item.unitPrice,
             selectedOptions: item.selectedOptions,
+            productSlug: (item.productId as any).slug,
+            currentPrice: (item.productId as any).price,
         })),
         totalAmount: doc.totalAmount,
         currency: doc.currency,

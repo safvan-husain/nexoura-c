@@ -16,7 +16,10 @@ export async function createOrder(data: CreateOrderInput): Promise<Order> {
 
 export async function getOrderById(id: string): Promise<Order | null> {
     await connectDB();
-    const doc = await OrderModel.findById(id);
+    const doc = await OrderModel.findById(id).populate({
+        path: 'items.productId',
+        select: 'slug price name images'
+    });
     return doc ? toOrder(doc) : null;
 }
 
@@ -64,8 +67,12 @@ export async function listOrders(params: {
     await connectDB();
 
     const query: any = {};
-    if (params.userId) query.userId = params.userId;
-    if (params.sessionId) query.sessionId = params.sessionId;
+    // if userId is present, query for user orders else query for session orders
+    if (params.userId) {
+        query.userId = params.userId;
+    } else if (params.sessionId) {
+        query.sessionId = params.sessionId;
+    }
     if (params.status) query.status = params.status;
 
     const page = params.page || 1;

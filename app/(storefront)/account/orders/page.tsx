@@ -85,13 +85,13 @@ export default async function UserOrdersPage() {
                                     <span className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em]">Total Amount</span>
                                 </div>
 
-                                <div className="md:border-l border-gray-100 md:pl-8 flex items-center">
+                                <Link href={`/account/orders/${order.id}`} className="md:border-l border-gray-100 md:pl-8 flex items-center">
                                     <button className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center transition-all group-hover:scale-110 active:scale-95">
                                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                         </svg>
                                     </button>
-                                </div>
+                                </Link>
                             </div>
                         </div>
                     ))}
