@@ -23,10 +23,10 @@ export class WishlistItem {
 @typegoose.index({ sessionId: 1 }, { unique: true, sparse: true })
 @typegoose.index({ userId: 1 }, { unique: true, sparse: true })
 export class Wishlist {
-    @typegoose.prop({ index: true, type: String })
+    @typegoose.prop({ type: String })
     public sessionId?: string;
 
-    @typegoose.prop({ ref: () => UserModel.User, index: true, type: typegoose.mongoose.Schema.Types.ObjectId })
+    @typegoose.prop({ ref: () => UserModel.User, type: typegoose.mongoose.Schema.Types.ObjectId })
     public userId?: typegoose.Ref<UserModel.User>;
 
     @typegoose.prop({ type: () => [WishlistItem], default: [] })
@@ -58,13 +58,16 @@ export interface WishlistPlain {
 }
 
 export function toWishlist(doc: typegoose.DocumentType<Wishlist>): WishlistPlain {
+    // Defensive check: ensure items is an array (can be undefined in production)
+    const items = Array.isArray(doc.items) ? doc.items : [];
+
     const wishlist: WishlistPlain = {
         id: (doc._id as any).toString(),
         sessionId: doc.sessionId,
         userId: doc.userId?.toString(),
-        items: doc.items.map(item => ({
+        items: items.map(item => ({
             productId: item.productId,
-            selectedVariantItemIds: item.selectedVariantItemIds,
+            selectedVariantItemIds: item.selectedVariantItemIds || [],
             createdAt: item.createdAt.toISOString(),
         })),
         createdAt: doc.createdAt.toISOString(),

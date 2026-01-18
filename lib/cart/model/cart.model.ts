@@ -71,13 +71,16 @@ export interface CartPlain {
 }
 
 export function toCart(doc: typegoose.DocumentType<Cart>): CartPlain {
+    // Defensive check: ensure items is an array (can be undefined in production)
+    const items = Array.isArray(doc.items) ? doc.items : [];
+
     const cart: CartPlain = {
         id: (doc._id as any).toString(),
         sessionId: doc.sessionId,
         userId: doc.userId?.toString(),
-        items: doc.items.map(item => ({
+        items: items.map(item => ({
             productId: item.productId,
-            selectedVariantItemIds: item.selectedVariantItemIds,
+            selectedVariantItemIds: item.selectedVariantItemIds || [],
             quantity: item.quantity,
             createdAt: item.createdAt.toISOString(),
         })),

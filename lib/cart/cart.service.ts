@@ -17,6 +17,11 @@ import { ProductModel } from '@/lib/models/product.model';
 import { DocumentType } from '@typegoose/typegoose';
 
 async function populateCart(cart: CartPlain): Promise<CartPlain> {
+    // Defensive check: ensure items is an array
+    if (!Array.isArray(cart.items)) {
+        cart.items = [];
+    }
+
     const productIds = cart.items.map(item => item.productId);
     if (productIds.length === 0) return cart;
 
@@ -217,23 +222,27 @@ export async function mergeCarts(sessionId: string, userId: string): Promise<Car
             }
 
             // Case C: Both exist, merge them
-            const mergedItems = userCart.items.map((item: CartItem) => ({
+            // Defensive check: ensure items arrays exist
+            const userItems = Array.isArray(userCart.items) ? userCart.items : [];
+            const guestItems = Array.isArray(guestCart.items) ? guestCart.items : [];
+
+            const mergedItems = userItems.map((item: CartItem) => ({
                 productId: item.productId,
-                selectedVariantItemIds: [...item.selectedVariantItemIds],
+                selectedVariantItemIds: [...(item.selectedVariantItemIds || [])],
                 quantity: item.quantity,
                 createdAt: item.createdAt,
             }));
 
-            for (const guestItem of guestCart.items) {
+            for (const guestItem of guestItems) {
                 const existingIndex = mergedItems.findIndex((i: any) =>
                     i.productId === guestItem.productId &&
-                    normalizeVariantItemIds(i.selectedVariantItemIds).join(',') === normalizeVariantItemIds(guestItem.selectedVariantItemIds).join(',')
+                    normalizeVariantItemIds(i.selectedVariantItemIds).join(',') === normalizeVariantItemIds(guestItem.selectedVariantItemIds || []).join(',')
                 );
 
                 if (existingIndex === -1) {
                     mergedItems.push({
                         productId: guestItem.productId,
-                        selectedVariantItemIds: [...guestItem.selectedVariantItemIds],
+                        selectedVariantItemIds: [...(guestItem.selectedVariantItemIds || [])],
                         quantity: guestItem.quantity,
                         createdAt: guestItem.createdAt,
                     });
@@ -241,6 +250,7 @@ export async function mergeCarts(sessionId: string, userId: string): Promise<Car
                     mergedItems[existingIndex].quantity += guestItem.quantity;
                 }
             }
+
 
             await CartModel.updateOne(
                 { _id: userCart._id },
