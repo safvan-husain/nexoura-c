@@ -1,6 +1,6 @@
 'use server'
 
-import { revalidateTag } from 'next/cache'
+import { updateTag, revalidateTag, revalidatePath } from 'next/cache'
 import { createProduct, updateProduct, deleteProduct } from '@/lib/product/product.service'
 
 export async function createProductAction(formData: FormData) {
@@ -24,8 +24,13 @@ export async function createProductAction(formData: FormData) {
 
     const product = await createProduct(productData);
 
-    revalidateTag('products', 'max')
-    return { success: true, data: product }
+    updateTag('products')
+    revalidatePath('/admin/products')
+    revalidatePath('/')
+    revalidatePath('/products')
+
+    // Serialize to plain object to avoid Maximum call stack size exceeded on RSC pass-back
+    return { success: true, data: JSON.parse(JSON.stringify(product)) }
   } catch (error: any) {
     console.error('[ProductAction] createProductAction error:', error);
     return { error: error.message || 'Failed to create product' }
@@ -53,9 +58,19 @@ export async function updateProductAction(id: string, formData: FormData) {
 
     const product = await updateProduct(id, productData);
 
-    revalidateTag('products', 'max')
-    revalidateTag(`product-${id}`, 'max')
-    return { success: true, data: product }
+    updateTag('products')
+    updateTag(`product-${id}`)
+    if (product.slug) {
+      updateTag(`product-${product.slug}`)
+    }
+
+    revalidatePath('/admin/products')
+    revalidatePath('/')
+    revalidatePath('/products')
+    revalidatePath(`/products/${product.slug}`)
+
+    // Serialize to plain object to avoid Maximum call stack size exceeded on RSC pass-back
+    return { success: true, data: JSON.parse(JSON.stringify(product)) }
   } catch (error: any) {
     console.error('[ProductAction] updateProductAction error:', error);
     return { error: error.message || 'Failed to update product' }
@@ -65,7 +80,11 @@ export async function updateProductAction(id: string, formData: FormData) {
 export async function deleteProductAction(id: string) {
   try {
     await deleteProduct(id);
-    revalidateTag('products', 'max')
+    updateTag('products')
+    updateTag(`product-${id}`)
+    revalidatePath('/admin/products')
+    revalidatePath('/')
+    revalidatePath('/products')
     return { success: true }
   } catch (error: any) {
     console.error('[ProductAction] deleteProductAction error:', error);
