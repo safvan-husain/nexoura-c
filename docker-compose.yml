@@ -24,7 +24,9 @@ services:
         - path: .
           target: /app
           action: sync
-    restart: always
+    restart: no
+    # CRITICAL: change the restart policy to 'always' when deploying to production
+    # restart: always
 
 # Optional: Add a volume for node_modules to persist them and avoid re-installing
 # however we are mounting the whole directory so we need to be careful with host vs container arch.
