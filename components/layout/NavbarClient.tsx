@@ -145,18 +145,35 @@ export function NavbarClient() {
                     </div>
                 </div>
 
-                {/* MOBILE LAYOUT START */}
-                {/* Logo Left-Aligned on Mobile */}
-                <div className="md:hidden absolute left-4 flex items-center">
+                {/* MOBILE LAYOUT: Hamburger left | Logo center | Search+Cart right */}
+                {/* Hamburger – left */}
+                <button
+                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                    className="md:hidden absolute left-4 flex items-center text-gray-600 hover:text-black transition-colors"
+                    aria-label="Menu"
+                >
+                    {isMobileMenuOpen ? <XIcon /> : <MenuIcon />}
+                </button>
+
+                {/* Brand – centered absolutely so it is always visually centered */}
+                <div className="md:hidden absolute left-1/2 -translate-x-1/2 flex items-center">
                     <Link href="/" className="text-2xl font-bold leading-tight text-gray-900 uppercase">
                         EZRRAH
                     </Link>
                 </div>
-                {/* MOBILE LAYOUT END */}
 
 
-                {/* RIGHT SIDE ABSOLUTE ICONS */}
-                <div className="absolute right-4 md:right-8 flex items-center gap-5">
+                {/* RIGHT SIDE ICONS */}
+                <div className="absolute right-4 md:right-8 flex items-center gap-4">
+                    {/* Mobile only: Search button → navigates to /search page */}
+                    <Link
+                        href="/search"
+                        className="md:hidden text-gray-600 hover:text-black transition-colors"
+                        aria-label="Search"
+                    >
+                        <SearchIcon />
+                    </Link>
+
                     {/* Desktop Only Icons */}
                     <div className="hidden md:flex items-center gap-5">
                         {showNavSearch && (
@@ -168,7 +185,7 @@ export function NavbarClient() {
                                             initial={{ opacity: 0, scale: 0.8 }}
                                             animate={{ opacity: 1, scale: 1 }}
                                             exit={{ opacity: 0, scale: 0.8 }}
-                                            onClick={() => { setIsSearchActive(true); console.log("search icon clicked") }}
+                                            onClick={() => { setIsSearchActive(true); }}
                                             className="text-gray-600 hover:text-black transition-colors"
                                             aria-label="Search"
                                         >
@@ -259,7 +276,7 @@ export function NavbarClient() {
                         )}
                     </div>
 
-                    {/* Always Visible: Cart */}
+                    {/* Cart – always visible */}
                     <Link href="/cart" className="text-gray-600 hover:text-black transition-colors relative" aria-label="Cart">
                         <CartIcon />
                         {cartCount > 0 && (
@@ -268,15 +285,6 @@ export function NavbarClient() {
                             </span>
                         )}
                     </Link>
-
-                    {/* Mobile Only: Menu Toggle */}
-                    <button
-                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                        className="md:hidden text-gray-600 hover:text-black transition-colors ml-2"
-                        aria-label="Menu"
-                    >
-                        {isMobileMenuOpen ? <XIcon /> : <MenuIcon />}
-                    </button>
                 </div>
             </div>
 

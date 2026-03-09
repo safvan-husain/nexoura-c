@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import React from 'react'
 
 interface FooterProps {
@@ -36,9 +37,11 @@ export default function Footer({ className = '' }: FooterProps) {
                     <ul className="space-y-3">
                         {['Home', 'Products', 'Contact'].map(link => (
                             <li key={link}>
-                                <span className="text-sm text-gray-600 hover:text-gray-900 cursor-pointer transition-colors">
-                                    {link}
-                                </span>
+                                <Link href={link === 'Home' ? '/' : link === 'Products' ? '/products' : '/contact'}>
+                                    <span className="text-sm text-gray-600 hover:text-gray-900 cursor-pointer transition-colors">
+                                        {link}
+                                    </span>
+                                </Link>
                             </li>
                         ))}
                     </ul>
