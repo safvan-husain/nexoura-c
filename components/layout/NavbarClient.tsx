@@ -111,6 +111,10 @@ export function NavbarClient() {
 
     return (
         <nav className="relative z-[110] bg-transparent border-b border-gray-400/70">
+            {/* Flash Sale Banner */}
+            <div className="w-full bg-black text-white text-center py-2 text-xs sm:text-sm tracking-widest uppercase font-medium">
+                ✦ Flash Sale — <span className="font-bold">50% Off</span> Everything ✦
+            </div>
             <div className="relative flex mx-auto h-16 items-center justify-center backdrop-blur-sm px-4 sm:px-6 lg:px-8">
                 {/* ORIGINAL CENTERED LAYOUT (Hidden on Mobile) */}
                 {/* We use the exact structure from the original file for desktop */}

@@ -1,4 +1,5 @@
 import { Navbar } from "@/components/layout/Navbar";
+import ConditionalFooter from "@/components/layout/ConditionalFooter";
 import { Suspense } from "react";
 
 export default function StorefrontLayout({
@@ -12,6 +13,7 @@ export default function StorefrontLayout({
                 <Navbar />
             </Suspense>
             {children}
+            <ConditionalFooter />
         </>
     );
 }

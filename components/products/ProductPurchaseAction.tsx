@@ -26,10 +26,9 @@ export default function ProductPurchaseAction({ product }: ProductPurchaseAction
                 <div className="flex gap-4">
                     <button
                         onClick={() => setIsCheckoutOpen(true)}
-                        disabled={product.stock <= 0}
-                        className="flex-1 bg-black text-white h-14 rounded-2xl font-bold uppercase tracking-[0.2em] hover:bg-gray-900 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-black/10 disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none disabled:scale-100"
+                        className="flex-1 bg-black text-white h-14 rounded-2xl font-bold uppercase tracking-[0.2em] hover:bg-gray-900 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-black/10"
                     >
-                        {product.stock > 0 ? 'Buy Now' : 'Out of Stock'}
+                        Pre-Order
                     </button>
                     <button
                         aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
@@ -54,10 +53,9 @@ export default function ProductPurchaseAction({ product }: ProductPurchaseAction
 
                 <button
                     onClick={() => addToCart(product._id)}
-                    disabled={product.stock <= 0}
-                    className="w-full border-2 border-black text-black h-14 rounded-2xl font-bold uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-all disabled:border-gray-200 disabled:text-gray-400"
+                    className="w-full border-2 border-black text-black h-14 rounded-2xl font-bold uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-all"
                 >
-                    {product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
+                    Add to Cart
                 </button>
             </div>
 

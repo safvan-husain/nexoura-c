@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Suspense } from 'react'
 import ProductOptions from '@/components/products/ProductOptions'
 import ProductPurchaseAction from '@/components/products/ProductPurchaseAction'
+import TrustIndicators from '@/components/products/TrustIndicators'
 
 async function ProductContent({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params
@@ -140,6 +141,11 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                 <Suspense fallback={<ProductLoading />}>
                     <ProductContent params={params} />
                 </Suspense>
+
+                {/* Trust Indicators */}
+                <div className="mt-12">
+                    <TrustIndicators />
+                </div>
             </div>
         </div>
     )

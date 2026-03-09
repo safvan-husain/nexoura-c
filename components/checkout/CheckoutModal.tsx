@@ -67,24 +67,20 @@ export default function CheckoutModal({ isOpen, onClose, product, items, initial
                 throw new Error(data.message || 'Failed to save billing details');
             }
 
-            // 2. Initiate Stripe Checkout
-            const checkoutResp = await fetch('/api/checkout_sessions', {
+            // 2. Create pre-order
+            const preorderResp = await fetch('/api/preorder', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ items: displayItems }),
             });
 
-            const data = await checkoutResp.json();
-            if (!checkoutResp.ok) {
-                throw new Error(data.message || 'Failed to initiate checkout');
+            const data = await preorderResp.json();
+            if (!preorderResp.ok) {
+                throw new Error(data.message || 'Failed to place pre-order');
             }
 
-            // 3. Redirect to Stripe
-            if (data.url) {
-                window.location.href = data.url;
-            } else {
-                throw new Error('No checkout URL received');
-            }
+            // 3. Redirect to success page
+            window.location.href = '/checkout/success';
         } catch (err: any) {
             console.error('Checkout error:', err);
             setError(err.message || 'An unexpected error occurred during checkout.');
@@ -150,7 +146,7 @@ export default function CheckoutModal({ isOpen, onClose, product, items, initial
                                 </div>
                                 <div className="flex justify-between items-center text-sm mt-2">
                                     <span className="text-gray-500">Shipping</span>
-                                    <span className="text-emerald-500 font-bold uppercase text-[10px] tracking-widest">Calculated at Next Step</span>
+                                    <span className="text-emerald-500 font-bold uppercase text-[10px] tracking-widest">To Be Determined</span>
                                 </div>
                                 <div className="flex justify-between items-center text-xl mt-6 pt-6 border-t-2 border-dashed border-gray-200">
                                     <span className="font-black uppercase text-[10px] tracking-[0.3em]">Total</span>
@@ -164,8 +160,8 @@ export default function CheckoutModal({ isOpen, onClose, product, items, initial
                     <div className="flex-1 p-8 overflow-y-auto">
                         <div className="flex justify-between items-center mb-8">
                             <div>
-                                <h2 className="text-2xl font-black uppercase tracking-tight">Checkout</h2>
-                                <p className="text-sm text-gray-400">Enter your billing and shipping details</p>
+                                <h2 className="text-2xl font-black uppercase tracking-tight">Pre-Order</h2>
+                                <p className="text-sm text-gray-400">Enter your details to reserve your order</p>
                             </div>
                             <button
                                 onClick={onClose}

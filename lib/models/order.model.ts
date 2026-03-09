@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document, Model, Types } from 'mongoose';
 import type { BillingDetails } from '@/lib/order/billing-details.schema';
 
-export type OrderStatus = 'pending' | 'paid' | 'cancelled' | 'failed' | 'completed';
+export type OrderStatus = 'preorder' | 'pending' | 'paid' | 'cancelled' | 'failed' | 'completed';
 
 // Subdocument interface for order items
 export interface IOrderItem {
@@ -47,8 +47,8 @@ const OrderSchema = new Schema<IOrder>({
     currency: { type: String, required: true, default: 'usd' },
     status: {
         type: String,
-        enum: ['pending', 'paid', 'cancelled', 'failed', 'completed'],
-        default: 'pending',
+        enum: ['preorder', 'pending', 'paid', 'cancelled', 'failed', 'completed'],
+        default: 'preorder',
         index: true
     },
     stripeSessionId: { type: String, unique: true, sparse: true, index: true },

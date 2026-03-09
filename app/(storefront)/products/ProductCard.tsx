@@ -14,7 +14,7 @@ interface Product {
   images: Array<{ url: string; alt?: string }>
 }
 
-export function ProductCard({ product, index }: { product: Product; index: number }) {
+function ProductCard({ product, index }: { product: Product; index: number }) {
   const primaryImage = product.images[0]?.url
 
   return (
@@ -49,7 +49,7 @@ export function ProductCard({ product, index }: { product: Product; index: numbe
       </div>
 
       <div className="flex flex-col gap-1 px-2">
-        <div className="flex justify-between items-start gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
           <h3 className="text-xl font-bold uppercase leading-tight group-hover:text-gray-600 transition-colors">
             {product.name}
           </h3>

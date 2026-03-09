@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import { getProducts } from '@/lib/api/products'
-import { ProductCard } from './ProductCard'
+import ProductCard from '../../../components/products/ProductCard'
+import TrustInd from '../../../components/products/TrustIndicators'
 import Link from 'next/link'
 
 export default function ProductsPage({
@@ -66,6 +67,13 @@ async function ProductsList({ page, search }: { page: number; search?: string })
         ))}
       </div>
 
+      {/* Trust Indicators */}
+      <div className="mt-16">
+        <TrustInd />
+      </div>
+
+
+
       {data.pagination && data.pagination.totalPages > 1 && (
         <div className="mt-24 pt-12 border-t border-gray-100 flex justify-center items-center gap-8">
           {data.pagination.page > 1 && (
@@ -89,16 +97,6 @@ async function ProductsList({ page, search }: { page: number; search?: string })
           )}
         </div>
       )}
-
-      {/* Footer Branding similar to Overlay */}
-      <div className="mt-24 pt-12 border-t border-gray-100 flex flex-col items-center gap-6 text-center">
-        <p className="text-gray-400 text-sm font-medium uppercase tracking-[0.3em]">Nexoura Premium Collection</p>
-        <div className="flex gap-8">
-          {['Instagram', 'Twitter', 'Facebook'].map(social => (
-            <span key={social} className="text-[10px] font-bold uppercase tracking-widest cursor-pointer hover:text-black transition-colors">{social}</span>
-          ))}
-        </div>
-      </div>
     </>
   )
 }

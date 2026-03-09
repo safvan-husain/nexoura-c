@@ -16,7 +16,7 @@ export const CreateOrderSchema = z.object({
     items: z.array(OrderItemSchema).min(1),
     totalAmount: z.number().min(0),
     currency: z.string().default('usd'),
-    status: z.enum(['pending', 'paid', 'cancelled', 'failed', 'completed']).default('pending'),
+    status: z.enum(['preorder', 'pending', 'paid', 'cancelled', 'failed', 'completed']).default('preorder'),
     billingDetails: BillingDetailsSchema.optional(),
 });
 

@@ -125,7 +125,7 @@ export default function ProductDetailsCard({
           </div>
         </div>
 
-        {/* Buy Now Button */}
+        {/* Buy Now Button
         <AnimatePresence mode="wait">
           <motion.div
             key={`actions-${product?._id}`}
@@ -144,7 +144,7 @@ export default function ProductDetailsCard({
               {product.stock > 0 ? 'Buy Now' : 'Out of Stock'}
             </button>
           </motion.div>
-        </AnimatePresence>
+        </AnimatePresence> */}
       </div>
 
       <CheckoutModal

@@ -206,7 +206,7 @@ export default function BillingDetailsForm({ initialData, onSubmit, isLoading }:
                         </svg>
                         Wait...
                     </>
-                ) : 'Confirm and Checkout'}
+                ) : 'Place Pre-Order'}
             </button>
         </form>
     );

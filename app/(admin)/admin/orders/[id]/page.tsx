@@ -42,10 +42,12 @@ export default async function AdminOrderDetailsPage({
                 <div className="flex gap-4">
                     <div className={`px-6 py-2 rounded-full text-sm font-black uppercase tracking-widest flex items-center gap-2 border ${order.status === 'paid' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
                         order.status === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                        order.status === 'preorder' ? 'bg-blue-50 text-blue-700 border-blue-200' :
                             'bg-gray-50 text-gray-700 border-gray-200'
                         }`}>
                         <span className={`w-2 h-2 rounded-full ${order.status === 'paid' ? 'bg-emerald-500' :
                             order.status === 'pending' ? 'bg-amber-500' :
+                            order.status === 'preorder' ? 'bg-blue-500' :
                                 'bg-gray-500'
                             }`} />
                         {order.status}

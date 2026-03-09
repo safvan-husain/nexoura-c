@@ -176,7 +176,7 @@ export default function CartClient() {
                             </div>
                             <div className="flex justify-between text-gray-400 uppercase tracking-widest text-xs font-bold">
                                 <span>Shipping</span>
-                                <span className="text-white">Calculated at next step</span>
+                                <span className="text-white">To Be Determined</span>
                             </div>
                             <div className="pt-4 border-t border-white/10 flex justify-between items-center">
                                 <span className="font-bold uppercase tracking-widest text-sm">Total</span>
@@ -189,13 +189,13 @@ export default function CartClient() {
                             disabled={cartDetails.length === 0}
                             className="w-full bg-white text-black py-5 rounded-2xl font-black uppercase tracking-[0.2em] hover:bg-gray-200 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:scale-100 disabled:hover:bg-white"
                         >
-                            Checkout
+                            Place Pre-Order
                         </button>
 
                         <p className="text-[10px] text-center text-gray-500 uppercase tracking-widest mt-6 leading-relaxed">
-                            Secured checkout powered by Stripe.
+                            Reserve your items now.
                             <br />
-                            Taxes and shipping calculated at checkout.
+                            You'll be notified when products are ready.
                         </p>
                     </div>
                 </div>

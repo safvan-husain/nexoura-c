@@ -27,7 +27,7 @@ export default async function AdminOrdersPage({
                 </div>
 
                 <div className="flex gap-2">
-                    {['all', 'pending', 'paid', 'completed', 'cancelled'].map((s) => (
+                    {['all', 'preorder', 'pending', 'paid', 'completed', 'cancelled'].map((s) => (
                         <Link
                             key={s}
                             href={`/admin/orders${s === 'all' ? '' : `?status=${s}`}`}
@@ -68,6 +68,7 @@ export default async function AdminOrdersPage({
                                 <td className="px-8 py-6">
                                     <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${order.status === 'paid' ? 'bg-emerald-100 text-emerald-800 border-emerald-200' :
                                         order.status === 'pending' ? 'bg-amber-100 text-amber-800 border-amber-200' :
+                                        order.status === 'preorder' ? 'bg-blue-100 text-blue-800 border-blue-200' :
                                             'bg-gray-100 text-gray-800'
                                         } border`}>
                                         {order.status}
