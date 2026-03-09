@@ -295,7 +295,7 @@ export function NavbarClient() {
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        className="md:hidden bg-white border-t border-gray-100 overflow-hidden absolute w-full z-[120] shadow-xl top-16 left-0"
+                        className="md:hidden bg-white border-t border-gray-100 overflow-hidden absolute w-full z-[120] shadow-xl top-22 left-0"
                     >
                         <div className="flex flex-col p-6 space-y-6">
                             <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-medium text-gray-600 hover:text-black text-center uppercase">
