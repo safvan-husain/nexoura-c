@@ -166,14 +166,23 @@ export function ProductCrousel({
                                     )}
                                 </div>
 
-                                {/* Floor shadow for each product - positioned to stay within card bounds */}
-                                <div
-                                    className={`absolute left-1/2 -translate-x-1/2 rounded-full transition-opacity duration-500 ${i === 2 ? 'w-[65%] h-3 bg-black/70 blur-md' : 'w-[60%] h-4 bg-black/60 blur-lg'}`}
-                                    style={{
-                                        bottom: '18%',
-                                        opacity: i === 2 ? currentPos.opacity * 0.9 : currentPos.opacity * 0.8
-                                    }}
-                                />
+                                {/* Floor shadow for each product - Spread Top Gradient Base + Gradient */}
+                                <>
+                                    <div
+                                        className={`absolute left-1/2 -translate-x-1/2 rounded-full transition-opacity duration-500 z-0 ${i === 2 ? 'w-[50%] h-3 bg-black/40 blur-lg' : 'w-[45%] h-3 bg-black/30 blur-lg'}`}
+                                        style={{
+                                            bottom: '16%',
+                                            opacity: i === 2 ? currentPos.opacity * 0.8 : currentPos.opacity * 0.6
+                                        }}
+                                    />
+                                    <div
+                                        className={`absolute left-1/2 -translate-x-1/2 transition-opacity duration-500 z-0 bg-gradient-to-t to-transparent blur-2xl rounded-t-[100%] ${i === 2 ? 'w-[60%] h-24 from-black/35' : 'w-[50%] h-20 from-black/30'}`}
+                                        style={{
+                                            bottom: '15%',
+                                            opacity: i === 2 ? currentPos.opacity * 0.8 : currentPos.opacity * 0.6
+                                        }}
+                                    />
+                                </>
                             </div>
 
                         </div>
