@@ -24,6 +24,8 @@ export interface Product {
   metadata?: Record<string, any>
   slug: string
   subtitle?: string
+  hasSizes?: boolean
+  sizes?: string[]
 }
 
 interface ProductViewerProps {

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import SizeChartModal from './SizeChartModal';
 
 interface ProductOptionsProps {
     hasColors: boolean;
@@ -17,6 +18,7 @@ export default function ProductOptions({
 }: ProductOptionsProps) {
     const [selectedColor, setSelectedColor] = useState(colors?.[0] || '');
     const [selectedSize, setSelectedSize] = useState(sizes?.[0] || '');
+    const [isSizeChartOpen, setIsSizeChartOpen] = useState(false);
 
     return (
         <div className="flex flex-col sm:flex-row sm:items-start gap-8 sm:gap-16 mt-4 mb-8">
@@ -55,9 +57,17 @@ export default function ProductOptions({
             {/* Size Selection */}
             {hasSizes && sizes.length > 0 && (
                 <div className="space-y-3">
-                    <span className="block text-[10px] font-bold uppercase tracking-widest text-gray-400">
-                        Size: <span className="text-black ml-1 uppercase">{selectedSize}</span>
-                    </span>
+                    <div className="flex items-center gap-4">
+                        <span className="block text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                            Size: <span className="text-black ml-1 uppercase">{selectedSize}</span>
+                        </span>
+                        <button
+                            onClick={() => setIsSizeChartOpen(true)}
+                            className="text-[10px] text-gray-500 hover:text-black underline uppercase tracking-widest whitespace-nowrap mt-0.5"
+                        >
+                            (Size Chart)
+                        </button>
+                    </div>
                     <div className="flex flex-wrap gap-2">
                         {sizes.map((size) => (
                             <button
@@ -74,6 +84,11 @@ export default function ProductOptions({
                     </div>
                 </div>
             )}
+
+            <SizeChartModal 
+                isOpen={isSizeChartOpen} 
+                onClose={() => setIsSizeChartOpen(false)} 
+            />
         </div>
     );
 }

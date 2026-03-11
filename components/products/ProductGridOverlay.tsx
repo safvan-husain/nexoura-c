@@ -98,7 +98,7 @@ export default function ProductGridOverlay({ products, isOpen, onClose }: Produc
                                         </h3>
 
                                         <p className="text-gray-400 text-lg md:text-xl font-medium mb-12 max-w-2xl leading-relaxed">
-                                            Pre-Orders start tomorrow. Be among the first to grab your favorite styles with an exclusive <span className="text-white font-bold bg-white/10 px-2 py-0.5 rounded-md">20% Pre-Order Discount</span>.
+                                            Pre-Orders start tomorrow. Be among the first to grab your favorite styles with an exclusive <span className="text-white font-bold bg-white/10 px-2 py-0.5 rounded-md">50% Pre-Order Discount</span>.
                                         </p>
                                     </div>
 
