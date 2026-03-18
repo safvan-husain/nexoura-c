@@ -124,7 +124,7 @@ export default function ProductGridOverlay({ products, isOpen, onClose }: Produc
                                                 <Zap className="w-6 h-6 text-yellow-500" />
                                             </div>
                                             <h4 className="text-xl font-bold mb-2">Very Limited</h4>
-                                            <p className="text-gray-400 text-sm leading-relaxed">Limited time. Limited pieces. Collection will not be restocked once sold out during pre-order phase.</p>
+                                            <p className="text-gray-400 text-sm leading-relaxed">Limited time, Limited pieces. Collection will not be restocked once sold out during pre-order phase.</p>
                                         </div>
                                     </div>
 
