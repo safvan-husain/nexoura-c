@@ -52,14 +52,14 @@ export function ProductCrousel({
         return newDisplay.reverse();
     };
 
-    // Auto-rotate carousel every 1 second
+    // Auto-rotate carousel every 5 seconds
     useEffect(() => {
         if (products.length < 2) return;
 
         const interval = setInterval(() => {
             const nextIndex = (currentIndex + 1) % products.length;
             setCurrentIndex(nextIndex);
-        }, 1000);
+        }, 5000);
 
         return () => clearInterval(interval);
     }, [currentIndex, products.length, setCurrentIndex]);

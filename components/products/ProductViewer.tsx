@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { ProductCrousel } from './ProductCrousel'
 import ProductDetailsCard from './ProductDetailsCard'
 import ProductGridOverlay from './ProductGridOverlay'
@@ -143,8 +144,9 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
     }
   }, [isOverlayOpen])
 
-  // Scroll/Wheel detection to trigger overlay
+  // Scroll/Wheel and Swipe detection
   useEffect(() => {
+    let touchStartX = 0;
     let touchStartY = 0;
 
     const handleWheel = (e: WheelEvent) => {
@@ -158,34 +160,55 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
     }
 
     const handleTouchStart = (e: TouchEvent) => {
+      touchStartX = e.touches[0].clientX
       touchStartY = e.touches[0].clientY
     }
 
     const handleTouchMove = (e: TouchEvent) => {
       if (isOverlayOpen) return
+      // We handle vertical move only
+    }
 
-      const touchEndY = e.touches[0].clientY
-      const deltaY = touchStartY - touchEndY // Positive if scrolling down (finger moving up)
-      const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 10
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (isOverlayOpen) return
 
-      if (isAtBottom && deltaY > 50) { // Threshold of 50px for mobile
-        setIsOverlayOpen(true)
+      const touchEndX = e.changedTouches[0].clientX
+      const touchEndY = e.changedTouches[0].clientY
+      const deltaX = touchStartX - touchEndX
+      const deltaY = touchStartY - touchEndY
+
+      // Horizontal Swipe
+      if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+        if (deltaX > 0) {
+          handleNext()
+        } else {
+          handlePrevious()
+        }
+      } 
+      // Vertical Swipe (at bottom only)
+      else if (Math.abs(deltaY) > Math.abs(deltaX) && deltaY > 50) {
+        const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 10
+        if (isAtBottom) {
+          setIsOverlayOpen(true)
+        }
       }
     }
 
     window.addEventListener('wheel', handleWheel)
     window.addEventListener('touchstart', handleTouchStart)
     window.addEventListener('touchmove', handleTouchMove)
+    window.addEventListener('touchend', handleTouchEnd)
 
     return () => {
       window.removeEventListener('wheel', handleWheel)
       window.removeEventListener('touchstart', handleTouchStart)
       window.removeEventListener('touchmove', handleTouchMove)
+      window.removeEventListener('touchend', handleTouchEnd)
     }
-  }, [isOverlayOpen])
+  }, [isOverlayOpen, currentIndex, currentImageIndex, products.length, images.length])
 
   return (
-    <div className="relative">
+    <div className="relative group/viewer">
       <div className="w-full h-[93vh] max-w-full overflow-x-hidden flex flex-col lg:flex-row items-center justify-center z-10 gap-4 lg:gap-22 min-h-[50dvh] lg:h-[100vh] px-4 py-4 relative">
         {/* Left Details Card - Absolutely Positioned */}
         <div className="hidden lg:block absolute left-4 bottom-0 w-[20%] z-60">
@@ -195,6 +218,22 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
         </div>
 
         <div className="shrink-0 w-full lg:w-[70%] overflow-hidden relative h-[600px] md:h-full">
+          {/* Navigation Arrows - Repositioned around the main product */}
+          <button
+            onClick={handlePrevious}
+            className="absolute left-[4%] md:left-[26%] top-[30%] md:top-4/10 -translate-y-1/2 z-60 p-2 md:p-4 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-black/30 hover:text-black hover:bg-white/20 hover:border-white/30 transition-all active:scale-90"
+            aria-label="Previous product"
+          >
+            <ChevronLeft size={32} />
+          </button>
+          <button
+            onClick={handleNext}
+            className="absolute right-[4%] md:right-[26%] top-[30%] md:top-4/10 -translate-y-1/2 z-60 p-2 md:p-4 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-black/30 hover:text-black hover:bg-white/20 hover:border-white/30 transition-all active:scale-90"
+            aria-label="Next product"
+          >
+            <ChevronRight size={32} />
+          </button>
+
           <div className="absolute w-[220%] md:w-full left-1/2 -translate-x-1/2 md:left-auto md:translate-x-0 h-full">
             <ProductCrousel
               products={products.map(p => ({
