@@ -87,9 +87,9 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
 
                     {/* Quick Add Button */}
                     <div className="absolute bottom-6 left-1/2 -translate-x-1/2 translate-y-12 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-                        <Link href={`/products/${product.slug}`} className="bg-black text-white px-8 py-3 rounded-xl font-bold text-xs uppercase tracking-widest whitespace-nowrap hover:scale-105 active:scale-95 transition-all inline-block">
+                        <div className="bg-black text-white px-8 py-3 rounded-xl font-bold text-xs uppercase tracking-widest whitespace-nowrap hover:scale-105 active:scale-95 transition-all inline-block cursor-pointer">
                             View Product
-                        </Link>
+                        </div>
                     </div>
                 </div>
 

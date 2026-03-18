@@ -262,7 +262,7 @@ export default function ProductViewer({ products, initialIndex }: ProductViewerP
           </div>
           <input
             type="text"
-            placeholder="SEARCH products"
+            placeholder="type here"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-transparent text-2xl font-black text-transparent [-webkit-text-stroke:1px_rgba(0,0,0,0.4)] placeholder:text-black/20 focus:outline-none focus:border-black focus:[-webkit-text-stroke:1px_black] transition-all uppercase"

@@ -52,14 +52,14 @@ export function ProductCrousel({
         return newDisplay.reverse();
     };
 
-    // Auto-rotate carousel every 5 seconds
+    // Auto-rotate carousel every 2 seconds
     useEffect(() => {
         if (products.length < 2) return;
 
         const interval = setInterval(() => {
             const nextIndex = (currentIndex + 1) % products.length;
             setCurrentIndex(nextIndex);
-        }, 5000);
+        }, 2000);
 
         return () => clearInterval(interval);
     }, [currentIndex, products.length, setCurrentIndex]);
@@ -153,12 +153,14 @@ export function ProductCrousel({
                                 {/* Product image */}
                                 <div className="relative w-full h-full drop-shadow-2xl">
                                     {product.img.length > 0 ? (
-                                        <Image
-                                            src={product.img}
-                                            alt={product.name}
-                                            fill
-                                            className="object-contain"
-                                        />
+                                        <Link href={`/products/${product.slug}`}>
+                                            <Image
+                                                src={product.img}
+                                                alt={product.name}
+                                                fill
+                                                className="object-contain"
+                                            />
+                                        </Link>
                                     ) : (
                                         <div className="bg-white/80 backdrop-blur-sm w-full h-full flex items-center justify-center rounded-lg">
                                             <span className="text-gray-400 text-xs md:text-sm">No image</span>
@@ -188,7 +190,7 @@ export function ProductCrousel({
                         </div>
                     );
                 })}
-                <div className='absolute flex flex-col items-center justify-center bottom-0 left-1/2 z-50 -translate-x-1/2 w-full'>
+                <div className='absolute flex flex-col items-center justify-center pt-10 md:mt-0 bottom-0 md:bottom-10 left-1/2 z-50 -translate-x-1/2 w-full'>
                     {/* Product name carousel - Infinite Vertical Scroller */}
                     <InfiniteVerticalScroller
                         names={products.map(p => p.name)}

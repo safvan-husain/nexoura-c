@@ -208,7 +208,7 @@ export function InfiniteVerticalScroller({
                         margin: 0
                     }}
                 >
-                    <div className={textClassName || "px-4 text-center w-full uppercase font-[family-name:var(--font-mavine)] font-black tracking-[0.05em] text-6xl md:text-8xl text-black"}>
+                    <div className={textClassName || "px-4 text-center w-full uppercase font-[family-name:var(--font-mavine)] font-black tracking-[0.05em] text-4xl md:text-6xl text-black"}>
                         {n}
                     </div>
                 </li>
